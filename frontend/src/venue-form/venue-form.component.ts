@@ -19,15 +19,15 @@ export class VenueFormComponent implements OnInit {
   venueForm!: FormGroup;
   message = '';
   step: number = 1;
-  
+
   venueId: string | null = null;
   isEditMode: boolean = false;
-  
-  existingImages: any[] = []; 
+
+  existingImages: any[] = [];
   imagesToDelete: number[] = [];
   selectedFiles: File[] = [];
   previewUrls: string[] = [];
-  sports: any[] = []; // Za dropdown sportova iz baze
+  sports: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -42,12 +42,12 @@ export class VenueFormComponent implements OnInit {
 
     this.venueForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(200)]],
-      sport_id: ['', [Validators.required]], // Dodato zbog baze
+      sport_id: ['', [Validators.required]],
       country: ['Srbija', [Validators.required, Validators.maxLength(100)]],
       city: ['', [Validators.required, Validators.maxLength(100)]],
       street: ['', [Validators.required, Validators.maxLength(255)]],
-      lat: [null, [Validators.required]], // Dodato za mapu
-      lng: [null, [Validators.required]], // Dodato za mapu
+      lat: [null, [Validators.required]],
+      lng: [null, [Validators.required]],
       price_per_slot: [null, [Validators.required, Validators.min(0.01)]],
       slot_duration_mins: [60, [Validators.required]],
       description: ['', [Validators.maxLength(1000)]]
@@ -79,6 +79,7 @@ export class VenueFormComponent implements OnInit {
   }
 
   onAddressChange(event: AddressResult) {
+    console.log('onAddressChange pozvan:', event);
     this.venueForm.patchValue({
       city: event.city,
       street: event.street,
@@ -86,13 +87,12 @@ export class VenueFormComponent implements OnInit {
       lat: event.lat,
       lng: event.lng
     });
+    console.log('Form vrijednosti nakon patch:', this.venueForm.value);
   }
 
-  // --- STEP LOGIKA ---
   savedWorkingHours: any[] = [];
 
   nextStep() {
-
     if (this.step === 1) {
       if (this.venueForm.valid) {
         this.step = 2;

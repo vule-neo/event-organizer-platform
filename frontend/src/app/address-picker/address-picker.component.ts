@@ -1,4 +1,5 @@
-import { Component, ElementRef, EventEmitter, NgZone, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output,
+         ElementRef, ViewChild, AfterViewInit, NgZone, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface AddressResult {
@@ -10,53 +11,76 @@ export interface AddressResult {
   lng: number;
 }
 
+declare var google: any;
+
 @Component({
   selector: 'app-address-picker',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './address-picker.component.html',
-  styleUrls: ['./address-picker.component.css']
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AddressPickerComponent implements AfterViewInit {
-  @ViewChild('addressInput') addressInput!: ElementRef;
   @Output() addressSelected = new EventEmitter<AddressResult>();
-
-  private autocomplete: google.maps.places.Autocomplete | undefined;
+  @ViewChild('addressInput') addressInput!: ElementRef;
 
   constructor(private ngZone: NgZone) {}
 
   ngAfterViewInit() {
-    // Inicijalizacija Google Autocomplete-a
-    this.autocomplete = new google.maps.places.Autocomplete(this.addressInput.nativeElement, {
-      componentRestrictions: { country: ['rs', 'ba', 'me', 'hr'] }, // Balkan filter
-      fields: ['address_components', 'geometry', 'formatted_address']
-    });
+    const autocomplete = new google.maps.places.Autocomplete(
+      this.addressInput.nativeElement,
+      {
+        componentRestrictions: { country: ['rs', 'ba', 'me', 'hr'] },
+        fields: ['formatted_address', 'address_components', 'geometry']
+      }
+    );
 
-    this.autocomplete.addListener('place_changed', () => {
+    autocomplete.addListener('place_changed', () => {
       this.ngZone.run(() => {
-        const place = this.autocomplete?.getPlace();
+        const place = autocomplete.getPlace();
+        console.log('Place:', place);
 
-        if (!place || !place.geometry) {
-          console.error('Adresa nije pronađena ili nema koordinata.');
+        if (!place.geometry) {
+          console.warn('Nema geometry za odabranu adresu');
           return;
         }
 
         const result: AddressResult = {
           formatted: place.formatted_address || '',
-          street: this.getComponent(place, 'route') + ' ' + this.getComponent(place, 'street_number'),
-          city: this.getComponent(place, 'locality') || this.getComponent(place, 'administrative_area_level_2'),
-          country: this.getComponent(place, 'country'),
-          lat: place.geometry.location!.lat(),
-          lng: place.geometry.location!.lng()
+          street: this.getStreet(place),
+          city: this.getCity(place),
+          country: this.getCountry(place),
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
         };
 
+        console.log('Emitujem:', result);
         this.addressSelected.emit(result);
       });
     });
   }
 
-  private getComponent(place: google.maps.places.PlaceResult, type: string): string {
-    const comp = place.address_components?.find(c => c.types.includes(type));
-    return comp ? comp.long_name : '';
+  private getStreet(place: any): string {
+    const components = place.address_components;
+    if (!components) return '';
+    const route = components.find((c: any) => c.types.includes('route'))?.long_name || '';
+    const number = components.find((c: any) => c.types.includes('street_number'))?.long_name || '';
+    return number ? `${route} ${number}`.trim() : route.trim();
+  }
+
+  private getCity(place: any): string {
+    const components = place.address_components;
+    if (!components) return '';
+    return components.find((c: any) =>
+      c.types.includes('locality') ||
+      c.types.includes('postal_town') ||
+      c.types.includes('administrative_area_level_2')
+    )?.long_name || '';
+  }
+
+  private getCountry(place: any): string {
+    const components = place.address_components;
+    if (!components) return '';
+    return components.find((c: any) => c.types.includes('country'))?.long_name || '';
   }
 }

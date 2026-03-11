@@ -2,12 +2,12 @@
   <label class="form-label">Pretraži adresu (Google Maps) *</label>
   <div class="input-group">
     <span class="input-icon">📍</span>
-    <input 
-      #addressInput 
-      type="text" 
-      class="google-input" 
+    <input
+      #addressInput
+      type="text"
       placeholder="Unesite ulicu i broj..."
-      (keydown.enter)="$event.preventDefault()"
+      class="address-input"
+      autocomplete="off"
     />
   </div>
   <small class="text-muted">Obavezno odaberite predlog iz liste.</small>

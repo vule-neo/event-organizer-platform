@@ -1,0 +1,15 @@
+# Node
+node_modules/
+npm-debug.log
+
+# Environment variables
+.env
+
+# Angular build
+dist/
+
+# OS
+.DS_Store
+
+# VS Code
+.vscode/

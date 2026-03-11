@@ -1,0 +1,55 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <div class="d-inline-block p-3 rounded-circle bg-primary bg-opacity-10 mb-3">
+              <i class="bi bi-person-badge fs-1 text-primary"></i>
+            </div>
+            <h3 class="fw-bold">Moj Profil</h3>
+            <p class="text-muted small">Vaši podaci su automatski učitani</p>
+          </div>
+
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-uppercase text-muted">Email (Nalog)</label>
+              <input type="email" formControlName="email" class="form-control bg-light border-0" readonly>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label class="form-label small fw-bold text-uppercase text-muted">Ime</label>
+                <input type="text" formControlName="first_name" class="form-control border-2" 
+                       placeholder="Učitavanje..."
+                       [class.is-invalid]="profileForm.get('first_name')?.invalid && profileForm.get('first_name')?.touched">
+              </div>
+              <div class="col">
+                <label class="form-label small fw-bold text-uppercase text-muted">Prezime</label>
+                <input type="text" formControlName="last_name" class="form-control border-2"
+                       placeholder="Učitavanje..."
+                       [class.is-invalid]="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-uppercase text-muted">Telefon</label>
+              <input type="text" formControlName="phone" class="form-control border-2" placeholder="+381 6..."
+                     [class.is-invalid]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
+              <div class="form-text small italic">Ovaj broj će koristiti vlasnici terena da vas kontaktiraju.</div>
+            </div>
+
+            <div *ngIf="message" [class]="'alert small border-0 py-2 ' + (isError ? 'alert-danger' : 'alert-success')">
+              <i class="bi" [ngClass]="isError ? 'bi-exclamation-triangle' : 'bi-check-circle'"></i> {{ message }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm" [disabled]="loading || profileForm.invalid">
+              <span *ngIf="!loading">AŽURIRAJ PODATKE</span>
+              <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

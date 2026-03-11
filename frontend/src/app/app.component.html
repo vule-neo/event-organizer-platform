@@ -1,0 +1,40 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a routerLink="/explore" class="logo">
+      <span class="icon">⚽</span> Sportski Termin
+    </a>
+
+    <div class="nav-links">
+      <a routerLink="/explore" routerLinkActive="active">Istraži terene</a>
+
+      <ng-container *ngIf="!authService.isLoggedIn()">
+        <a routerLink="/login" class="btn-login">Prijavi se</a>
+        <a routerLink="/userRegister" class="btn-register">Registracija</a>
+      </ng-container>
+
+      <ng-container *ngIf="authService.isLoggedIn()">
+        
+        <ng-container *ngIf="authService.hasRole('owner')">
+          <a routerLink="/venues/ownerVenues" routerLinkActive="active">Moji Tereni</a>
+          <a routerLink="/venues/reports" routerLinkActive="active">Rezervacije kod mene</a>
+          <a routerLink="/venues/new" class="btn-create" routerLinkActive="active">+ Novi teren</a>
+        </ng-container>
+
+        <ng-container *ngIf="authService.hasRole('customer')">
+          <a routerLink="/my-bookings" routerLinkActive="active">Moje rezervacije</a>
+        </ng-container>
+
+        <div class="user-menu">
+          <a routerLink="/profile" class="user-profile-link" routerLinkActive="active">
+            <i class="bi bi-person-circle"></i> {{ authService.getUserName() }}
+          </a>
+          <button class="btn-logout" (click)="logout()">Odjavi se</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</nav>
+
+<main class="content-wrapper">
+  <router-outlet></router-outlet>
+</main>

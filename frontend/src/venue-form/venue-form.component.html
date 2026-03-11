@@ -1,0 +1,115 @@
+<div class="container">
+  <div class="stepper">
+    <div [class.active]="step === 1">1. Osnovni podaci</div>
+    <div [class.active]="step === 2">2. Radno vrijeme</div>
+    <div [class.active]="step === 3">3. Slike</div>
+  </div>
+
+  <form [formGroup]="venueForm">
+    
+    <div *ngIf="step === 1" class="form-step">
+      <h2>{{ isEditMode ? 'Izmeni osnovne podatke' : 'Informacije o terenu' }}</h2>
+
+      <div class="field">
+        <label>Naziv terena *</label>
+        <input type="text" formControlName="name" placeholder="npr. Arena Sport" />
+      </div>
+
+      <div class="field">
+        <label>Tip sporta *</label>
+        <select formControlName="sport_id">
+          <option value="" disabled>Odaberite sport</option>
+          <option *ngFor="let s of sports" [value]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <app-address-picker (addressSelected)="onAddressChange($event)"></app-address-picker>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Grad</label>
+          <input type="text" formControlName="city" readonly placeholder="Automatski iz mape..." />
+        </div>
+        <div class="field">
+          <label>Ulica i broj</label>
+          <input type="text" formControlName="street" readonly placeholder="Automatski iz mape..." />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Cijena po terminu (RSD) *</label>
+          <input type="number" formControlName="price_per_slot" />
+        </div>
+        <div class="field">
+          <label>Trajanje termina *</label>
+          <select formControlName="slot_duration_mins">
+            <option [value]="60">60 minuta</option>
+            <option [value]="90">90 minuta</option>
+            <option [value]="120">120 minuta</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Opis terena</label>
+        <textarea formControlName="description" rows="4" class="description-area"></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-next" (click)="nextStep()">Dalje: Radno vrijeme →</button>
+      </div>
+    </div>
+
+    <div *ngIf="step === 2" class="form-step">
+      <h2>Radno vrijeme</h2>
+      <app-working-hours #workingHoursComp></app-working-hours>
+      <div class="actions">
+        <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
+        <button type="button" class="btn-next" (click)="nextStep()">Dalje: Slike →</button>
+      </div>
+    </div>
+
+    <div *ngIf="step === 3" class="form-step">
+      <h2>Slike terena (Max 20)</h2>
+      
+      <div *ngIf="existingImages.length > 0">
+        <p>Trenutne slike na serveru:</p>
+        <div class="preview-grid mb-3">
+          <div *ngFor="let img of existingImages; let i = index" class="preview-item">
+            <img [src]="'http://localhost:5000' + img.url" />
+            <button type="button" class="btn-remove" (click)="removeExistingImage(img.id, i)">×</button>
+          </div>
+        </div>
+        <hr>
+      </div>
+
+      <div class="upload-area" (click)="fileInput.click()">
+        <input #fileInput type="file" (change)="onFileSelected($event)" multiple accept="image/*" style="display: none;" />
+        <div class="upload-placeholder">
+          <span class="icon">📷</span>
+          <p>Dodaj nove slike</p>
+        </div>
+      </div>
+
+      <div class="preview-grid" *ngIf="previewUrls.length > 0">
+        <div *ngFor="let url of previewUrls; let i = index" class="preview-item new-image-preview">
+          <img [src]="url" />
+          <button type="button" class="btn-remove" (click)="removeImage(i)">×</button>
+          <span class="badge">Novo</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
+        <button type="button" class="btn-submit" (click)="createVenue()" [disabled]="venueForm.invalid">
+          {{ isEditMode ? 'Sačuvaj izmene' : 'Završi i kreiraj teren' }}
+        </button>
+      </div>
+    </div>
+
+    <p class="msg-error" *ngIf="message">{{ message }}</p>
+  </form>
+</div>

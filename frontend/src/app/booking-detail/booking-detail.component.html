@@ -1,0 +1,59 @@
+<div class="container py-5" *ngIf="booking">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="bg-success p-4 text-white text-center">
+          <h3 class="mb-0 fw-bold">Potvrda Rezervacije</h3>
+          <small class="opacity-75">ID: #{{ booking.id.substring(0,8) }}</small>
+        </div>
+        
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark">{{ booking.venue_name }}</h2>
+            <p class="text-muted">📍 {{ booking.address }}, {{ booking.city }}</p>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="small text-muted text-uppercase">Datum</label>
+              <p class="fw-bold fs-5">{{ booking.start_time | date:'dd.MM.yyyy' }}</p>
+            </div>
+            <div class="col-6 text-end">
+              <label class="small text-muted text-uppercase">Vreme</label>
+              <p class="fw-bold fs-5">{{ booking.start_time | date:'HH:mm' }} - {{ booking.end_time | date:'HH:mm' }}</p>
+            </div>
+          </div>
+
+          <hr class="my-4" style="border-style: dashed;">
+
+          <div class="mb-4">
+            <label class="small text-muted text-uppercase d-block mb-2">Klijent</label>
+            <div class="d-flex align-items-center bg-light p-3 rounded-3">
+              <div class="avatar me-3 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                {{ booking.first_name[0] }}{{ booking.last_name[0] }}
+              </div>
+              <div>
+                <h6 class="mb-0 fw-bold">{{ booking.first_name }} {{ booking.last_name }}</h6>
+                <small class="text-muted">{{ booking.phone }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center bg-success bg-opacity-10 p-3 rounded-3 mb-4">
+            <span class="fw-bold">Ukupno plaćeno:</span>
+            <span class="h4 mb-0 fw-bold text-success">{{ booking.price_paid }} RSD</span>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-lg rounded-3" (click)="printTicket()">
+              🖨️ Odštampaj potvrdu
+            </button>
+            <button class="btn btn-outline-secondary" routerLink="/my-bookings">
+              Nazad na listu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

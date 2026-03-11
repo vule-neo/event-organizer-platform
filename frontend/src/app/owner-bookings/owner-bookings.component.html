@@ -1,0 +1,76 @@
+<div class="container py-4">
+  <h2 class="fw-bold mb-4">Pregled Rezervacija i Zarade 📈</h2>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-success text-white shadow-sm border-0 rounded-4 p-3 h-100">
+        <small class="text-uppercase opacity-75">Ukupna Zarada</small>
+        <h2 class="fw-bold mb-0">{{ stats.totalEarnings | number }} RSD</h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-primary text-white shadow-sm border-0 rounded-4 p-3 h-100">
+        <small class="text-uppercase opacity-75">Aktivne Rezervacije</small>
+        <h2 class="fw-bold mb-0">{{ stats.confirmedCount }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">Teren</th>
+            <th>Klijent</th>
+            <th>Datum i Vreme</th>
+            <th>Iznos</th>
+            <th>Status</th>
+            <th>Kontakt</th>
+            <th class="pe-4 text-center">Detalji</th> </tr>
+        </thead>
+        <tbody>
+  <tr *ngFor="let b of bookings">
+    <td class="ps-4 fw-bold">{{ b.venue_name }}</td>
+    <td>{{ b.client_name }}</td>
+    <td>
+      <div class="small fw-bold">{{ b.start_time | date:'dd.MM.yyyy' }}</div>
+      <div class="text-muted small">{{ b.start_time | date:'HH:mm' }} - {{ b.end_time | date:'HH:mm' }}</div>
+    </td>
+    <td class="text-success fw-bold">{{ b.price_paid }} RSD</td>
+    <td>
+      <span class="badge" [ngClass]="{
+        'bg-success': b.status === 'confirmed',
+        'bg-danger': b.status === 'cancelled_by_owner',
+        'bg-warning text-dark': b.status === 'cancelled_by_client',
+        'bg-secondary': b.status === 'completed'
+      }">
+        {{ b.status === 'confirmed' ? 'Potvrđeno' : 
+           b.status === 'cancelled_by_owner' ? 'Otkazao Vlasnik' : 
+           b.status === 'cancelled_by_client' ? 'Otkazao Klijent' : b.status }}
+      </span>
+    </td>
+    <td>
+      <a [href]="'tel:' + b.client_phone" class="btn btn-sm btn-outline-primary me-1" title="Pozovi">📞</a>
+      <a [href]="'mailto:' + b.client_email" class="btn btn-sm btn-outline-secondary" title="Pošalji Email">📧</a>
+    </td>
+    
+    <td class="pe-4 text-center">
+      <div class="d-flex justify-content-center gap-2">
+        <button [routerLink]="['/bookings', b.id]" class="btn btn-sm btn-dark rounded-pill px-3">
+          🎫 Detalji
+        </button>
+
+        <button *ngIf="b.status === 'confirmed'" 
+                (click)="cancelBooking(b.id)" 
+                class="btn btn-sm btn-outline-danger rounded-pill px-3">
+          🚫 Otkaži
+        </button>
+      </div>
+    </td>
+  </tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>

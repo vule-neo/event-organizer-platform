@@ -1,0 +1,26 @@
+<div class="register-form">
+  <h2>Registracija</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="register()">
+    <input type="text" formControlName="first_name" placeholder="Ime" />
+    <input type="text" formControlName="last_name" placeholder="Prezime" />
+    <input type="email" formControlName="email" placeholder="Email" />
+    <input type="tel" formControlName="phone" placeholder="Telefon" />
+    <input type="password" formControlName="password" placeholder="Lozinka" />
+
+    <div class="role-selection">
+      <p>Registrujem se kao:</p>
+      <label class="radio-label">
+        <input type="radio" value="customer" formControlName="role"> 
+        <span>Igrač</span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" value="owner" formControlName="role"> 
+        <span>Vlasnik terena</span>
+      </label>
+    </div>
+
+    <button type="submit" [disabled]="registerForm.invalid">Registruj se</button>
+  </form>
+  
+  <p *ngIf="message">{{ message }}</p>
+</div>

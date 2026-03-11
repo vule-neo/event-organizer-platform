@@ -1,0 +1,18 @@
+<div class="working-hours-container">
+  <div class="day-row" *ngFor="let day of workingHours">
+    <div class="day-info">
+      <input type="checkbox" [(ngModel)]="day.is_open" id="day-{{day.day_of_week}}">
+      <label [for]="day.day_of_week"><strong>{{ day.day_name }}</strong></label>
+    </div>
+
+    <div class="time-pickers" *ngIf="day.is_open; else closedText">
+      <input type="time" [(ngModel)]="day.open_time">
+      <span> do </span>
+      <input type="time" [(ngModel)]="day.close_time">
+    </div>
+
+    <ng-template #closedText>
+      <span class="status-closed">Zatvoreno</span>
+    </ng-template>
+  </div>
+</div>

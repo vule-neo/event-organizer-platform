@@ -1,0 +1,154 @@
+<div class="container py-4" *ngIf="!loading && venue">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="main-image-container mb-3">
+        <img [src]="activeImageUrl || 'assets/no-image.jpg'" class="img-fluid rounded shadow" alt="Teren">
+      </div>
+
+      <div class="d-flex gap-2 mb-4 overflow-auto pb-2" *ngIf="venue.images?.length > 1">
+        <div *ngFor="let img of venue.images" 
+             (click)="setActiveImage(img.url)"
+             class="thumb-item" 
+             [class.active-thumb]="activeImageUrl.includes(img.url)">
+          <img [src]="'http://localhost:5000' + img.url" class="rounded cursor-pointer shadow-sm">
+        </div>
+      </div>
+
+      <div class="venue-header mb-4">
+  <h1 class="display-5 fw-bold">{{ venue.name }}</h1>
+  
+  <div class="d-flex align-items-center mb-3">
+    <ng-container *ngIf="venue.avg_rating; else noRating">
+      <div class="text-warning me-2 fs-4">
+        <span *ngFor="let star of [1,2,3,4,5]">
+          <i class="bi" [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
+        </span>
+      </div>
+      <span class="fw-bold fs-5 me-2">{{ venue.avg_rating }}</span>
+      <span class="text-muted">({{ venue.review_count }} recenzija)</span>
+    </ng-container>
+    
+    <ng-template #noRating>
+      <span class="badge bg-light text-dark border">✨ Novo na platformi</span>
+    </ng-template>
+  </div>
+
+  <p class="text-muted fs-5">
+    <span class="me-2">📍</span>{{ venue.street }}, {{ venue.city }}
+  </p>
+  <div class="text-success fw-bold fs-3">
+      {{ venue.price_per_slot }} RSD <span class="fs-6 text-muted fw-normal">/ termin</span>
+    </div>
+</div>
+
+      <hr>
+
+      <div class="venue-description mb-5">
+        <h3>O terenu</h3>
+        <p class="lead">{{ venue.description || 'Vlasnik nije uneo opis za ovaj teren.' }}</p>
+      </div>
+
+      <div class="working-hours">
+        <h3>Radno vreme</h3>
+        <div class="card border-0 bg-light">
+          <div class="card-body">
+            <div *ngFor="let day of venue.working_hours" class="d-flex justify-content-between py-2 border-bottom">
+              <span class="fw-bold">{{ dayNames[day.day_of_week] }}</span>
+              <span *ngIf="day.is_open" class="text-dark">
+                <span class="badge bg-white text-success border border-success-subtle fw-medium">
+                  {{ day.open_time.substring(0,5) }} - {{ day.close_time.substring(0,5) }}
+                </span>
+              </span>
+              <span *ngIf="!day.is_open" class="text-danger-emphasis small fw-bold">Zatvoreno</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="sticky-top" style="top: 100px;">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="venue.avg_rating">
+              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
+                ★ {{ venue.avg_rating }}
+              </span>
+              <small class="text-muted">{{ venue.review_count }} ocena korisnika</small>
+            </div>
+            <h4 class="mb-3 fw-bold">Rezerviši termin</h4>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-uppercase text-muted">Izaberi datum</label>
+              <input type="date" class="form-control form-control-lg border-2" 
+                     [(ngModel)]="selectedDate" 
+                     (change)="onDateChange()"
+                     [min]="today">
+            </div>
+
+            <div class="mb-4" *ngIf="availableSlots.length > 0">
+              <label class="form-label small fw-bold text-uppercase text-muted">Dostupni termini</label>
+              <div class="d-flex flex-wrap gap-2">
+                <button *ngFor="let slot of availableSlots" 
+                        class="btn btn-sm px-3 py-2 fw-bold"
+                        [class.btn-outline-success]="!slot.isOccupied && selectedSlot !== slot"
+                        [class.btn-success]="selectedSlot === slot"
+                        [class.btn-secondary]="slot.isOccupied"
+                        [disabled]="slot.isOccupied"
+                        (click)="selectSlot(slot)">
+                  {{ slot.start }}
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="availableSlots.length === 0" class="alert alert-warning border-0 small">
+              Teren ne radi na odabrani datum.
+            </div>
+
+            <hr *ngIf="selectedSlot">
+            <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="selectedSlot">
+              <div>
+                <span class="d-block small text-muted">Termin:</span>
+                <strong class="text-success">{{ selectedSlot.start }} - {{ selectedSlot.end }}</strong>
+              </div>
+              <div class="text-end">
+                <span class="h3 mb-0 fw-bold">{{ venue.price_per_slot }} RSD</span>
+              </div>
+            </div>
+
+            <button *ngIf="venue?.owner_id !== authService.getUser().id"
+        class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mt-2" 
+        [disabled]="!selectedSlot"
+        (click)="confirmBooking()">
+            POTVRDI REZERVACIJU
+          </button>
+
+          <div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
+            Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id" 
+     class="mt-3 p-3 border rounded-3 bg-light">
+  <h6 class="fw-bold text-danger">Alati za vlasnika</h6>
+  <p class="small text-muted">Blokiraj selektovani termin za ovaj dan.</p>
+  <button class="btn btn-danger btn-sm w-100" 
+          [disabled]="!selectedSlot" 
+          (click)="blockSelectedSlot()">
+    ⛔ BLOKIRAJ TERMIN
+  </button>
+</div>
+
+<div *ngIf="loading" class="text-center my-5">
+  <div class="spinner-grow text-success" role="status"></div>
+  <p class="mt-2">Učitavanje podataka...</p>
+</div>
+
+<div *ngIf="errorMessage" class="container mt-4">
+  <div class="alert alert-danger">{{ errorMessage }}</div>
+</div>

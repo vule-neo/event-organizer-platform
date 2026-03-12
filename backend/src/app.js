@@ -44,6 +44,9 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
+const adminRoutes = require('./routes/admin.routes');
+app.use('/api/admin', adminRoutes);
+
 // POKRETANJE CRON POSLA (Automatizacija statusa)
 cronService.initCron();
 

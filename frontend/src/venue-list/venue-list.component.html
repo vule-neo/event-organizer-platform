@@ -8,10 +8,10 @@
     <div class="filters-bar">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          (input)="applyFilters()" 
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
           placeholder="Pretraži po nazivu ili ulici..."
         />
       </div>
@@ -20,6 +20,14 @@
         <select [(ngModel)]="selectedCity" (change)="applyFilters()">
           <option value="">Svi gradovi</option>
           <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+        </select>
+      </div>
+
+      <!-- NOVO: Sport filter -->
+      <div class="select-box">
+        <select [(ngModel)]="selectedSport" (change)="applyFilters()">
+          <option value="">Svi sportovi</option>
+          <option *ngFor="let sport of sports" [value]="sport.id">{{ sport.name }}</option>
         </select>
       </div>
     </div>
@@ -37,12 +45,11 @@
   <div class="venue-grid" *ngIf="!loading && filteredVenues.length > 0">
     <div class="venue-card" *ngFor="let venue of filteredVenues">
       <div class="card-image position-relative">
-        <img 
-          [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'" 
+        <img
+          [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'"
           alt="{{ venue.name }}"
         />
         <div class="price-tag">{{ venue.price_per_slot }} RSD</div>
-        
         <div class="rating-badge" *ngIf="venue.avg_rating">
           <span class="star">★</span> {{ venue.avg_rating | number:'1.1-1' }}
         </div>
@@ -50,14 +57,17 @@
 
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-1">
-           <div class="card-category">Sportski Teren</div>
-           <div class="review-count" *ngIf="venue.review_count > 0">
-             ({{ venue.review_count }} recenzija)
-           </div>
+          <div class="card-category">
+            <!-- NOVO: Prikaži naziv sporta -->
+            {{ getSportName(venue.sport_id) }}
+          </div>
+          <div class="review-count" *ngIf="venue.review_count > 0">
+            ({{ venue.review_count }} recenzija)
+          </div>
         </div>
-        
+
         <h3>{{ venue.name }}</h3>
-        
+
         <div class="location">
           <span class="icon">📍</span>
           {{ venue.street }}, {{ venue.city }}
@@ -65,13 +75,8 @@
 
         <div class="features">
           <span class="feature">⏱️ {{ venue.slot_duration_mins }} min</span>
-          
-          <span class="feature" *ngIf="venue.avg_rating">
-            ⭐ {{ venue.avg_rating }}
-          </span>
-          <span class="feature text-success" *ngIf="!venue.avg_rating">
-            ✨ Novo
-          </span>
+          <span class="feature" *ngIf="venue.avg_rating">⭐ {{ venue.avg_rating }}</span>
+          <span class="feature text-success" *ngIf="!venue.avg_rating">✨ Novo</span>
         </div>
 
         <button class="btn-details" [routerLink]="['/venues/details', venue.id]">
@@ -85,6 +90,8 @@
     <span class="empty-icon">🏟️</span>
     <h3>Nema pronađenih terena</h3>
     <p>Pokušaj sa drugom pretragom ili drugim gradom.</p>
-    <button (click)="searchTerm = ''; selectedCity = ''; applyFilters()" class="btn-reset">Poništi filtere</button>
+    <button (click)="searchTerm = ''; selectedCity = ''; selectedSport = ''; applyFilters()" class="btn-reset">
+      Poništi filtere
+    </button>
   </div>
 </div>

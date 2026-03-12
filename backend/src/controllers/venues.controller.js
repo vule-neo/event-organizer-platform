@@ -74,3 +74,12 @@ exports.getAllSports = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.toggleActive = async (req, res) => {
+  try {
+    const result = await venueService.toggleVenueActive(req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

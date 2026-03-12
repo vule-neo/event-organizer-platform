@@ -12,8 +12,24 @@ import { RouterModule } from '@angular/router';
 })
 export class OwnerBookingsComponent implements OnInit {
   bookings: any[] = [];
-  stats = { totalEarnings: 0, confirmedCount: 0 };
   loading = true;
+
+  // Osnovne statistike
+  stats = {
+    totalEarnings: 0,
+    confirmedCount: 0,
+    cancelledCount: 0,
+    completedCount: 0
+  };
+
+  // Zarada po terenu
+  earningsByVenue: { name: string, earnings: number, count: number }[] = [];
+
+  // Zarada po mjesecu (poslednjih 6 mjeseci)
+  earningsByMonth: { label: string, earnings: number }[] = [];
+
+  // Najpopularniji termini (sati)
+  popularHours: { hour: string, count: number }[] = [];
 
   constructor(private bookingService: BookingService) {}
 
@@ -22,6 +38,9 @@ export class OwnerBookingsComponent implements OnInit {
       next: (data) => {
         this.bookings = data;
         this.calculateStats();
+        this.calculateEarningsByVenue();
+        this.calculateEarningsByMonth();
+        this.calculatePopularHours();
         this.loading = false;
       },
       error: (err) => console.error(err)
@@ -29,25 +48,94 @@ export class OwnerBookingsComponent implements OnInit {
   }
 
   calculateStats() {
-    const confirmed = this.bookings.filter(b => b.status === 'confirmed' || b.status === 'completed');
-    this.stats.totalEarnings = confirmed.reduce((sum, b) => sum + Number(b.price_paid), 0);
-    this.stats.confirmedCount = confirmed.length;
+    const active = this.bookings.filter(b => b.status === 'confirmed' || b.status === 'completed');
+    this.stats.totalEarnings = active.reduce((sum, b) => sum + Number(b.price_paid), 0);
+    this.stats.confirmedCount = this.bookings.filter(b => b.status === 'confirmed').length;
+    this.stats.cancelledCount = this.bookings.filter(b =>
+      b.status === 'cancelled_by_client' || b.status === 'cancelled_by_owner'
+    ).length;
+    this.stats.completedCount = this.bookings.filter(b => b.status === 'completed').length;
   }
 
-  // Dodaj u klasu metodu:
+  calculateEarningsByVenue() {
+    const map: { [key: string]: { earnings: number, count: number } } = {};
+
+    this.bookings
+      .filter(b => b.status === 'confirmed' || b.status === 'completed')
+      .forEach(b => {
+        if (!map[b.venue_name]) map[b.venue_name] = { earnings: 0, count: 0 };
+        map[b.venue_name].earnings += Number(b.price_paid);
+        map[b.venue_name].count++;
+      });
+
+    this.earningsByVenue = Object.entries(map)
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => b.earnings - a.earnings);
+  }
+
+  calculateEarningsByMonth() {
+    const map: { [key: string]: number } = {};
+    const now = new Date();
+
+    // Inicijalizuj poslednjih 6 mjeseci sa 0
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      map[key] = 0;
+    }
+
+    this.bookings
+      .filter(b => b.status === 'confirmed' || b.status === 'completed')
+      .forEach(b => {
+        const d = new Date(b.start_time);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (map[key] !== undefined) map[key] += Number(b.price_paid);
+      });
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Avg', 'Sep', 'Okt', 'Nov', 'Dec'];
+    this.earningsByMonth = Object.entries(map).map(([key, earnings]) => {
+      const month = parseInt(key.split('-')[1]) - 1;
+      return { label: monthNames[month], earnings };
+    });
+  }
+
+  calculatePopularHours() {
+    const map: { [key: string]: number } = {};
+
+    this.bookings
+      .filter(b => b.status === 'confirmed' || b.status === 'completed')
+      .forEach(b => {
+        const hour = new Date(b.start_time).getHours().toString().padStart(2, '0') + ':00';
+        map[hour] = (map[hour] || 0) + 1;
+      });
+
+    this.popularHours = Object.entries(map)
+      .map(([hour, count]) => ({ hour, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }
+
+  getMaxMonthEarnings(): number {
+    return Math.max(...this.earningsByMonth.map(m => m.earnings), 1);
+  }
+
+  getMaxVenueEarnings(): number {
+    return Math.max(...this.earningsByVenue.map(v => v.earnings), 1);
+  }
+
   cancelBooking(id: string) {
-    if (confirm('Da li ste sigurni da želite da otkažete ovaj termin? Novac će biti vraćen klijentu.')) {
+    if (confirm('Da li ste sigurni da želite da otkažete ovaj termin?')) {
       this.bookingService.cancelByOwner(id).subscribe({
-        next: (res) => {
-          // Osvežavamo status u lokalnom nizu da se UI odmah promeni
+        next: () => {
           const booking = this.bookings.find(b => b.id === id);
           if (booking) booking.status = 'cancelled_by_owner';
-          this.calculateStats(); // Ponovo izračunaj zaradu jer je ovaj termin otpao
+          this.calculateStats();
+          this.calculateEarningsByVenue();
+          this.calculateEarningsByMonth();
           alert('Termin otkazan.');
         },
         error: (err) => alert(err.error.message || 'Greška pri otkazivanju')
       });
     }
   }
-
 }

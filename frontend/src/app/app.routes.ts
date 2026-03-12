@@ -11,6 +11,9 @@ import { MyBookingsComponent } from './my-bookings/my-bookings.component';
 import { OwnerBookingsComponent } from './owner-bookings/owner-bookings.component';
 import { BookingDetailComponent } from './booking-detail/booking-detail.component';
 import { ProfileComponent } from './profile/profile.component'; // <--- DODAT IMPORT
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { AdminVenuesComponent } from './admin-venues/admin-venues.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/explore', pathMatch: 'full' },
@@ -61,5 +64,16 @@ export const routes: Routes = [
     path: 'bookings/:id', 
     component: BookingDetailComponent, 
     canActivate: [authGuard] 
-  }
+  },
+
+  {
+  path: 'admin',
+  canActivate: [authGuard, roleGuard],
+  data: { expectedRoles: ['admin'] },
+  children: [
+    { path: '', component: AdminDashboardComponent },
+    { path: 'users', component: AdminUsersComponent },
+    { path: 'venues', component: AdminVenuesComponent }
+  ]
+}
 ];

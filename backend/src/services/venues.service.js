@@ -211,6 +211,16 @@ exports.getVenuesForOwner = async (ownerId) => {
   return result.rows;
 };
 
+exports.toggleVenueActive = async (venueId) => {
+  const result = await pool.query(
+    `UPDATE venues SET is_active = NOT is_active, updated_at = NOW() 
+     WHERE id = $1 RETURNING id, is_active`,
+    [venueId]
+  );
+  if (result.rows.length === 0) throw new Error('Teren nije pronađen');
+  return result.rows[0];
+};
+
 exports.getVenueById = async (id) => {
   // Dodali smo avg_rating i review_count u osnovni query
   const venue = await pool.query(
@@ -278,4 +288,6 @@ exports.getAllSports = async () => {
   } catch (err) {
     throw err;
   }
+
+  
 };

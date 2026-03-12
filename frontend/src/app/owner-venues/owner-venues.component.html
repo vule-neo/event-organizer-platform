@@ -21,25 +21,34 @@
 
   <div class="row" *ngIf="venues.length > 0">
     <div class="col-md-6 col-lg-4 mb-4" *ngFor="let venue of venues">
-      <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-        
+      <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden"
+           [class.opacity-50]="!venue.is_active">
+
         <div class="position-relative">
-          <img 
-            [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.png'" 
-            class="card-img-top" 
+          <img
+            [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.png'"
+            class="card-img-top"
             style="height: 200px; object-fit: cover;"
             alt="{{ venue.name }}"
           >
           <div *ngIf="venue.avg_rating" class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm py-2 px-3 rounded-pill">
-            <span class="text-warning fw-bold">★</span> {{ venue.avg_rating }} 
+            <span class="text-warning fw-bold">★</span> {{ venue.avg_rating }}
             <small class="text-muted">({{ venue.review_count }})</small>
           </div>
+          <!-- Status badge na slici -->
+          <div class="position-absolute top-0 start-0 m-3">
+            <span class="badge rounded-pill px-3 py-2"
+                  [class.bg-success]="venue.is_active"
+                  [class.bg-secondary]="!venue.is_active">
+              {{ venue.is_active ? '● Aktivan' : '● Neaktivan' }}
+            </span>
+          </div>
         </div>
-        
+
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="card-title fw-bold mb-0 text-truncate" style="max-width: 70%;">{{ venue.name }}</h5>
-            <div *ngIf="!venue.avg_rating" class="small text-muted italic">Bez ocena</div>
+            <div *ngIf="!venue.avg_rating" class="small text-muted">Bez ocena</div>
           </div>
 
           <p class="card-text text-muted small mb-3">
@@ -54,16 +63,25 @@
           </div>
         </div>
 
-        <div class="card-footer bg-white border-0 d-flex justify-content-between p-3">
-          <button class="btn btn-outline-primary btn-sm rounded-3 px-3" (click)="onView(venue.id)">
+        <div class="card-footer bg-white border-0 d-flex justify-content-between p-3 gap-1">
+          <button class="btn btn-outline-primary btn-sm rounded-3 px-2" (click)="onView(venue.id)">
             <i class="bi bi-eye"></i> Pogledaj
           </button>
 
-          <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" (click)="onEdit(venue.id)">
+          <button class="btn btn-outline-secondary btn-sm rounded-3 px-2" (click)="onEdit(venue.id)">
             <i class="bi bi-pencil"></i> Uredi
           </button>
-          
-          <button class="btn btn-outline-danger btn-sm rounded-3 px-3" (click)="onDelete(venue.id)">
+
+          <button
+            class="btn btn-sm rounded-3 px-2"
+            [class.btn-outline-success]="!venue.is_active"
+            [class.btn-outline-warning]="venue.is_active"
+            (click)="onToggleActive(venue)">
+            <i class="bi" [class.bi-toggle-off]="!venue.is_active" [class.bi-toggle-on]="venue.is_active"></i>
+            {{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}
+          </button>
+
+          <button class="btn btn-outline-danger btn-sm rounded-3 px-2" (click)="onDelete(venue.id)">
             <i class="bi bi-trash"></i> Obriši
           </button>
         </div>

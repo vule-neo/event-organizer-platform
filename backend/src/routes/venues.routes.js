@@ -18,7 +18,7 @@ router.get(
   roleMiddleware(['owner', 'admin']), // Može i admin ako ga ikad dodaš
   venueController.getVenuesForOwner
 );
-
+router.patch('/:id/toggle-active', authMiddleware, roleMiddleware(['owner']), venueController.toggleActive);
 router.get('/sports', venueController.getAllSports); // <--- DODAJ OVO
 // 3. Ovo ostaje javno (svi mogu da vide terene na početnoj strani)
 router.get('/all', venueController.getAllVenues);

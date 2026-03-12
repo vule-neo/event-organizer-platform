@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { VenueService } from '../app/services/venue.service';
-import { FormsModule } from '@angular/forms'; // Za Search bar
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-venue-list',
@@ -17,15 +17,17 @@ export class VenueListComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
-  // Filter polja
   searchTerm: string = '';
   selectedCity: string = '';
+  selectedSport: string = '';
   cities: string[] = [];
+  sports: any[] = [];
 
   constructor(private venueService: VenueService) {}
 
   ngOnInit(): void {
     this.loadVenues();
+    this.loadSports();
   }
 
   loadVenues() {
@@ -34,28 +36,38 @@ export class VenueListComponent implements OnInit {
       next: (data) => {
         this.venues = data;
         this.filteredVenues = data;
-        
-        // Izvlačimo unikatne gradove za filter dropdown
-        this.cities = [...new Set(data.map(v => v.city))].sort();
-        
+        this.cities = [...new Set(data.map((v: any) => v.city))].sort();
         this.loading = false;
       },
       error: (err) => {
         console.error(err);
-        this.errorMessage = 'Neuspešno učitavanje terena. Proverite vezu sa serverom.';
+        this.errorMessage = 'Neuspešno učitavanje terena.';
         this.loading = false;
       }
     });
   }
 
-  // Funkcija koja filtrira listu u realnom vremenu
-  applyFilters() {
-    this.filteredVenues = this.venues.filter(v => {
-      const matchesSearch = v.name.toLowerCase().includes(this.searchTerm.toLowerCase()) || 
-                            v.street.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesCity = this.selectedCity === '' || v.city === this.selectedCity;
-      
-      return matchesSearch && matchesCity;
+  loadSports() {
+    this.venueService.getSports().subscribe({
+      next: (data) => this.sports = data,
+      error: () => {}
     });
   }
+
+  applyFilters() {
+    this.filteredVenues = this.venues.filter(v => {
+      const matchesSearch = v.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                            v.street.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesCity = this.selectedCity === '' || v.city === this.selectedCity;
+      const matchesSport = this.selectedSport === '' || String(v.sport_id) === String(this.selectedSport);
+
+      return matchesSearch && matchesCity && matchesSport;
+    });
+  }
+
+  getSportName(sportId: any): string {
+    const sport = this.sports.find(s => String(s.id) === String(sportId));
+    return sport ? sport.name : 'Sportski Teren';
+  }
 }
+

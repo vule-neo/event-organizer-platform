@@ -50,6 +50,7 @@ export class VenueDetailComponent implements OnInit {
         if (data.images && data.images.length > 0) {
           this.activeImageUrl = 'http://localhost:5000' + data.images[0].url;
         }
+        console.log(this.venue.images);
         this.loadOccupiedSlots(); // <--- DODAJ OVO OVDE
         this.loading = false;
       },

@@ -1,0 +1,58 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">👥 Korisnici</h4>
+    <a routerLink="/admin" class="btn btn-outline-secondary btn-sm">← Nazad</a>
+  </div>
+
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden" *ngIf="!loading">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">Ime i Prezime</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Rola</th>
+            <th>Registrovan</th>
+            <th>Status</th>
+            <th class="pe-4 text-center">Akcija</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users" [class.opacity-50]="!u.is_active">
+            <td class="ps-4 fw-bold">{{ u.first_name }} {{ u.last_name }}</td>
+            <td class="text-muted">{{ u.email }}</td>
+            <td class="text-muted">{{ u.phone || '-' }}</td>
+            <td>
+              <span class="badge rounded-pill"
+                    [class.bg-primary]="u.role === 'owner'"
+                    [class.bg-secondary]="u.role === 'customer'">
+                {{ u.role === 'owner' ? 'Vlasnik' : 'Korisnik' }}
+              </span>
+            </td>
+            <td class="text-muted small">{{ u.created_at | date:'dd.MM.yyyy' }}</td>
+            <td>
+              <span class="badge rounded-pill"
+                    [class.bg-success]="u.is_active"
+                    [class.bg-danger]="!u.is_active">
+                {{ u.is_active ? 'Aktivan' : 'Blokiran' }}
+              </span>
+            </td>
+            <td class="pe-4 text-center">
+              <button class="btn btn-sm rounded-3"
+                      [class.btn-outline-danger]="u.is_active"
+                      [class.btn-outline-success]="!u.is_active"
+                      (click)="toggleUser(u)">
+                {{ u.is_active ? 'Blokiraj' : 'Odblokiraj' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

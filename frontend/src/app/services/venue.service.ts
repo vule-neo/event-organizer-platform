@@ -52,6 +52,10 @@ export class VenueService {
     return this.http.get<any[]>(this.sportsUrl);
   }
 
+  toggleVenueActive(id: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/toggle-active`, {});
+  }
+
   
 }
 

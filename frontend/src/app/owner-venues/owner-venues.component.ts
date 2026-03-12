@@ -72,4 +72,16 @@ export class OwnerVenuesComponent implements OnInit {
     // Dodajemo '/details' jer tako piše u tvojim rutama
     this.router.navigate(['/venues/details', venueId]);
   }
+
+  onToggleActive(venue: any) {
+    const akcija = venue.is_active ? 'deaktivirate' : 'aktivirate';
+    if (confirm(`Da li želite da ${akcija} teren "${venue.name}"?`)) {
+      this.venueService.toggleVenueActive(venue.id).subscribe({
+        next: (res) => {
+          venue.is_active = res.is_active;
+        },
+        error: () => alert('Greška pri promjeni statusa.')
+      });
+    }
+  }
 }

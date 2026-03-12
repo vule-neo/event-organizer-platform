@@ -49,3 +49,24 @@ exports.getProfile = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    await authService.forgotPassword(req.body.email);
+    res.json({ message: 'Ako nalog postoji, poslan je email sa uputstvima.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Greška pri slanju emaila.' });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    await authService.resetPassword(token, password);
+    res.json({ message: 'Lozinka uspješno promijenjena.' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};

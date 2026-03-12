@@ -2,11 +2,13 @@
   <div class="stepper">
     <div [class.active]="step === 1">1. Osnovni podaci</div>
     <div [class.active]="step === 2">2. Radno vrijeme</div>
-    <div [class.active]="step === 3">3. Slike</div>
+    <div [class.active]="step === 3">3. Tagovi</div>
+    <div [class.active]="step === 4">4. Slike</div>
   </div>
 
   <form [formGroup]="venueForm">
-    
+
+    <!-- KORAK 1 -->
     <div *ngIf="step === 1" class="form-step">
       <h2>{{ isEditMode ? 'Izmeni osnovne podatke' : 'Informacije o terenu' }}</h2>
 
@@ -63,18 +65,46 @@
       </div>
     </div>
 
+    <!-- KORAK 2 -->
     <div *ngIf="step === 2" class="form-step">
       <h2>Radno vrijeme</h2>
       <app-working-hours #workingHoursComp></app-working-hours>
       <div class="actions">
         <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
-        <button type="button" class="btn-next" (click)="nextStep()">Dalje: Slike →</button>
+        <button type="button" class="btn-next" (click)="nextStep()">Dalje: Tagovi →</button>
       </div>
     </div>
 
-    <div *ngIf="step === 3" class="form-step">
+    <!-- KORAK 3 - TAGOVI -->
+<div *ngIf="step === 3" class="form-step">
+  <h2>Sadržaj i pogodnosti</h2>
+  <p class="text-muted">Označite šta vaš teren nudi korisnicima.</p>
+
+  <div class="tags-grid">
+    <div *ngFor="let tag of allTags"
+         class="tag-item"
+         [class.tag-selected]="isTagSelected(tag.id)"
+         (click)="toggleTag(tag.id)">
+      <i class="bi {{ tag.icon }}"></i>
+      <span>{{ tag.name }}</span>
+      <i class="bi bi-check-circle-fill ms-auto check-icon" *ngIf="isTagSelected(tag.id)"></i>
+    </div>
+  </div>
+
+  <div class="selected-count" *ngIf="selectedTagIds.length > 0">
+    ✅ Odabrano: {{ selectedTagIds.length }} {{ selectedTagIds.length === 1 ? 'pogodnost' : 'pogodnosti' }}
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
+    <button type="button" class="btn-next" (click)="nextStep()">Dalje: Slike →</button>
+  </div>
+</div>
+
+    <!-- KORAK 4 - SLIKE -->
+    <div *ngIf="step === 4" class="form-step">
       <h2>Slike terena (Max 20)</h2>
-      
+
       <div *ngIf="existingImages.length > 0">
         <p>Trenutne slike na serveru:</p>
         <div class="preview-grid mb-3">

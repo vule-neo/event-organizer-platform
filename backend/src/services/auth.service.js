@@ -110,3 +110,62 @@ exports.getUserById = async (userId) => {
     );
     return result.rows[0];
 };
+
+
+const crypto = require('crypto');
+const mailer = require('../config/mailer');
+
+exports.forgotPassword = async (email) => {
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  
+  // Uvijek vrati isti odgovor — ne otkrivaj da li email postoji
+  if (result.rows.length === 0) return;
+
+  const user = result.rows[0];
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 sat
+
+  await pool.query(
+    'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
+    [token, expires, user.id]
+  );
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+  await mailer.sendMail({
+    from: `"Sportski Tereni" <${process.env.EMAIL_USER}>`,
+    to: user.email,
+    subject: 'Resetovanje lozinke',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto; padding: 32px; border: 1px solid #e0e0e0; border-radius: 12px;">
+        <h2 style="color: #0d6efd;">Resetovanje lozinke</h2>
+        <p>Primili smo zahtjev za resetovanje lozinke za vaš nalog.</p>
+        <p>Kliknite na dugme ispod — link važi <strong>1 sat</strong>:</p>
+        <a href="${resetUrl}" 
+           style="display:inline-block; margin: 16px 0; padding: 12px 28px; background:#0d6efd; color:white; border-radius:8px; text-decoration:none; font-weight:bold;">
+          Resetuj lozinku
+        </a>
+        <p style="color:#999; font-size:12px;">Ako niste tražili resetovanje, ignorišite ovaj email.</p>
+      </div>
+    `
+  });
+};
+
+exports.resetPassword = async (token, newPassword) => {
+  const result = await pool.query(
+    'SELECT * FROM users WHERE reset_token = $1 AND reset_token_expires > NOW()',
+    [token]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Token je nevažeći ili je istekao.');
+  }
+
+  const user = result.rows[0];
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await pool.query(
+    'UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
+    [hashed, user.id]
+  );
+};

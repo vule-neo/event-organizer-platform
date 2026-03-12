@@ -35,7 +35,6 @@
             <span class="text-warning fw-bold">★</span> {{ venue.avg_rating }}
             <small class="text-muted">({{ venue.review_count }})</small>
           </div>
-          <!-- Status badge na slici -->
           <div class="position-absolute top-0 start-0 m-3">
             <span class="badge rounded-pill px-3 py-2"
                   [class.bg-success]="venue.is_active"
@@ -55,12 +54,29 @@
             <i class="bi bi-geo-alt-fill text-danger"></i> {{ venue.city }}, {{ venue.street }}
           </p>
 
-          <div class="bg-light p-3 rounded-3">
+          <div class="bg-light p-3 rounded-3 mb-3">
             <div class="d-flex justify-content-between align-items-center">
               <span class="small text-muted">Cena po terminu:</span>
               <span class="fw-bold text-primary">{{ venue.price_per_slot }} RSD</span>
             </div>
           </div>
+
+          <!-- TAGOVI -->
+          <div class="d-flex flex-wrap gap-1" *ngIf="venue.tags?.length > 0">
+            <span *ngFor="let tag of venue.tags.slice(0, 5)"
+                  class="badge rounded-pill d-flex align-items-center gap-1 px-2 py-1"
+                  style="background:#f0f4ff; color:#0d6efd; border:1px solid #c7d7fd; font-size:11px;"
+                  [title]="tag.name">
+              <i class="bi {{ tag.icon }}"></i>
+              {{ tag.name }}
+            </span>
+            <span *ngIf="venue.tags.length > 5"
+                  class="badge rounded-pill px-2 py-1"
+                  style="background:#f8f9fa; color:#6c757d; border:1px solid #dee2e6; font-size:11px;">
+              +{{ venue.tags.length - 5 }} još
+            </span>
+          </div>
+
         </div>
 
         <div class="card-footer bg-white border-0 d-flex justify-content-between p-3 gap-1">

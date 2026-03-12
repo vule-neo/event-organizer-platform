@@ -28,6 +28,10 @@ export class VenueFormComponent implements OnInit {
   selectedFiles: File[] = [];
   previewUrls: string[] = [];
   sports: any[] = [];
+  
+  // Tagovi
+  allTags: any[] = [];
+  selectedTagIds: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +58,7 @@ export class VenueFormComponent implements OnInit {
     });
 
     this.loadSports();
+    this.loadTags();
 
     if (this.isEditMode && this.venueId) {
       this.loadVenueData(this.venueId);
@@ -67,19 +72,27 @@ export class VenueFormComponent implements OnInit {
     });
   }
 
+  loadTags() {
+    this.venueService.getTags().subscribe({
+      next: (data) => this.allTags = data,
+      error: () => this.message = 'Greška pri učitavanju tagova.'
+    });
+  }
+
   loadVenueData(id: string) {
     this.venueService.getVenueById(id).subscribe({
       next: (data) => {
         this.venueForm.patchValue(data);
         if (data.working_hours) this.savedWorkingHours = data.working_hours;
         if (data.images) this.existingImages = data.images;
+        // Učitaj postojeće tagove
+        if (data.tags) this.selectedTagIds = data.tags.map((t: any) => t.id);
       },
       error: () => this.message = 'Greška pri učitavanju podataka.'
     });
   }
 
   onAddressChange(event: AddressResult) {
-    console.log('onAddressChange pozvan:', event);
     this.venueForm.patchValue({
       city: event.city,
       street: event.street,
@@ -87,7 +100,19 @@ export class VenueFormComponent implements OnInit {
       lat: event.lat,
       lng: event.lng
     });
-    console.log('Form vrijednosti nakon patch:', this.venueForm.value);
+  }
+
+  toggleTag(tagId: string) {
+    const index = this.selectedTagIds.indexOf(tagId);
+    if (index === -1) {
+      this.selectedTagIds.push(tagId);
+    } else {
+      this.selectedTagIds.splice(index, 1);
+    }
+  }
+
+  isTagSelected(tagId: string): boolean {
+    return this.selectedTagIds.includes(tagId);
   }
 
   savedWorkingHours: any[] = [];
@@ -109,6 +134,8 @@ export class VenueFormComponent implements OnInit {
         this.savedWorkingHours = this.workingHoursComp.getWorkingHoursData();
         this.step = 3;
       }
+    } else if (this.step === 3) {
+      this.step = 4;
     }
   }
 
@@ -157,6 +184,7 @@ export class VenueFormComponent implements OnInit {
     });
 
     formData.append('working_hours', JSON.stringify(this.savedWorkingHours));
+    formData.append('tags', JSON.stringify(this.selectedTagIds));
     this.selectedFiles.forEach(file => formData.append('images', file));
     formData.append('owner_id', ownerId);
     formData.append('currency', 'RSD');

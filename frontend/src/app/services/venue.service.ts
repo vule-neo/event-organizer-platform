@@ -11,40 +11,38 @@ export interface Venue {
   price_per_slot: number;
   slot_duration_mins: number;
   description: string;
+  is_active: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class VenueService {
-  private apiUrl = 'http://localhost:5000/api/venues';// Bilo je: private sportsUrl = 'http://localhost:5000/api/sports';
-// Promeni u:
+  private apiUrl = 'http://localhost:5000/api/venues';
   private sportsUrl = 'http://localhost:5000/api/venues/sports';
+  private tagsUrl = 'http://localhost:5000/api/venues/tags';
+
   constructor(private http: HttpClient) {}
 
-  // 1. Kreiranje (POST šalje ceo objekat/FormData)
   createVenue(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/new`, data);
   }
 
-  // 2. Dobavljanje za vlasnika - SADA JE GET
   getVenuesForOwner(ownerId: string): Observable<Venue[]> {
-    // Šalje zahtev na: http://localhost:5000/api/venues/owner/UUID
     return this.http.get<Venue[]>(`${this.apiUrl}/owner/${ownerId}`);
   }
 
-  // 3. Početna strana (Ovo bi realno trebalo da bude GET)
   getAllVenues(): Observable<Venue[]> {
     return this.http.get<Venue[]>(`${this.apiUrl}/all`);
   }
 
-  deleteVenue(id: string) {
+  deleteVenue(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  getVenueById(id: string) {
+  getVenueById(id: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  updateVenue(id: string, data: FormData) {
+  updateVenue(id: string, data: FormData): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, data);
   }
 
@@ -52,11 +50,11 @@ export class VenueService {
     return this.http.get<any[]>(this.sportsUrl);
   }
 
+  getTags(): Observable<any[]> {
+    return this.http.get<any[]>(this.tagsUrl);
+  }
+
   toggleVenueActive(id: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/toggle-active`, {});
   }
-
-  
 }
-
-

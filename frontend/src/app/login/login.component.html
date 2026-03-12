@@ -16,11 +16,18 @@
     <button type="submit" [disabled]="loading">
       {{ loading ? 'Logging in...' : 'Login' }}
     </button>
-    @if(errorMessage != '') {
-    <div style="color:red; margin-top:10px;">
-      {{ errorMessage }}
+
+    <div style="margin-top: 10px; text-align: right;">
+      <a routerLink="/forgot-password" style="font-size: 13px; color: #0d6efd;">
+        Zaboravili ste lozinku?
+      </a>
     </div>
-    }   
+
+    @if(errorMessage != '') {
+      <div style="color:red; margin-top:10px;">
+        {{ errorMessage }}
+      </div>
+    }
 
   </form>
 </div>

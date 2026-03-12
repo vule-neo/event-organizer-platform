@@ -6,46 +6,58 @@
       </div>
 
       <div class="d-flex gap-2 mb-4 overflow-auto pb-2" *ngIf="venue.images?.length > 1">
-        <div *ngFor="let img of venue.images" 
+        <div *ngFor="let img of venue.images"
              (click)="setActiveImage(img.url)"
-             class="thumb-item" 
-             [class.active-thumb]="activeImageUrl.includes(img.url)">
+             class="thumb-item"
+             [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url">
           <img [src]="'http://localhost:5000' + img.url" class="rounded cursor-pointer shadow-sm">
         </div>
       </div>
 
       <div class="venue-header mb-4">
-  <h1 class="display-5 fw-bold">{{ venue.name }}</h1>
-  
-  <div class="d-flex align-items-center mb-3">
-    <ng-container *ngIf="venue.avg_rating; else noRating">
-      <div class="text-warning me-2 fs-4">
-        <span *ngFor="let star of [1,2,3,4,5]">
-          <i class="bi" [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
-        </span>
-      </div>
-      <span class="fw-bold fs-5 me-2">{{ venue.avg_rating }}</span>
-      <span class="text-muted">({{ venue.review_count }} recenzija)</span>
-    </ng-container>
-    
-    <ng-template #noRating>
-      <span class="badge bg-light text-dark border">✨ Novo na platformi</span>
-    </ng-template>
-  </div>
+        <h1 class="display-5 fw-bold">{{ venue.name }}</h1>
 
-  <p class="text-muted fs-5">
-    <span class="me-2">📍</span>{{ venue.street }}, {{ venue.city }}
-  </p>
-  <div class="text-success fw-bold fs-3">
-      {{ venue.price_per_slot }} RSD <span class="fs-6 text-muted fw-normal">/ termin</span>
-    </div>
-</div>
+        <div class="d-flex align-items-center mb-3">
+          <ng-container *ngIf="venue.avg_rating; else noRating">
+            <div class="text-warning me-2 fs-4">
+              <span *ngFor="let star of [1,2,3,4,5]">
+                <i class="bi" [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
+              </span>
+            </div>
+            <span class="fw-bold fs-5 me-2">{{ venue.avg_rating }}</span>
+            <span class="text-muted">({{ venue.review_count }} recenzija)</span>
+          </ng-container>
+          <ng-template #noRating>
+            <span class="badge bg-light text-dark border">✨ Novo na platformi</span>
+          </ng-template>
+        </div>
+
+        <p class="text-muted fs-5">
+          <span class="me-2">📍</span>{{ venue.street }}, {{ venue.city }}
+        </p>
+        <div class="text-success fw-bold fs-3">
+          {{ venue.price_per_slot }} RSD <span class="fs-6 text-muted fw-normal">/ termin</span>
+        </div>
+      </div>
 
       <hr>
 
-      <div class="venue-description mb-5">
+      <div class="venue-description mb-4">
         <h3>O terenu</h3>
         <p class="lead">{{ venue.description || 'Vlasnik nije uneo opis za ovaj teren.' }}</p>
+      </div>
+
+      <!-- TAGOVI -->
+      <div class="venue-tags mb-5" *ngIf="venue.tags?.length > 0">
+        <h3>Pogodnosti</h3>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <span *ngFor="let tag of venue.tags"
+                class="badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill"
+                style="background-color: #f0f4ff; color: #0d6efd; border: 1px solid #c7d7fd; font-size: 13px; font-weight: 500;">
+            <i class="bi {{ tag.icon }}"></i>
+            {{ tag.name }}
+          </span>
+        </div>
       </div>
 
       <div class="working-hours">
@@ -80,8 +92,8 @@
 
             <div class="mb-4">
               <label class="form-label small fw-bold text-uppercase text-muted">Izaberi datum</label>
-              <input type="date" class="form-control form-control-lg border-2" 
-                     [(ngModel)]="selectedDate" 
+              <input type="date" class="form-control form-control-lg border-2"
+                     [(ngModel)]="selectedDate"
                      (change)="onDateChange()"
                      [min]="today">
             </div>
@@ -89,7 +101,7 @@
             <div class="mb-4" *ngIf="availableSlots.length > 0">
               <label class="form-label small fw-bold text-uppercase text-muted">Dostupni termini</label>
               <div class="d-flex flex-wrap gap-2">
-                <button *ngFor="let slot of availableSlots" 
+                <button *ngFor="let slot of availableSlots"
                         class="btn btn-sm px-3 py-2 fw-bold"
                         [class.btn-outline-success]="!slot.isOccupied && selectedSlot !== slot"
                         [class.btn-success]="selectedSlot === slot"
@@ -117,15 +129,15 @@
             </div>
 
             <button *ngIf="venue?.owner_id !== authService.getUser().id"
-        class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mt-2" 
-        [disabled]="!selectedSlot"
-        (click)="confirmBooking()">
-            POTVRDI REZERVACIJU
-          </button>
+                    class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mt-2"
+                    [disabled]="!selectedSlot"
+                    (click)="confirmBooking()">
+              POTVRDI REZERVACIJU
+            </button>
 
-          <div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
-            Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.
-          </div>
+            <div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
+              Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.
+            </div>
           </div>
         </div>
       </div>
@@ -133,12 +145,12 @@
   </div>
 </div>
 
-<div *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id" 
+<div *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id"
      class="mt-3 p-3 border rounded-3 bg-light">
   <h6 class="fw-bold text-danger">Alati za vlasnika</h6>
   <p class="small text-muted">Blokiraj selektovani termin za ovaj dan.</p>
-  <button class="btn btn-danger btn-sm w-100" 
-          [disabled]="!selectedSlot" 
+  <button class="btn btn-danger btn-sm w-100"
+          [disabled]="!selectedSlot"
           (click)="blockSelectedSlot()">
     ⛔ BLOKIRAJ TERMIN
   </button>

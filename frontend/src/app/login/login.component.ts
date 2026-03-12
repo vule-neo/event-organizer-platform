@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
@@ -26,27 +26,22 @@ export class LoginComponent {
       password: ['', [Validators.required]]
     });
   }
+
   onSubmit() {
     this.loading = true;
     this.errorMessage = '';
     if (this.loginForm.invalid) {
-        this.errorMessage = 'Molimo popunite sva polja ispravno.';
-        this.loading = false;
-        return;
-    };
-
-    
+      this.errorMessage = 'Molimo popunite sva polja ispravno.';
+      this.loading = false;
+      return;
+    }
 
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email, password).subscribe({
       next: (response) => {
-        console.log('Login success:', response);
-
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-
-        // In the onSubmit success callback:
         this.router.navigate(['']);
       },
       error: (err) => {

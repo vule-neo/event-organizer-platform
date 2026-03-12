@@ -83,3 +83,12 @@ exports.toggleActive = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getAllTags = async (req, res) => {
+  try {
+    const tags = await venueService.getAllTags();
+    res.json(tags);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

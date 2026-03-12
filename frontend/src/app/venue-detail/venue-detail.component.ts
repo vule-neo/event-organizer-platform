@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // OBAVEZNO ZA DATUM
+import { FormsModule } from '@angular/forms';
 import { VenueService } from '../services/venue.service';
 import { BookingService } from '../services/booking.service';
 import { AuthService } from '../services/auth.service';
@@ -19,12 +19,21 @@ export class VenueDetailComponent implements OnInit {
   errorMessage = '';
   activeImageUrl: string = '';
 
-  // Booking varijable
   today: string = new Date().toISOString().split('T')[0];
   selectedDate: string = this.today;
   availableSlots: any[] = [];
   selectedSlot: any = null;
-  occupiedSlots: string[] = []; // Ovde će kasnije dolaziti podaci sa backenda
+  occupiedSlots: string[] = [];
+
+  // Reviews
+  reviews: any[] = [];
+  canReview = false;
+  reviewRating = 5;
+  reviewComment = '';
+  reviewSubmitting = false;
+  reviewSuccess = false;
+  reviewError = '';
+  hoverRating = 0;
 
   dayNames = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 
@@ -32,7 +41,7 @@ export class VenueDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private venueService: VenueService,
     private bookingService: BookingService,
-    public authService : AuthService
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -50,13 +59,81 @@ export class VenueDetailComponent implements OnInit {
         if (data.images && data.images.length > 0) {
           this.activeImageUrl = 'http://localhost:5000' + data.images[0].url;
         }
-        console.log(this.venue.images);
-        this.loadOccupiedSlots(); // <--- DODAJ OVO OVDE
+        this.loadOccupiedSlots();
+        this.loadReviews();
+        this.checkCanReview();
         this.loading = false;
       },
-      error: (err) => {
+      error: () => {
         this.errorMessage = 'Greška pri učitavanju detalja terena.';
         this.loading = false;
+      }
+    });
+  }
+
+  loadReviews() {
+    this.venueService.getVenueReviews(this.venue.id).subscribe({
+      next: (data) => this.reviews = data,
+      error: () => {}
+    });
+  }
+
+  checkCanReview() {
+    const user = this.authService.getUser();
+    if (!user || user.id === this.venue.owner_id) return;
+
+    // Provjeri da li ima completed booking za ovaj teren
+    this.bookingService.getMyBookings().subscribe({
+      next: (bookings: any[]) => {
+        this.canReview = bookings.some(b => 
+          b.venue_id === this.venue.id && 
+          b.status === 'completed' && 
+          !b.is_reviewed
+        );
+      },
+      error: () => {}
+    });
+  }
+
+  getCompletedBookingId(): string | null {
+    // Ovo se koristi kad submitujemo review — treba booking_id
+    return null; // Handled u submitReview
+  }
+
+  submitReview() {
+    if (!this.reviewComment.trim()) { this.reviewError = 'Unesite komentar.'; return; }
+    this.reviewSubmitting = true;
+    this.reviewError = '';
+
+    // Nađi completed booking_id
+    this.bookingService.getMyBookings().subscribe({
+      next: (bookings: any[]) => {
+        const booking = bookings.find(b => 
+          b.venue_id === this.venue.id && 
+          b.status === 'completed' && 
+          !b.is_reviewed
+        );
+
+        if (!booking) { this.reviewError = 'Nema završenih rezervacija za recenziju.'; this.reviewSubmitting = false; return; }
+
+        this.venueService.submitReview({
+          venue_id: this.venue.id,
+          booking_id: booking.id,
+          rating: this.reviewRating,
+          comment: this.reviewComment
+        }).subscribe({
+          next: () => {
+            this.reviewSuccess = true;
+            this.reviewSubmitting = false;
+            this.canReview = false;
+            this.loadReviews();
+            this.loadVenue(this.venue.id); // Osvježi avg_rating
+          },
+          error: (err) => {
+            this.reviewError = err.error?.message || 'Greška.';
+            this.reviewSubmitting = false;
+          }
+        });
       }
     });
   }
@@ -66,21 +143,16 @@ export class VenueDetailComponent implements OnInit {
   }
 
   onDateChange() {
-    this.selectedSlot = null; // Resetuj selekciju
-    this.loadOccupiedSlots(); // Povuci nove zauzete termine za taj dan
+    this.selectedSlot = null;
+    this.loadOccupiedSlots();
   }
 
   generateSlots() {
     if (!this.venue || !this.venue.working_hours) return;
-
     const dateObj = new Date(this.selectedDate);
-    const dayOfWeek = dateObj.getDay(); 
+    const dayOfWeek = dateObj.getDay();
     const workingDay = this.venue.working_hours.find((h: any) => h.day_of_week === dayOfWeek);
-
-    if (!workingDay || !workingDay.is_open) {
-      this.availableSlots = [];
-      return;
-    }
+    if (!workingDay || !workingDay.is_open) { this.availableSlots = []; return; }
 
     const slots = [];
     let currentTime = this.parseTime(workingDay.open_time);
@@ -88,15 +160,11 @@ export class VenueDetailComponent implements OnInit {
     const duration = this.venue.slot_duration_mins;
 
     while (currentTime + duration <= endTime) {
-      const slotStart = this.formatTime(currentTime);
-      const slotEnd = this.formatTime(currentTime + duration);
-      
       slots.push({
-        start: slotStart,
-        end: slotEnd,
-        isOccupied: this.occupiedSlots.includes(slotStart)
+        start: this.formatTime(currentTime),
+        end: this.formatTime(currentTime + duration),
+        isOccupied: this.occupiedSlots.includes(this.formatTime(currentTime))
       });
-
       currentTime += duration;
     }
     this.availableSlots = slots;
@@ -114,81 +182,84 @@ export class VenueDetailComponent implements OnInit {
   }
 
   selectSlot(slot: any) {
-    if (!slot.isOccupied) {
-      this.selectedSlot = slot;
-    }
+    if (!slot.isOccupied) this.selectedSlot = slot;
   }
 
   blockSelectedSlot() {
     if (!this.selectedSlot || !this.venue) return;
-
     const blockData = {
       venue_id: this.venue.id,
-      // Ovde takođe koristimo getUser().id
-      owner_id: this.authService.getUser().id, 
+      owner_id: this.authService.getUser().id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
       end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
       reason: 'Ručna blokada termina'
     };
-
-    if (confirm(`Da li sigurno želiš da blokiraš termin ${this.selectedSlot.start}?`)) {
+    if (confirm(`Blokirati termin ${this.selectedSlot.start}?`)) {
       this.bookingService.blockSlot(blockData).subscribe({
-        next: () => {
-          alert('Termin uspešno blokiran.');
-          this.loadOccupiedSlots(); 
-        },
+        next: () => { alert('Termin blokiran.'); this.loadOccupiedSlots(); },
         error: (err) => alert(err.error.message)
       });
     }
   }
 
-  
-
-  // Ova funkcija pita backend: "Šta je zauzeto za ovaj teren na ovaj datum?"
   loadOccupiedSlots() {
     if (!this.venue || !this.selectedDate) return;
-
-    const venueId = this.venue.id;
-    
-    this.bookingService.getOccupiedSlots(venueId, this.selectedDate).subscribe({
+    this.bookingService.getOccupiedSlots(this.venue.id, this.selectedDate).subscribe({
       next: (occupied: any[]) => {
-        // Izvlačimo samo start_time i formatiramo ga u HH:mm da bi generateSlots() znao da uporedi
-        // Pošto tvoj backend vraća "18:00:00+00", substring(11, 16) ili slično zavisi od formata, 
-        // ali ako servis vrati čisto vreme, samo ga mapiraj:
         this.occupiedSlots = occupied.map(o => {
           const date = new Date(o.start_time);
-          // Koristimo lokalno vreme jer korisnik bira lokalno vreme na frontu
-          const h = date.getHours().toString().padStart(2, '0');
-          const m = date.getMinutes().toString().padStart(2, '0');
-          return `${h}:${m}`;
+          return `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
         });
-        
-        this.generateSlots(); // Ponovo iscrtaj slotove sa novim podacima o zauzetosti
+        this.generateSlots();
       },
-      error: (err) => console.error('Greška pri učitavanju zauzetih termina', err)
+      error: (err) => console.error(err)
     });
   }
 
   confirmBooking() {
     if (!this.selectedSlot || !this.venue) return;
-
-    // Pravimo ISO format koji PostgreSQL razume (npr. 2026-03-09T18:00:00Z)
-    const startTimeISO = `${this.selectedDate}T${this.selectedSlot.start}:00Z`;
-    const endTimeISO = `${this.selectedDate}T${this.selectedSlot.end}:00Z`;
-
     const bookingData = {
       venue_id: this.venue.id,
-      start_time: startTimeISO,
-      end_time: endTimeISO,
+      start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
+      end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
       price_paid: this.venue.price_per_slot
     };
-
     this.bookingService.createBooking(bookingData).subscribe({
-      next: (res) => {
-        alert('Uspešno rezervisano!');
-        this.loadOccupiedSlots(); // Osveži listu da se termin zacrveni/onemogući
-      },
+      next: () => { alert('Uspešno rezervisano!'); this.loadOccupiedSlots(); },
       error: (err) => alert(err.error.message || 'Greška')
     });
   }
+
+  // Recurring
+recurringWeeks = 4;
+showRecurring = false;
+recurringResult: any = null;
+recurringLoading = false;
+
+confirmRecurringBooking() {
+  if (!this.selectedSlot || !this.venue) return;
+  this.recurringLoading = true;
+  this.recurringResult = null;
+
+  const data = {
+    venue_id: this.venue.id,
+    start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
+    end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
+    price_paid: this.venue.price_per_slot,
+    weeks: this.recurringWeeks
+  };
+
+  this.bookingService.createRecurringBooking(data).subscribe({
+    next: (res: any) => {
+      this.recurringResult = res;
+      this.recurringLoading = false;
+      this.loadOccupiedSlots();
+    },
+    error: (err) => {
+      alert(err.error?.message || 'Greška');
+      this.recurringLoading = false;
+    }
+  });
+}
+
 }

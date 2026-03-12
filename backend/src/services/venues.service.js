@@ -283,3 +283,4 @@ exports.getAllTags = async () => {
   const result = await pool.query('SELECT * FROM venue_tags ORDER BY name ASC');
   return result.rows;
 };
+

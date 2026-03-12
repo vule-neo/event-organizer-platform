@@ -42,4 +42,8 @@ export class BookingService {
     return this.http.patch(`${this.apiUrl}/${id}/owner-cancel`, {});
   }
 
+  createRecurringBooking(data: any) {
+    return this.http.post(`${this.apiUrl}/create-recurring`, data);
+  }
+
 }

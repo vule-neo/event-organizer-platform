@@ -96,3 +96,22 @@ exports.cancelByOwner = async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 };
+
+exports.createRecurring = async (req, res) => {
+    try {
+        const data = {
+            ...req.body,
+            client_id: req.user.id
+        };
+        const result = await bookingService.createRecurring(data);
+
+        let message = `Uspješno rezervisano ${result.created} termina.`;
+        if (result.failed.length > 0) {
+            message += ` Sljedeći datumi su bili zauzeti: ${result.failed.join(', ')}`;
+        }
+
+        res.status(201).json({ message, ...result });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};

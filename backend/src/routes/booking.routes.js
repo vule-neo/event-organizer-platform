@@ -9,7 +9,7 @@ router.get('/occupied', bookingController.getOccupied);
 // Samo za ulogovane korisnike
 router.post('/create', authMiddleware, bookingController.create);
 router.get('/my-reservations', authMiddleware, bookingController.getMyBookings);
-
+router.post('/create-recurring', authMiddleware, bookingController.createRecurring);
 router.patch('/:id/cancel', authMiddleware, bookingController.cancel);
 // Dodajemo roleGuard da budemo sigurni da samo vlasnici pristupaju
 const roleGuard = require('../middleware/role.middleware'); // Proveri putanju do tvog roleGuarda

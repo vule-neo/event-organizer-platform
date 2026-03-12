@@ -57,4 +57,14 @@ export class VenueService {
   toggleVenueActive(id: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/toggle-active`, {});
   }
+
+  private baseUrl = 'http://localhost:5000/api';
+
+  getVenueReviews(venueId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/reviews/venue/${venueId}`);
+  }
+
+  submitReview(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reviews`, data);
+  }
 }

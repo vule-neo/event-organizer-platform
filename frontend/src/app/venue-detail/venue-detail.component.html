@@ -76,8 +76,65 @@
           </div>
         </div>
       </div>
+      <!-- RECENZIJE -->
+<div class="reviews-section mt-5">
+  <h3 class="mb-4">Recenzije 
+    <span class="text-muted fs-6 fw-normal" *ngIf="reviews.length > 0">({{ reviews.length }})</span>
+  </h3>
+
+  <!-- Forma za ostavljanje recenzije -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" *ngIf="canReview && !reviewSuccess">
+    <h5 class="fw-bold mb-3">Ostavite recenziju</h5>
+
+    <!-- Zvjezdice -->
+    <div class="d-flex gap-1 mb-3">
+      <span *ngFor="let star of [1,2,3,4,5]"
+            class="star-select"
+            [class.active]="star <= (hoverRating || reviewRating)"
+            (mouseenter)="hoverRating = star"
+            (mouseleave)="hoverRating = 0"
+            (click)="reviewRating = star">
+        <i class="bi bi-star-fill"></i>
+      </span>
     </div>
 
+    <textarea class="form-control mb-3" rows="3"
+              [(ngModel)]="reviewComment"
+              placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
+
+    <div class="alert alert-danger small py-2" *ngIf="reviewError">{{ reviewError }}</div>
+
+    <button class="btn btn-primary" (click)="submitReview()" [disabled]="reviewSubmitting">
+      {{ reviewSubmitting ? 'Slanje...' : 'Objavi recenziju' }}
+    </button>
+  </div>
+
+  <div class="alert alert-success" *ngIf="reviewSuccess">
+    ✅ Recenzija uspješno objavljena!
+  </div>
+
+  <!-- Lista recenzija -->
+  <div *ngIf="reviews.length === 0" class="text-muted fst-italic">
+    Još nema recenzija za ovaj teren.
+  </div>
+
+  <div *ngFor="let review of reviews" class="card border-0 bg-light rounded-4 p-3 mb-3">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div>
+        <span class="fw-bold">{{ review.first_name }} {{ review.last_name }}</span>
+        <div class="text-warning mt-1">
+          <span *ngFor="let star of [1,2,3,4,5]">
+            <i class="bi" [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
+          </span>
+        </div>
+      </div>
+      <small class="text-muted">{{ review.created_at | date:'dd.MM.yyyy' }}</small>
+    </div>
+    <p class="mb-0 text-dark">{{ review.comment }}</p>
+  </div>
+</div>
+    </div>
+    
     <div class="col-lg-4">
       <div class="sticky-top" style="top: 100px;">
         <div class="card shadow-sm border-0 rounded-4">
@@ -128,12 +185,52 @@
               </div>
             </div>
 
-            <button *ngIf="venue?.owner_id !== authService.getUser().id"
-                    class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mt-2"
-                    [disabled]="!selectedSlot"
-                    (click)="confirmBooking()">
-              POTVRDI REZERVACIJU
-            </button>
+            <button *ngIf="venue?.owner_id !== authService.getUser().id && !showRecurring"
+        class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mt-2"
+        [disabled]="!selectedSlot"
+        (click)="confirmBooking()">
+  POTVRDI REZERVACIJU
+</button>
+
+<!-- Recurring toggle -->
+<div *ngIf="selectedSlot && venue?.owner_id !== authService.getUser().id" class="mt-2">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="recurringCheck" [(ngModel)]="showRecurring">
+    <label class="form-check-label small" for="recurringCheck">
+      🔁 Ponavljaj svake sedmice
+    </label>
+  </div>
+
+  <div *ngIf="showRecurring" class="mt-2 p-3 bg-light rounded-3">
+    <label class="form-label small fw-bold">Broj sedmica (uključujući prvu):</label>
+    <div class="d-flex align-items-center gap-2">
+      <input type="range" class="form-range" min="2" max="8" [(ngModel)]="recurringWeeks">
+      <span class="badge bg-primary px-3 py-2">{{ recurringWeeks }} sed.</span>
+    </div>
+    <p class="small text-muted mb-2">
+      Ukupno: <strong>{{ recurringWeeks * venue.price_per_slot }} RSD</strong>
+    </p>
+    <button class="btn btn-primary w-100 fw-bold"
+            [disabled]="recurringLoading"
+            (click)="confirmRecurringBooking()">
+      {{ recurringLoading ? 'Rezervisanje...' : '🔁 REZERVIŠI ' + recurringWeeks + ' TERMINA' }}
+    </button>
+  </div>
+
+  <!-- Rezultat -->
+  <div *ngIf="recurringResult" class="mt-2">
+    <div class="alert alert-success small py-2">
+      ✅ Rezervisano {{ recurringResult.created }} termina.
+    </div>
+    <div class="alert alert-warning small py-2" *ngIf="recurringResult.failed?.length > 0">
+      ⚠️ Zauzeto: {{ recurringResult.failed.join(', ') }}
+    </div>
+  </div>
+</div>
+
+<div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
+  Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.
+</div>
 
             <div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
               Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.

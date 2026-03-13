@@ -282,20 +282,35 @@
             <div class="slot-summary-price">{{ venue.price_per_slot }} RSD</div>
           </div>
 
+          <!-- Nelogovan korisnik -->
+          <div class="guest-cta" *ngIf="!authService.isLoggedIn()">
+            <div class="guest-cta-icon"><i class="bi bi-lock-fill"></i></div>
+            <p class="guest-cta-text">Prijavite se da biste rezervisali termin</p>
+            <a routerLink="/login" class="btn-guest-login">
+              <i class="bi bi-box-arrow-in-right"></i> Prijavi se
+            </a>
+            <a routerLink="/userRegister" class="btn-guest-register">
+              <i class="bi bi-person-plus"></i> Kreiraj nalog
+            </a>
+          </div>
+
           <!-- Book button (single) -->
-          <button class="btn-book" *ngIf="venue?.owner_id !== authService.getUser().id && !showRecurring"
+          <button class="btn-book"
+            *ngIf="authService.isLoggedIn() && venue?.owner_id !== authService.getUser().id && !showRecurring"
             [disabled]="!selectedSlot" (click)="confirmBooking()">
             <i class="bi bi-check-circle"></i> Potvrdi rezervaciju
           </button>
 
           <!-- Recurring toggle -->
-          <label class="recurring-toggle" *ngIf="selectedSlot && venue?.owner_id !== authService.getUser().id">
+          <label class="recurring-toggle"
+            *ngIf="authService.isLoggedIn() && selectedSlot && venue?.owner_id !== authService.getUser().id">
             <input type="checkbox" [(ngModel)]="showRecurring" />
             <span><i class="bi bi-arrow-repeat"></i> Ponavljaj svake sedmice</span>
           </label>
 
           <!-- Recurring panel -->
-          <div class="recurring-panel" *ngIf="showRecurring && venue?.owner_id !== authService.getUser().id">
+          <div class="recurring-panel"
+            *ngIf="authService.isLoggedIn() && showRecurring && venue?.owner_id !== authService.getUser().id">
             <span class="booking-label">Broj sedmica (uključujući prvu)</span>
             <div class="recurring-slider-row">
               <input type="range" min="2" max="8" [(ngModel)]="recurringWeeks" />
@@ -323,7 +338,7 @@
           </div>
 
           <!-- Owner info -->
-          <div class="owner-info-msg" *ngIf="venue?.owner_id === authService.getUser().id">
+          <div class="owner-info-msg" *ngIf="authService.isLoggedIn() && venue?.owner_id === authService.getUser().id">
             <i class="bi bi-info-circle"></i>
             Koristite Alate za vlasnika za upravljanje terminima.
           </div>

@@ -23,7 +23,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   searchTerm = '';
   selectedCity = '';
-  selectedSport: any = '';
+  selectedSport = '';   // uvijek string, nikad undefined/null
   cities: string[] = [];
   sports: any[] = [];
 
@@ -87,25 +87,17 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   loadAvailableToday() {
     this.availableTodayLoading = true;
     this.venueService.getAvailableToday().subscribe({
-      next: (data: any) => {
-        this.availableToday = data;
-        this.availableTodayLoading = false;
-      },
-      error: () => {
-        this.availableTodayLoading = false;
-      }
+      next: (data) => { this.availableToday = data; this.availableTodayLoading = false; },
+      error: () => { this.availableTodayLoading = false; }
     });
   }
 
-  // Carousel scroll buttons
   carouselScroll(dir: 'left' | 'right') {
     const track = this.carouselTrackRef?.nativeElement;
     if (!track) return;
-    const amount = 340;
-    track.scrollBy({ left: dir === 'right' ? amount : -amount, behavior: 'smooth' });
+    track.scrollBy({ left: dir === 'right' ? 340 : -340, behavior: 'smooth' });
   }
 
-  // Drag-to-scroll
   onCarouselMouseDown(e: MouseEvent) {
     const track = this.carouselTrackRef?.nativeElement;
     if (!track) return;
@@ -120,16 +112,12 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.isDragging) return;
     const track = this.carouselTrackRef?.nativeElement;
     if (!track) return;
-    const dx = e.pageX - this.dragStartX;
-    track.scrollLeft = this.scrollStartX - dx;
+    track.scrollLeft = this.scrollStartX - (e.pageX - this.dragStartX);
   }
 
   onCarouselMouseUp() {
     const track = this.carouselTrackRef?.nativeElement;
-    if (track) {
-      track.style.cursor = 'grab';
-      track.style.userSelect = '';
-    }
+    if (track) { track.style.cursor = 'grab'; track.style.userSelect = ''; }
     this.isDragging = false;
   }
 
@@ -137,7 +125,6 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.isDragging) this.onCarouselMouseUp();
   }
 
-  // Navigate only if not dragging (distinguish click vs drag)
   private dragDistanceMoved = 0;
   onCarouselDragStart(e: MouseEvent) {
     this.dragDistanceMoved = 0;
@@ -152,9 +139,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToVenue(venueId: string) {
-    if (this.dragDistanceMoved < 8) {
-      this.router.navigate(['/venues/details', venueId]);
-    }
+    if (this.dragDistanceMoved < 8) this.router.navigate(['/venues/details', venueId]);
   }
 
   // ---- GOOGLE MAPS ----
@@ -235,15 +220,23 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
         fillColor: '#1e3a5f', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2,
         scale: 1.8, anchor: new google.maps.Point(12, 22),
       };
-      const marker = new google.maps.Marker({ position, map: this.map, title: venue.name, icon: svgMarker, animation: google.maps.Animation.DROP });
-      marker.addListener('click', () => this.ngZone.run(() => { this.selectedVenue = venue; this.openInfoWindow(marker, venue); }));
+      const marker = new google.maps.Marker({
+        position, map: this.map, title: venue.name, icon: svgMarker,
+        animation: google.maps.Animation.DROP
+      });
+      marker.addListener('click', () => this.ngZone.run(() => {
+        this.selectedVenue = venue;
+        this.openInfoWindow(marker, venue);
+      }));
       this.markers.push(marker);
       bounds.extend(position);
     });
 
     if (hasValidCoords && venues.length > 1) {
       this.map.fitBounds(bounds);
-      google.maps.event.addListenerOnce(this.map, 'idle', () => { if (this.map.getZoom() > 13) this.map.setZoom(13); });
+      google.maps.event.addListenerOnce(this.map, 'idle', () => {
+        if (this.map.getZoom() > 13) this.map.setZoom(13);
+      });
     } else if (hasValidCoords && venues.length === 1) {
       this.map.setCenter(bounds.getCenter());
       this.map.setZoom(14);
@@ -278,7 +271,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.venueService.getAllVenues().subscribe({
       next: (data) => {
         this.venues = data;
-        this.filteredVenues = data;
+        this.filteredVenues = [...data];
         this.cities = [...new Set(data.map((v: any) => v.city).filter(Boolean))].sort() as string[];
         this.loading = false;
         if (this.mapReady) this.placeMarkers(this.filteredVenues);
@@ -287,41 +280,103 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  loadSports() { this.venueService.getSports().subscribe({ next: (d) => this.sports = d, error: () => { } }); }
+  loadSports() {
+    this.venueService.getSports().subscribe({ next: (d) => this.sports = d, error: () => { } });
+  }
 
   loadStats() {
     this.venueService.getPublicStats().subscribe({
-      next: (d) => { this.statVenues = d.total_venues; this.statUsers = d.total_users; this.statBookings = d.total_bookings; },
+      next: (d) => {
+        this.statVenues = d.total_venues;
+        this.statUsers = d.total_users;
+        this.statBookings = d.total_bookings;
+      },
       error: () => { }
     });
   }
 
+  // Zatvori dropdowne klikom van njih
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent) {
-    if (!(e.target as HTMLElement).closest('.search-dropdown-wrap')) { this.cityOpen = false; this.sportOpen = false; }
+    const target = e.target as HTMLElement;
+    // Zatvori samo ako klik nije unutar search-card (da chip buttoni rade)
+    if (!target.closest('.search-card') && !target.closest('.active-filters')) {
+      this.cityOpen = false;
+      this.sportOpen = false;
+    }
   }
 
-  toggleCityDropdown(e: MouseEvent) { e.stopPropagation(); this.cityOpen = !this.cityOpen; this.sportOpen = false; }
-  toggleSportDropdown(e: MouseEvent) { e.stopPropagation(); this.sportOpen = !this.sportOpen; this.cityOpen = false; }
+  toggleCityDropdown(e: MouseEvent) {
+    e.stopPropagation();
+    this.cityOpen = !this.cityOpen;
+    this.sportOpen = false;
+  }
 
-  selectCity(city: string, e?: MouseEvent) { e?.stopPropagation(); this.selectedCity = city; this.cityOpen = false; this.applyFilters(); }
-  selectSport(sportId: any, e?: MouseEvent) { e?.stopPropagation(); this.selectedSport = sportId; this.sportOpen = false; this.applyFilters(); }
+  toggleSportDropdown(e: MouseEvent) {
+    e.stopPropagation();
+    this.sportOpen = !this.sportOpen;
+    this.cityOpen = false;
+  }
 
-  onSearchInput() { clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(() => this.applyFilters(), 300); }
-  clearSearch() { this.searchTerm = ''; this.applyFilters(); }
-  resetFilters() { this.searchTerm = ''; this.selectedCity = ''; this.selectedSport = ''; this.applyFilters(); }
+  selectCity(city: string, e?: MouseEvent) {
+    e?.stopPropagation();
+    this.selectedCity = city;
+    this.cityOpen = false;
+    this.applyFilters();
+  }
+
+  selectSport(sportId: any, e?: MouseEvent) {
+    e?.stopPropagation();
+    // Uvijek čuvaj kao string
+    this.selectedSport = sportId ? String(sportId) : '';
+    this.sportOpen = false;
+    this.applyFilters();
+  }
+
+  onSearchInput() {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => this.applyFilters(), 300);
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.applyFilters();
+  }
+
+  // Potpuni reset — vraća sve na početak
+  resetFilters() {
+    this.searchTerm = '';
+    this.selectedCity = '';
+    this.selectedSport = '';
+    this.cityOpen = false;
+    this.sportOpen = false;
+    this.isFiltering = false;
+    this.filteredVenues = [...this.venues];
+    if (this.mapReady) this.placeMarkers(this.filteredVenues);
+  }
 
   applyFilters() {
-    this.isFiltering = !!(this.searchTerm || this.selectedCity || this.selectedSport);
-    const term = this.searchTerm.toLowerCase();
-    this.filteredVenues = this.venues.filter(v => {
-      const matchSearch = !term || v.name?.toLowerCase().includes(term) || v.street?.toLowerCase().includes(term) || v.city?.toLowerCase().includes(term);
-      const matchCity = !this.selectedCity || v.city === this.selectedCity;
-      const matchSport = !this.selectedSport || String(v.sport_id) === String(this.selectedSport);
-      return matchSearch && matchCity && matchSport;
-    });
+    const term = this.searchTerm.trim().toLowerCase();
+    const city = this.selectedCity;
+    const sport = this.selectedSport; // uvijek string
+
+    this.isFiltering = !!(term || city || sport);
+
+    if (!this.isFiltering) {
+      this.filteredVenues = [...this.venues];
+    } else {
+      this.filteredVenues = this.venues.filter(v => {
+        const matchSearch = !term ||
+          v.name?.toLowerCase().includes(term) ||
+          v.street?.toLowerCase().includes(term) ||
+          v.city?.toLowerCase().includes(term);
+        const matchCity = !city || v.city === city;
+        const matchSport = !sport || String(v.sport_id) === sport;
+        return matchSearch && matchCity && matchSport;
+      });
+    }
+
     if (this.mapReady) this.placeMarkers(this.filteredVenues);
-    setTimeout(() => this.scrollToSearch(), 50);
   }
 
   scrollToSearch() {

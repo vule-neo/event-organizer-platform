@@ -99,7 +99,7 @@
       <div class="active-filters" *ngIf="isFiltering">
         <span class="filter-chip" *ngIf="searchTerm">
           <i class="bi bi-search"></i> "{{ searchTerm }}"
-          <button (click)="clearSearch()"><i class="bi bi-x"></i></button>
+          <button (click)="clearSearch(); $event.stopPropagation()"><i class="bi bi-x"></i></button>
         </span>
         <span class="filter-chip" *ngIf="selectedCity">
           <i class="bi bi-geo-alt"></i> {{ selectedCity }}
@@ -110,7 +110,7 @@
           <button (click)="selectSport('', $event)"><i class="bi bi-x"></i></button>
         </span>
         <span class="filter-results-count">{{ filteredVenues.length }} rezultata</span>
-        <button class="filter-reset-link" (click)="resetFilters()">Poništi sve</button>
+        <button class="filter-reset-link" (click)="resetFilters(); $event.stopPropagation()">Poništi sve</button>
       </div>
 
       <!-- Stats -->

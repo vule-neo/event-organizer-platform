@@ -555,3 +555,184 @@
   color: var(--text-secondary);
   padding: 8px;
 }
+/* Dijeli owner-page, owner-venues-grid, ovc-* stilove iz owner-venues.component.css */
+/* Ovdje su samo booking-specific stilovi */
+
+.booking-card-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-card-item:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: rgba(30,58,95,0.12);
+}
+
+/* Status pill on image */
+.booking-status-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.status-confirmed {
+  background: rgba(22,163,74,0.85);
+  color: #fff;
+}
+
+.status-completed {
+  background: rgba(30,58,95,0.85);
+  color: #fff;
+}
+
+.status-cancelled {
+  background: rgba(107,114,128,0.75);
+  color: #fff;
+}
+
+.status-cancelled-late {
+  background: rgba(220,53,69,0.8);
+  color: #fff;
+}
+
+/* Booking info grid */
+.booking-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.booking-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.booking-info-row:last-child {
+  border-bottom: none;
+}
+
+.booking-info-row span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.booking-info-row span i {
+  color: var(--navy);
+  font-size: 13px;
+}
+
+.booking-info-row strong {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.booking-price-paid {
+  color: #16a34a !important;
+}
+
+/* Card footer */
+.booking-card-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.w-full {
+  width: 100%;
+  justify-content: center;
+}
+
+.ovc-btn-review {
+  background: rgba(232,184,109,0.1);
+  border-color: rgba(232,184,109,0.4);
+  color: var(--gold-dark);
+  font-size: 13px;
+  padding: 10px;
+}
+
+.ovc-btn-review:hover {
+  background: var(--gold);
+  color: var(--text);
+  border-color: var(--gold);
+}
+
+.ovc-btn-delete.w-full {
+  font-size: 13px;
+  padding: 10px;
+}
+
+.booking-no-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 8px;
+}
+
+.booking-reviewed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #16a34a;
+  font-weight: 600;
+  padding: 8px;
+}
+
+.booking-cancelled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px;
+}
+
+/* ---- CLICKABLE CARD FIX ---- */
+.booking-card-item {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.booking-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(30,58,95,0.15);
+}
+
+/* Spriječi da dugmad unutar kartice aktiviraju routerLink */
+.booking-card-footer button,
+.booking-card-footer a {
+  position: relative;
+  z-index: 2;
+}
+
+.booking-card-footer button:hover,
+.booking-card-footer a:hover {
+  transform: none; /* ne translateY jer je kartica već podiže */
+}

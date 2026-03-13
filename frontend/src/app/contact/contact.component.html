@@ -1,0 +1,135 @@
+<div class="support-page">
+
+  <!-- Hero -->
+  <div class="support-hero contact-hero">
+    <div class="support-hero-blob"></div>
+    <div class="support-hero-inner">
+      <div class="support-badge"><i class="bi bi-envelope-fill"></i> Kontakt</div>
+      <h1>Pišite nam</h1>
+      <p>Naš tim odgovara u roku od nekoliko sati svakim radnim danom.</p>
+    </div>
+  </div>
+
+  <div class="contact-container">
+
+    <div class="contact-grid">
+
+      <!-- Left: Info -->
+      <div class="contact-info">
+        <div class="contact-info-card">
+          <div class="contact-info-item">
+            <div class="ci-icon"><i class="bi bi-envelope"></i></div>
+            <div>
+              <span class="ci-label">Email</span>
+              <a class="ci-value" href="mailto:info@sportskitermin.rs">info&#64;sportskitermin.rs</a>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon"><i class="bi bi-telephone"></i></div>
+            <div>
+              <span class="ci-label">Telefon</span>
+              <a class="ci-value" href="tel:+381111234567">+381 11 123 4567</a>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon"><i class="bi bi-clock"></i></div>
+            <div>
+              <span class="ci-label">Radno vreme podrške</span>
+              <span class="ci-value">Pon–Pet, 09:00–18:00</span>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon"><i class="bi bi-geo-alt"></i></div>
+            <div>
+              <span class="ci-label">Adresa</span>
+              <span class="ci-value">Beograd, Srbija</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-social-card">
+          <p class="contact-social-label">Pratite nas</p>
+          <div class="contact-socials">
+            <a href="#" class="cs-btn" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="cs-btn" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="cs-btn" aria-label="Twitter/X"><i class="bi bi-twitter-x"></i></a>
+          </div>
+        </div>
+
+        <div class="contact-faq-nudge">
+          <i class="bi bi-question-circle"></i>
+          <div>
+            <strong>Brži odgovor?</strong>
+            <p>Možda je odgovor već na stranici <a routerLink="/faq">čestih pitanja</a>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="contact-form-wrap">
+        <div class="contact-form-card">
+          <h2>Pošaljite poruku</h2>
+          <p class="contact-form-sub">Popunite formu i javićemo se što pre.</p>
+
+          <div *ngIf="sent" class="contact-success">
+            <i class="bi bi-check-circle-fill"></i>
+            <div>
+              <strong>Poruka je poslata!</strong>
+              <span>Javićemo se na tvoju email adresu u roku od nekoliko sati.</span>
+            </div>
+          </div>
+
+          <form *ngIf="!sent" (ngSubmit)="submitForm()" #contactForm="ngForm">
+
+            <div class="form-row-2">
+              <div class="cf-group">
+                <label>Ime i prezime</label>
+                <div class="cf-input-wrap">
+                  <i class="bi bi-person cf-icon"></i>
+                  <input type="text" [(ngModel)]="form.name" name="name" placeholder="Marko Marković" required />
+                </div>
+              </div>
+              <div class="cf-group">
+                <label>Email adresa</label>
+                <div class="cf-input-wrap">
+                  <i class="bi bi-envelope cf-icon"></i>
+                  <input type="email" [(ngModel)]="form.email" name="email" placeholder="marko&#64;email.com" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="cf-group">
+              <label>Tema</label>
+              <div class="cf-input-wrap">
+                <i class="bi bi-tag cf-icon"></i>
+                <select [(ngModel)]="form.topic" name="topic" required>
+                  <option value="" disabled>Izaberi temu...</option>
+                  <option value="rezervacija">Problem sa rezervacijom</option>
+                  <option value="nalog">Problem sa nalogom</option>
+                  <option value="placanje">Pitanje o plaćanju</option>
+                  <option value="teren">Prijava problema sa terenom</option>
+                  <option value="vlasnik">Postavljanje terena / vlasnici</option>
+                  <option value="sugestija">Sugestija ili ideja</option>
+                  <option value="ostalo">Ostalo</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="cf-group">
+              <label>Poruka</label>
+              <textarea [(ngModel)]="form.message" name="message" placeholder="Opišite vaš problem ili pitanje..." rows="5" required></textarea>
+              <span class="cf-char-count">{{ form.message.length }} / 1000</span>
+            </div>
+
+            <button type="submit" class="btn-send" [disabled]="submitting || !contactForm.valid">
+              <span *ngIf="!submitting"><i class="bi bi-send"></i> Pošalji poruku</span>
+              <span *ngIf="submitting"><i class="bi bi-hourglass-split"></i> Slanje...</span>
+            </button>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

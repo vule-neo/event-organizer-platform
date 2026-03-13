@@ -19,6 +19,7 @@ export class VenueService {
   private apiUrl = 'http://localhost:5000/api/venues';
   private sportsUrl = 'http://localhost:5000/api/venues/sports';
   private tagsUrl = 'http://localhost:5000/api/venues/tags';
+  private baseUrl = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) {}
 
@@ -32,6 +33,10 @@ export class VenueService {
 
   getAllVenues(): Observable<Venue[]> {
     return this.http.get<Venue[]>(`${this.apiUrl}/all`);
+  }
+
+  getPublicStats(): Observable<{ total_venues: number; total_users: number; total_bookings: number }> {
+    return this.http.get<any>(`${this.apiUrl}/stats`);
   }
 
   deleteVenue(id: string): Observable<any> {
@@ -57,8 +62,6 @@ export class VenueService {
   toggleVenueActive(id: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/toggle-active`, {});
   }
-
-  private baseUrl = 'http://localhost:5000/api';
 
   getVenueReviews(venueId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/reviews/venue/${venueId}`);

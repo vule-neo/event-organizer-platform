@@ -1,0 +1,131 @@
+<div class="support-page">
+
+  <!-- Hero -->
+  <div class="support-hero help-hero">
+    <div class="support-hero-blob"></div>
+    <div class="support-hero-inner">
+      <div class="support-badge"><i class="bi bi-life-preserver"></i> Centar za pomoć</div>
+      <h1>Kako možemo pomoći?</h1>
+      <p>Sve što trebaš znati o korišćenju SportskiTermin platforme.</p>
+    </div>
+  </div>
+
+  <div class="help-container">
+
+    <!-- Quick cards -->
+    <div class="help-cards-grid">
+      <div class="help-card" routerLink="/faq" [queryParams]="{cat:'rezervacije'}">
+        <div class="help-card-icon"><i class="bi bi-calendar-check"></i></div>
+        <h3>Rezervacije</h3>
+        <p>Kako rezervisati, promeniti ili proveriti status termina.</p>
+        <span class="help-card-link">Saznaj više <i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="help-card" routerLink="/faq" [queryParams]="{cat:'placanje'}">
+        <div class="help-card-icon help-icon-gold"><i class="bi bi-credit-card"></i></div>
+        <h3>Plaćanje</h3>
+        <p>Model plaćanja, cene i naknade na platformi.</p>
+        <span class="help-card-link">Saznaj više <i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="help-card" routerLink="/faq" [queryParams]="{cat:'otkazivanje'}">
+        <div class="help-card-icon help-icon-red"><i class="bi bi-x-circle"></i></div>
+        <h3>Otkazivanje</h3>
+        <p>Politika otkazivanja i povrata — sve što trebaš znati.</p>
+        <span class="help-card-link">Saznaj više <i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="help-card" routerLink="/faq" [queryParams]="{cat:'nalog'}">
+        <div class="help-card-icon"><i class="bi bi-person-circle"></i></div>
+        <h3>Nalog i profil</h3>
+        <p>Registracija, lozinka, podešavanja naloga.</p>
+        <span class="help-card-link">Saznaj više <i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="help-card" routerLink="/faq" [queryParams]="{cat:'vlasnici'}">
+        <div class="help-card-icon"><i class="bi bi-building"></i></div>
+        <h3>Za vlasnike terena</h3>
+        <p>Dodavanje terena, upravljanje rezervacijama i statistikama.</p>
+        <span class="help-card-link">Saznaj više <i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="help-card" routerLink="/contact">
+        <div class="help-card-icon help-icon-navy"><i class="bi bi-headset"></i></div>
+        <h3>Kontaktiraj nas</h3>
+        <p>Nisi pronašao odgovor? Naš tim je tu za tebe.</p>
+        <span class="help-card-link">Piši nam <i class="bi bi-arrow-right"></i></span>
+      </div>
+    </div>
+
+    <!-- How it works steps -->
+    <div class="help-section">
+      <div class="help-section-title">
+        <h2>Kako funkcioniše <span class="text-navy">SportskiTermin</span>?</h2>
+        <p>Tri koraka do tvog sledećeg meča</p>
+      </div>
+      <div class="help-steps">
+        <div class="help-step">
+          <div class="help-step-num">01</div>
+          <div class="help-step-icon"><i class="bi bi-search"></i></div>
+          <h4>Pronađi teren</h4>
+          <p>Pretraži po gradu, sportu i dostupnim terminima. Pogledaj fotografije, ocene i sve detalje.</p>
+        </div>
+        <div class="help-step-arrow"><i class="bi bi-arrow-right"></i></div>
+        <div class="help-step">
+          <div class="help-step-num">02</div>
+          <div class="help-step-icon"><i class="bi bi-calendar3"></i></div>
+          <h4>Izaberi termin</h4>
+          <p>Odaberi datum i slobodan termin koji ti odgovara. Dostupnost je prikazana u realnom vremenu.</p>
+        </div>
+        <div class="help-step-arrow"><i class="bi bi-arrow-right"></i></div>
+        <div class="help-step">
+          <div class="help-step-num">03</div>
+          <div class="help-step-icon"><i class="bi bi-check-circle"></i></div>
+          <h4>Potvrdi i igraj</h4>
+          <p>Potvrdi rezervaciju, dobij email potvrdu i dođi na teren. Platiš gotovinom na licu mesta.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancellation policy -->
+    <div class="help-section">
+      <div class="help-section-title">
+        <h2>Politika <span class="text-navy">otkazivanja</span></h2>
+        <p>Jasna pravila, bez iznenađenja</p>
+      </div>
+      <div class="help-policy-grid">
+        <div class="help-policy-card help-policy-ok">
+          <div class="help-policy-icon"><i class="bi bi-check-circle-fill"></i></div>
+          <h4>Više od 24h pre termina</h4>
+          <p>Otkazivanje je <strong>potpuno besplatno</strong>. Samo klikni "Otkaži" u sekciji Moje rezervacije i termin se oslobađa.</p>
+          <div class="help-policy-tag">✓ Bez penala</div>
+        </div>
+        <div class="help-policy-card help-policy-warn">
+          <div class="help-policy-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+          <h4>Manje od 24h pre termina</h4>
+          <p>Otkazivanje putem platforme <strong>nije moguće</strong>. Kontaktiraj vlasnika terena direktno ako imaš hitne okolnosti.</p>
+          <div class="help-policy-tag">✗ Nije dostupno</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="help-section">
+      <div class="help-section-title">
+        <h2>Korisni <span class="text-navy">saveti</span></h2>
+      </div>
+      <div class="help-tips">
+        <div class="help-tip"><i class="bi bi-lightbulb-fill"></i><span>Rezerviši što ranije — popularni tereni se popunjavaju brzo, posebno vikendom i u večernjim satima.</span></div>
+        <div class="help-tip"><i class="bi bi-bell-fill"></i><span>Postavi obaveštenja za omiljena terena kako bi bio prvi obavešten kad se pojavi slobodan termin.</span></div>
+        <div class="help-tip"><i class="bi bi-star-fill"></i><span>Ostavi recenziju nakon korišćenja terena — pomažeš zajednici i vlasniku da poboljša uslugu.</span></div>
+        <div class="help-tip"><i class="bi bi-phone-fill"></i><span>Aplikacija je optimizovana za mobilne uređaje — rezerviši teren direktno sa telefona u par sekundi.</span></div>
+      </div>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="help-cta">
+      <h3>Još uvek imaš pitanja?</h3>
+      <p>Pogledaj sve odgovore ili nam piši direktno.</p>
+      <div class="help-cta-btns">
+        <a routerLink="/faq" class="btn-help-primary"><i class="bi bi-question-circle"></i> Česta pitanja</a>
+        <a routerLink="/contact" class="btn-help-secondary"><i class="bi bi-envelope"></i> Kontakt</a>
+      </div>
+    </div>
+
+  </div>
+</div>

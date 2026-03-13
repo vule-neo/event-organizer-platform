@@ -2,10 +2,7 @@ const venueService = require('../services/venues.service');
 
 exports.createVenue = async (req, res) => {
   try {
-    // Multer popunjava req.body i req.files
-    // Šaljemo oba servisu da bi on mogao da uradi transakciju
     const result = await venueService.createVenue(req.body, req.files);
-    
     res.status(201).json(result);
   } catch (err) {
     console.error('Greška u kontroleru (createVenue):', err);
@@ -15,7 +12,7 @@ exports.createVenue = async (req, res) => {
 
 exports.getVenuesForOwner = async (req, res) => {
   try {
-    const { ownerId } = req.params; 
+    const { ownerId } = req.params;
     const result = await venueService.getVenuesForOwner(ownerId);
     res.json(result);
   } catch (err) {
@@ -58,7 +55,6 @@ exports.getVenueById = async (req, res) => {
 exports.updateVenue = async (req, res) => {
   try {
     const { id } = req.params;
-    // req.body su tekstualna polja, req.files su nove slike ako ih ima
     const result = await venueService.updateVenue(id, req.body, req.files);
     res.json(result);
   } catch (err) {
@@ -88,6 +84,16 @@ exports.getAllTags = async (req, res) => {
   try {
     const tags = await venueService.getAllTags();
     res.json(tags);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ---- NOVO ----
+exports.getPublicStats = async (req, res) => {
+  try {
+    const result = await venueService.getPublicStats();
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

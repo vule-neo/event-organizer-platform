@@ -16,6 +16,9 @@ import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminVenuesComponent } from './admin-venues/admin-venues.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { FaqComponent } from './faq/faq.component';
+import { HelpmeComponent } from './helpme/helpme.component';
+import { ContactComponent } from './contact/contact.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/explore', pathMatch: 'full' },
@@ -45,5 +48,8 @@ export const routes: Routes = [
       { path: 'users', component: AdminUsersComponent },
       { path: 'venues', component: AdminVenuesComponent }
     ]
-  }
+  },
+  { path: 'faq',     component: FaqComponent     },
+  { path: 'help',    component: HelpmeComponent    },
+  { path: 'contact', component: ContactComponent },
 ];

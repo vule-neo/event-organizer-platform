@@ -11,6 +11,7 @@ router.patch('/:id/toggle-active', authMiddleware, roleMiddleware(['owner']), ve
 router.get('/sports', venueController.getAllSports);
 router.get('/tags', venueController.getAllTags);
 router.get('/all', venueController.getAllVenues);
+router.get('/stats', venueController.getPublicStats); // NOVO — mora prije /:id
 router.delete('/:id', authMiddleware, roleMiddleware(['owner']), venueController.deleteVenue);
 router.put('/:id', authMiddleware, roleMiddleware(['owner']), upload.array('images', 20), venueController.updateVenue);
 router.get('/:id', venueController.getVenueById);

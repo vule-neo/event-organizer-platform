@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookingService } from '../services/booking.service';
 import { ReviewModalComponent } from '../review-modal/review-modal.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-my-bookings',
   standalone: true,
-  imports: [CommonModule, ReviewModalComponent],
+  imports: [CommonModule, ReviewModalComponent, RouterLink],
   templateUrl: './my-bookings.component.html',
   styleUrls: ['./my-bookings.component.css']
 })

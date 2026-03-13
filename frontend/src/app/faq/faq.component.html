@@ -1,0 +1,185 @@
+<div class="support-page">
+
+  <!-- Hero -->
+  <div class="support-hero faq-hero">
+    <div class="support-hero-blob"></div>
+    <div class="support-hero-inner">
+      <div class="support-badge"><i class="bi bi-question-circle-fill"></i> Česta pitanja</div>
+      <h1>Sve što trebate znati</h1>
+      <p>Pronađite brze odgovore na najčešća pitanja o SportskiTermin platformi.</p>
+    </div>
+  </div>
+
+  <div class="faq-wrap">
+
+    <!-- Sidebar nav -->
+    <aside class="faq-sidebar">
+      <div class="faq-sidebar-inner">
+        <p class="faq-sidebar-label">Kategorije</p>
+        <a class="faq-nav-item" [class.active]="activeCategory === 'rezervacije'" (click)="activeCategory='rezervacije'">
+          <i class="bi bi-calendar-check"></i> Rezervacije
+        </a>
+        <a class="faq-nav-item" [class.active]="activeCategory === 'placanje'" (click)="activeCategory='placanje'">
+          <i class="bi bi-credit-card"></i> Plaćanje
+        </a>
+        <a class="faq-nav-item" [class.active]="activeCategory === 'otkazivanje'" (click)="activeCategory='otkazivanje'">
+          <i class="bi bi-x-circle"></i> Otkazivanje
+        </a>
+        <a class="faq-nav-item" [class.active]="activeCategory === 'nalog'" (click)="activeCategory='nalog'">
+          <i class="bi bi-person-circle"></i> Nalog
+        </a>
+        <a class="faq-nav-item" [class.active]="activeCategory === 'ocenjivanje'" (click)="activeCategory='ocenjivanje'">
+          <i class="bi bi-star"></i> Ocenjivanje
+        </a>
+        <a class="faq-nav-item" [class.active]="activeCategory === 'vlasnici'" (click)="activeCategory='vlasnici'">
+          <i class="bi bi-building"></i> Za vlasnike
+        </a>
+        <div class="faq-sidebar-divider"></div>
+        <a routerLink="/contact" class="faq-nav-contact">
+          <i class="bi bi-chat-dots"></i> Kontaktirajte nas
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="faq-main">
+
+      <!-- REZERVACIJE -->
+      <div class="faq-section" id="rezervacije" *ngIf="activeCategory === 'rezervacije'">
+        <div class="faq-section-header">
+          <div class="faq-section-icon"><i class="bi bi-calendar-check"></i></div>
+          <h2>Rezervacije</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let item of faqs.rezervacije">
+            <button class="faq-q" [class.open]="openId === item.id" (click)="toggle(item.id)">
+              <span>{{ item.q }}</span>
+              <i class="bi" [ngClass]="openId === item.id ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+            </button>
+            <div class="faq-a" [class.show]="openId === item.id">
+              <div class="faq-a-inner" [innerHTML]="item.a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAĆANJE -->
+      <div class="faq-section" id="placanje" *ngIf="activeCategory === 'placanje'">
+        <div class="faq-section-header">
+          <div class="faq-section-icon faq-icon-gold"><i class="bi bi-credit-card"></i></div>
+          <h2>Plaćanje</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let item of faqs.placanje">
+            <button class="faq-q" [class.open]="openId === item.id" (click)="toggle(item.id)">
+              <span>{{ item.q }}</span>
+              <i class="bi" [ngClass]="openId === item.id ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+            </button>
+            <div class="faq-a" [class.show]="openId === item.id">
+              <div class="faq-a-inner" [innerHTML]="item.a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OTKAZIVANJE -->
+      <div class="faq-section" id="otkazivanje" *ngIf="activeCategory === 'otkazivanje'">
+        <div class="faq-section-header">
+          <div class="faq-section-icon faq-icon-red"><i class="bi bi-x-circle"></i></div>
+          <h2>Otkazivanje i povrat</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let item of faqs.otkazivanje">
+            <button class="faq-q" [class.open]="openId === item.id" (click)="toggle(item.id)">
+              <span>{{ item.q }}</span>
+              <i class="bi" [ngClass]="openId === item.id ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+            </button>
+            <div class="faq-a" [class.show]="openId === item.id">
+              <div class="faq-a-inner" [innerHTML]="item.a"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Policy box -->
+        <div class="policy-card">
+          <div class="policy-row policy-ok">
+            <i class="bi bi-check-circle-fill"></i>
+            <div><strong>Više od 24h pre termina</strong><span>Besplatno otkazivanje, bez penala</span></div>
+          </div>
+          <div class="policy-divider"></div>
+          <div class="policy-row policy-warn">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <div><strong>Manje od 24h pre termina</strong><span>Otkazivanje nije moguće putem platforme</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NALOG -->
+      <div class="faq-section" id="nalog" *ngIf="activeCategory === 'nalog'">
+        <div class="faq-section-header">
+          <div class="faq-section-icon"><i class="bi bi-person-circle"></i></div>
+          <h2>Nalog i profil</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let item of faqs.nalog">
+            <button class="faq-q" [class.open]="openId === item.id" (click)="toggle(item.id)">
+              <span>{{ item.q }}</span>
+              <i class="bi" [ngClass]="openId === item.id ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+            </button>
+            <div class="faq-a" [class.show]="openId === item.id">
+              <div class="faq-a-inner" [innerHTML]="item.a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCENJIVANJE -->
+      <div class="faq-section" id="ocenjivanje" *ngIf="activeCategory === 'ocenjivanje'">
+        <div class="faq-section-header">
+          <div class="faq-section-icon faq-icon-gold"><i class="bi bi-star"></i></div>
+          <h2>Ocenjivanje terena</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let item of faqs.ocenjivanje">
+            <button class="faq-q" [class.open]="openId === item.id" (click)="toggle(item.id)">
+              <span>{{ item.q }}</span>
+              <i class="bi" [ngClass]="openId === item.id ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+            </button>
+            <div class="faq-a" [class.show]="openId === item.id">
+              <div class="faq-a-inner" [innerHTML]="item.a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VLASNICI -->
+      <div class="faq-section" id="vlasnici" *ngIf="activeCategory === 'vlasnici'">
+        <div class="faq-section-header">
+          <div class="faq-section-icon"><i class="bi bi-building"></i></div>
+          <h2>Za vlasnike terena</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let item of faqs.vlasnici">
+            <button class="faq-q" [class.open]="openId === item.id" (click)="toggle(item.id)">
+              <span>{{ item.q }}</span>
+              <i class="bi" [ngClass]="openId === item.id ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+            </button>
+            <div class="faq-a" [class.show]="openId === item.id">
+              <div class="faq-a-inner" [innerHTML]="item.a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA bottom -->
+      <div class="faq-cta">
+        <i class="bi bi-headset"></i>
+        <div>
+          <h3>Niste pronašli odgovor?</h3>
+          <p>Pišite nam — odgovaramo u roku od nekoliko sati.</p>
+        </div>
+        <a routerLink="/contact" class="btn-faq-cta">Kontaktirajte nas <i class="bi bi-arrow-right"></i></a>
+      </div>
+
+    </main>
+  </div>
+</div>

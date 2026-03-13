@@ -46,7 +46,6 @@ exports.createVenue = async (venueData, files) => {
       }
     }
 
-    // Tagovi
     if (venueData.tags) {
       const tags = typeof venueData.tags === 'string'
         ? JSON.parse(venueData.tags)
@@ -113,7 +112,6 @@ exports.updateVenue = async (venueId, body, files) => {
       }
     }
 
-    // Tagovi — re-insert metoda
     await client.query('DELETE FROM venue_tag_map WHERE venue_id = $1', [venueId]);
     if (tags) {
       const tagList = typeof tags === 'string' ? JSON.parse(tags) : tags;
@@ -284,3 +282,13 @@ exports.getAllTags = async () => {
   return result.rows;
 };
 
+// ---- NOVO ----
+exports.getPublicStats = async () => {
+  const result = await pool.query(`
+    SELECT 
+      (SELECT COUNT(*) FROM venues WHERE is_active = true)::int AS total_venues,
+      (SELECT COUNT(*) FROM users WHERE role = 'customer' AND is_active = true)::int AS total_users,
+      (SELECT COUNT(*) FROM bookings)::int AS total_bookings
+  `);
+  return result.rows[0];
+};

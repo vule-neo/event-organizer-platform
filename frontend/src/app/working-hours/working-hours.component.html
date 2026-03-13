@@ -1,18 +1,50 @@
-<div class="working-hours-container">
-  <div class="day-row" *ngFor="let day of workingHours">
-    <div class="day-info">
-      <input type="checkbox" [(ngModel)]="day.is_open" id="day-{{day.day_of_week}}">
-      <label [for]="day.day_of_week"><strong>{{ day.day_name }}</strong></label>
+<div class="wh-container">
+  <div class="wh-day-card" *ngFor="let day of workingHours" [class.wh-closed]="!day.is_open"
+    [class.wh-open]="day.is_open">
+    <!-- Header -->
+    <div class="wh-day-header" (click)="toggleDay(day)">
+      <div class="wh-day-info">
+        <div class="wh-chk" [class.wh-chk-active]="day.is_open">
+          <i class="bi bi-check-lg" *ngIf="day.is_open"></i>
+        </div>
+        <span class="wh-day-name">{{ day.day_name }}</span>
+        <span class="wh-day-short" *ngIf="day.is_open && day.open_time && day.close_time">
+          {{ day.open_time }} – {{ day.close_time }}
+        </span>
+      </div>
+      <div class="wh-day-right">
+        <span class="wh-badge wh-badge-open" *ngIf="day.is_open">Otvoreno</span>
+        <span class="wh-badge wh-badge-closed" *ngIf="!day.is_open">Zatvoreno</span>
+        <i class="bi wh-chevron" [class.bi-chevron-down]="!day.is_open" [class.bi-chevron-up]="day.is_open"></i>
+      </div>
     </div>
 
-    <div class="time-pickers" *ngIf="day.is_open; else closedText">
-      <input type="time" [(ngModel)]="day.open_time">
-      <span> do </span>
-      <input type="time" [(ngModel)]="day.close_time">
-    </div>
+    <!-- Time panel -->
+    <div class="wh-time-panel" *ngIf="day.is_open">
+      <div class="wh-time-group">
+        <label>Otvaranje</label>
+        <div class="wh-time-input-wrap">
+          <i class="bi bi-sunrise wh-time-icon"></i>
+          <input type="time" [(ngModel)]="day.open_time" (click)="$event.stopPropagation()" />
+        </div>
+      </div>
 
-    <ng-template #closedText>
-      <span class="status-closed">Zatvoreno</span>
-    </ng-template>
+      <div class="wh-time-arrow">
+        <i class="bi bi-arrow-right"></i>
+      </div>
+
+      <div class="wh-time-group">
+        <label>Zatvaranje</label>
+        <div class="wh-time-input-wrap">
+          <i class="bi bi-sunset wh-time-icon"></i>
+          <input type="time" [(ngModel)]="day.close_time" (click)="$event.stopPropagation()" />
+        </div>
+      </div>
+
+      <div class="wh-duration" *ngIf="day.open_time && day.close_time">
+        <i class="bi bi-clock-history"></i>
+        {{ getDuration(day.open_time, day.close_time) }}
+      </div>
+    </div>
   </div>
 </div>

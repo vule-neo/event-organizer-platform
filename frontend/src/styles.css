@@ -4,33 +4,36 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
 @import './support.css';
+
 /* ---- CSS VARIABLES ---- */
 :root {
-  --navy:           #1e3a5f;
-  --navy-light:     #2a4f82;
-  --navy-dark:      #152a45;
-  --gold:           #e8b86d;
-  --gold-light:     #f0ca8e;
-  --gold-dark:      #d4a050;
-  --bg:             #fafaf9;
-  --bg-secondary:   #f5f3f0;
-  --card:           #ffffff;
-  --border:         #ece9e3;
-  --text:           #1a1a2e;
+  --navy: #1e3a5f;
+  --navy-light: #2a4f82;
+  --navy-dark: #152a45;
+  --gold: #e8b86d;
+  --gold-light: #f0ca8e;
+  --gold-dark: #d4a050;
+  --bg: #fafaf9;
+  --bg-secondary: #f5f3f0;
+  --card: #ffffff;
+  --border: #ece9e3;
+  --text: #1a1a2e;
   --text-secondary: #6b7280;
-  --text-muted:     #9ca3af;
-  --shadow-sm:  0 1px 3px rgba(30,58,95,0.06);
-  --shadow:     0 4px 16px rgba(30,58,95,0.08), 0 2px 6px rgba(30,58,95,0.04);
-  --shadow-lg:  0 12px 40px rgba(30,58,95,0.12), 0 4px 12px rgba(30,58,95,0.06);
-  --shadow-xl:  0 24px 64px rgba(30,58,95,0.16);
-  --radius-sm:  10px;
-  --radius:     16px;
-  --radius-lg:  24px;
+  --text-muted: #9ca3af;
+  --shadow-sm: 0 1px 3px rgba(30, 58, 95, 0.06);
+  --shadow: 0 4px 16px rgba(30, 58, 95, 0.08), 0 2px 6px rgba(30, 58, 95, 0.04);
+  --shadow-lg: 0 12px 40px rgba(30, 58, 95, 0.12), 0 4px 12px rgba(30, 58, 95, 0.06);
+  --shadow-xl: 0 24px 64px rgba(30, 58, 95, 0.16);
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ---- RESET & BASE ---- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -49,7 +52,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
   line-height: 1.2;
@@ -75,16 +83,19 @@ button {
 /* ---- CONTENT WRAPPER ---- */
 .content-wrapper {
   min-height: 100vh;
-  padding-top: 80px; /* navbar height */
+  padding-top: 80px;
+  /* navbar height */
 }
 
 /* ---- SCROLLBAR ---- */
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-secondary);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--navy);
   border-radius: 3px;
@@ -94,15 +105,27 @@ button {
 [data-aos] {
   pointer-events: none;
 }
+
 [data-aos].aos-animate {
   pointer-events: auto;
 }
 
 /* ---- UTILITY CLASSES ---- */
-.text-navy   { color: var(--navy); }
-.text-gold   { color: var(--gold); }
-.text-muted  { color: var(--text-secondary); }
-.font-serif  { font-family: 'Montserrat', sans-serif; }
+.text-navy {
+  color: var(--navy);
+}
+
+.text-gold {
+  color: var(--gold);
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.font-serif {
+  font-family: 'Montserrat', sans-serif;
+}
 
 .btn-primary {
   display: inline-flex;
@@ -118,6 +141,7 @@ button {
   transition: var(--transition);
   border: 2px solid var(--navy);
 }
+
 .btn-primary:hover {
   background: var(--gold);
   border-color: var(--gold);
@@ -140,6 +164,7 @@ button {
   transition: var(--transition);
   border: 2px solid var(--navy);
 }
+
 .btn-outline:hover {
   background: var(--navy);
   color: #fff;
@@ -155,7 +180,7 @@ button {
 .pac-container {
   border-radius: 12px !important;
   border: 1.5px solid #ece9e3 !important;
-  box-shadow: 0 8px 32px rgba(30,58,95,0.12), 0 2px 8px rgba(30,58,95,0.06) !important;
+  box-shadow: 0 8px 32px rgba(30, 58, 95, 0.12), 0 2px 8px rgba(30, 58, 95, 0.06) !important;
   font-family: 'Inter', sans-serif !important;
   margin-top: 6px !important;
   overflow: hidden !important;
@@ -178,7 +203,7 @@ button {
 
 .pac-item:hover,
 .pac-item-selected {
-  background: rgba(30,58,95,0.06) !important;
+  background: rgba(30, 58, 95, 0.06) !important;
 }
 
 .pac-item-query {
@@ -196,7 +221,7 @@ button {
   margin-right: 10px !important;
   margin-top: 0 !important;
   flex-shrink: 0 !important;
-  background-color: rgba(30,58,95,0.08) !important;
+  background-color: rgba(30, 58, 95, 0.08) !important;
   border-radius: 50% !important;
   background-size: 0 !important;
 }
@@ -387,6 +412,7 @@ button {
     grid-template-columns: 1fr 1fr;
     gap: 32px;
   }
+
   .footer-brand {
     grid-column: 1 / -1;
   }
@@ -398,11 +424,147 @@ button {
     gap: 32px;
     padding: 48px 0 32px;
   }
+
   .footer-brand {
     grid-column: auto;
   }
+
   .footer-bottom {
     flex-direction: column;
     text-align: center;
   }
+}
+
+
+/* ============================================================
+   GOOGLE MAPS POPUP — mora biti u styles.css (GLOBALNO)
+   InfoWindow se renderuje van Angular shadow DOM-a
+   ============================================================ */
+
+/* Override Google's default InfoWindow padding */
+.gm-style .gm-style-iw-c {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(30, 58, 95, 0.18) !important;
+  overflow: hidden !important;
+  max-width: 260px !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+/* Hide default close button — we have our own */
+.gm-style .gm-style-iw-t::after {
+  background: #fff !important;
+}
+
+/* ---- POPUP CARD ---- */
+.map-popup {
+  width: 240px;
+  font-family: 'Inter', sans-serif;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.map-popup-img {
+  position: relative;
+  height: 130px;
+  overflow: hidden;
+}
+
+.map-popup-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.map-popup-sport {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #1e3a5f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  letter-spacing: 0.3px;
+}
+
+.map-popup-body {
+  padding: 12px 14px 14px;
+}
+
+.map-popup-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+.map-popup-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.map-popup-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.map-popup-new {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e8b86d;
+  background: rgba(232, 184, 109, 0.12);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+
+.map-popup-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a5f;
+  background: rgba(30, 58, 95, 0.07);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+
+.map-popup-loc {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 10px;
+}
+
+.map-popup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 0;
+  background: #1e3a5f;
+  color: #fff !important;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.map-popup-btn:hover {
+  background: #2a4f7e;
 }

@@ -399,9 +399,15 @@
   margin-bottom: 16px;
 }
 
-.vf-upload-area:hover {
+.vf-upload-area:hover,
+.vf-upload-area.drag-active {
   border-color: var(--navy);
-  background: rgba(30,58,95,0.02);
+  background: rgba(30,58,95,0.04);
+}
+
+.vf-upload-area.drag-active {
+  border-style: solid;
+  transform: scale(1.02);
 }
 
 .vf-upload-icon {

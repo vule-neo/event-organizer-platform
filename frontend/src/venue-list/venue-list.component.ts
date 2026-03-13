@@ -1,9 +1,12 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { VenueService } from '../app/services/venue.service';
 import { AuthService } from '../app/services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../environments/environment';
+
+declare var google: any;
 
 @Component({
   selector: 'app-venue-list',
@@ -12,7 +15,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './venue-list.component.html',
   styleUrl: './venue-list.component.css'
 })
-export class VenueListComponent implements OnInit, OnDestroy {
+export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   venues: any[] = [];
   filteredVenues: any[] = [];
   loading = true;
@@ -36,12 +39,22 @@ export class VenueListComponent implements OnInit, OnDestroy {
   activeHowItWorksTab: 'players' | 'owners' = 'players';
   private autoRotateInterval: any;
 
+  // Map
+  private map: any = null;
+  private markers: any[] = [];
+  private infoWindow: any = null;
+  selectedVenue: any = null;
+  mapReady = false;
+  private mapInitAttempts = 0;
+
   String = String;
   private searchTimeout: any;
 
   constructor(
     private venueService: VenueService,
-    public authService: AuthService
+    public authService: AuthService,
+    private router: Router,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit() {
@@ -49,20 +62,194 @@ export class VenueListComponent implements OnInit, OnDestroy {
     this.loadSports();
     this.loadStats();
     this.startAutoRotate();
+    this.loadGoogleMapsScript();
+  }
+
+  ngAfterViewInit() {
+    // Try init map after view is ready (in case script already loaded)
+    this.tryInitMap();
   }
 
   ngOnDestroy() {
     this.stopAutoRotate();
+    this.clearMarkers();
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(e: MouseEvent) {
-    if (!(e.target as HTMLElement).closest('.search-dropdown-wrap')) {
-      this.cityOpen = false;
-      this.sportOpen = false;
+  // ---- GOOGLE MAPS SCRIPT LOADER ----
+  private loadGoogleMapsScript() {
+    if (typeof google !== 'undefined' && google.maps) {
+      this.tryInitMap();
+      return;
+    }
+    if (document.getElementById('google-maps-script')) {
+      // Script already added, wait for it
+      this.waitForGoogle();
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'google-maps-script';
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=sr`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      this.ngZone.run(() => this.tryInitMap());
+    };
+    document.head.appendChild(script);
+  }
+
+  private waitForGoogle() {
+    const interval = setInterval(() => {
+      if (typeof google !== 'undefined' && google.maps) {
+        clearInterval(interval);
+        this.ngZone.run(() => this.tryInitMap());
+      }
+    }, 200);
+  }
+
+  private tryInitMap() {
+    if (this.map) return;
+    if (typeof google === 'undefined' || !google.maps) return;
+    const container = document.getElementById('venues-map');
+    if (!container) {
+      // DOM not ready yet, retry
+      if (this.mapInitAttempts < 20) {
+        this.mapInitAttempts++;
+        setTimeout(() => this.tryInitMap(), 300);
+      }
+      return;
+    }
+    this.initMap(container);
+  }
+
+  private initMap(container: HTMLElement) {
+    // Center on Serbia
+    const srbija = { lat: 44.0165, lng: 21.0059 };
+
+    this.map = new google.maps.Map(container, {
+      center: srbija,
+      zoom: 7,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      zoomControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_CENTER
+      },
+      styles: [
+        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9d8e8' }] },
+        { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f5f3f0' }] },
+        { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+        { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#e0ddd8' }] },
+        { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#c9c9c9' }] },
+      ]
+    });
+
+    this.infoWindow = new google.maps.InfoWindow();
+    this.mapReady = true;
+
+    // Place markers if venues already loaded
+    if (this.venues.length > 0) {
+      this.placeMarkers(this.filteredVenues);
     }
   }
 
+  private clearMarkers() {
+    this.markers.forEach(m => m.setMap(null));
+    this.markers = [];
+  }
+
+  private placeMarkers(venues: any[]) {
+    if (!this.map || !this.mapReady) return;
+    this.clearMarkers();
+
+    const bounds = new google.maps.LatLngBounds();
+    let hasValidCoords = false;
+
+    venues.forEach(venue => {
+      const lat = parseFloat(venue.lat);
+      const lng = parseFloat(venue.lng);
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      hasValidCoords = true;
+      const position = { lat, lng };
+
+      // Custom navy marker SVG
+      const svgMarker = {
+        path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
+        fillColor: '#1e3a5f',
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+        scale: 1.8,
+        anchor: new google.maps.Point(12, 22),
+      };
+
+      const marker = new google.maps.Marker({
+        position,
+        map: this.map,
+        title: venue.name,
+        icon: svgMarker,
+        animation: google.maps.Animation.DROP,
+      });
+
+      marker.addListener('click', () => {
+        this.ngZone.run(() => {
+          this.selectedVenue = venue;
+          this.openInfoWindow(marker, venue);
+        });
+      });
+
+      this.markers.push(marker);
+      bounds.extend(position);
+    });
+
+    if (hasValidCoords && venues.length > 1) {
+      this.map.fitBounds(bounds);
+      // Don't zoom in too much
+      google.maps.event.addListenerOnce(this.map, 'idle', () => {
+        if (this.map.getZoom() > 13) this.map.setZoom(13);
+      });
+    } else if (hasValidCoords && venues.length === 1) {
+      this.map.setCenter(bounds.getCenter());
+      this.map.setZoom(14);
+    }
+  }
+
+  private openInfoWindow(marker: any, venue: any) {
+    const sportName = this.getSportName(venue.sport_id);
+    const rating = venue.avg_rating
+      ? `<span class="map-popup-rating"><i class="bi bi-star-fill" style="color:#e8b86d;font-size:11px;"></i> ${Number(venue.avg_rating).toFixed(1)}</span>`
+      : `<span class="map-popup-new">Novo</span>`;
+
+    const imgSrc = venue.main_image
+      ? `http://localhost:5000${venue.main_image}`
+      : 'assets/no-image.jpg';
+
+    const content = `
+      <div class="map-popup">
+        <div class="map-popup-img">
+          <img src="${imgSrc}" alt="${venue.name}" onerror="this.src='assets/no-image.jpg'" />
+          <span class="map-popup-sport">${sportName}</span>
+        </div>
+        <div class="map-popup-body">
+          <h4 class="map-popup-name">${venue.name}</h4>
+          <div class="map-popup-meta">
+            ${rating}
+            <span class="map-popup-price">${venue.price_per_slot} RSD</span>
+          </div>
+          <p class="map-popup-loc"><i class="bi bi-geo-alt" style="font-size:11px;margin-right:3px;"></i>${venue.city}</p>
+          <a class="map-popup-btn" href="/venues/details/${venue.id}">
+            Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i>
+          </a>
+        </div>
+      </div>`;
+
+    this.infoWindow.setContent(content);
+    this.infoWindow.open(this.map, marker);
+  }
+
+  // ---- VENUE LOADING ----
   loadVenues() {
     this.venueService.getAllVenues().subscribe({
       next: (data) => {
@@ -70,6 +257,10 @@ export class VenueListComponent implements OnInit, OnDestroy {
         this.filteredVenues = data;
         this.cities = [...new Set(data.map((v: any) => v.city).filter(Boolean))].sort() as string[];
         this.loading = false;
+        // Markers after venues loaded
+        if (this.mapReady) {
+          this.placeMarkers(this.filteredVenues);
+        }
       },
       error: () => { this.errorMessage = 'Neuspešno učitavanje terena.'; this.loading = false; }
     });
@@ -86,7 +277,14 @@ export class VenueListComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Ove metode već postoje u tvom kodu:
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(e: MouseEvent) {
+    if (!(e.target as HTMLElement).closest('.search-dropdown-wrap')) {
+      this.cityOpen = false;
+      this.sportOpen = false;
+    }
+  }
+
   toggleCityDropdown(e: MouseEvent) {
     e.stopPropagation();
     this.cityOpen = !this.cityOpen;
@@ -137,19 +335,19 @@ export class VenueListComponent implements OnInit, OnDestroy {
       return matchSearch && matchCity && matchSport;
     });
 
-    setTimeout(() => {
-      this.scrollToSearch();
-    }, 50);
+    // Update map markers to match filters
+    if (this.mapReady) {
+      this.placeMarkers(this.filteredVenues);
+    }
+
+    setTimeout(() => this.scrollToSearch(), 50);
   }
 
   scrollToSearch() {
     const searchCard = document.querySelector('.search-card') as HTMLElement;
     if (searchCard) {
-      // Offset -100px kako bi search bar bio malo ispod vrha (i eventualnog navbar-a)
       const yOffset = -100;
       const y = searchCard.getBoundingClientRect().top + window.scrollY + yOffset;
-
-      // Skrolujemo samo ako smo udaljeni više od npr 50px, da ne trza kad je već u fokusu
       if (Math.abs(window.scrollY - y) > 50) {
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
@@ -161,18 +359,15 @@ export class VenueListComponent implements OnInit, OnDestroy {
     return this.sports.find(x => String(x.id) === String(sportId))?.name ?? '';
   }
 
-  // --- HOW IT WORKS TAB LOGIC ---
   setHowItWorksTab(tab: 'players' | 'owners', userInitiated: boolean = false) {
     this.activeHowItWorksTab = tab;
-    if (userInitiated) {
-      this.stopAutoRotate();
-    }
+    if (userInitiated) this.stopAutoRotate();
   }
 
   private startAutoRotate() {
     this.autoRotateInterval = setInterval(() => {
       this.activeHowItWorksTab = this.activeHowItWorksTab === 'players' ? 'owners' : 'players';
-    }, 5000); // menjamo svakih 5 sekundi
+    }, 5000);
   }
 
   private stopAutoRotate() {
@@ -182,4 +377,8 @@ export class VenueListComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Da li nijedan filtrirani teren nema koordinate */
+  get noVenueCoords(): boolean {
+    return this.filteredVenues.length > 0 && this.filteredVenues.every(v => !v.lat || !v.lng);
+  }
 }

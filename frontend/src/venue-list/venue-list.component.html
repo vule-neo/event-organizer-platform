@@ -167,6 +167,34 @@
   </div>
 </section>
 
+<!-- ===== MAP SECTION ===== -->
+<section class="map-section">
+  <div class="section-container">
+    <div class="map-section-header">
+      <div class="map-section-title">
+        <h2>Tereni na <span class="text-navy">mapi</span></h2>
+        <p *ngIf="!isFiltering">Svi aktivni tereni u Srbiji</p>
+        <p *ngIf="isFiltering">{{ filteredVenues.length }} terena pronađeno</p>
+      </div>
+      <div class="map-legend">
+        <span class="map-legend-dot"></span>
+        <span class="map-legend-label">Sportski teren</span>
+      </div>
+    </div>
+    <div class="map-wrapper">
+      <div id="venues-map"></div>
+      <div class="map-loading" *ngIf="!mapReady">
+        <div class="map-loading-spinner"></div>
+        <span>Učitavanje mape...</span>
+      </div>
+      <div class="map-no-coords" *ngIf="mapReady && noVenueCoords">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>Lokacije terena nisu dostupne na mapi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== HOW IT WORKS ===== -->
 <section class="how-it-works" *ngIf="!isFiltering">
   <div class="section-container">
@@ -418,4 +446,3 @@
     </div>
   </section>
 </ng-container>
-

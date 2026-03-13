@@ -28,7 +28,8 @@ export class VenueFormComponent implements OnInit {
   selectedFiles: File[] = [];
   previewUrls: string[] = [];
   sports: any[] = [];
-  
+  isDragging = false;
+
   // Tagovi
   allTags: any[] = [];
   selectedTagIds: string[] = [];
@@ -38,7 +39,7 @@ export class VenueFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private venueService: VenueService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.venueId = this.route.snapshot.paramMap.get('id');
@@ -146,11 +147,40 @@ export class VenueFormComponent implements OnInit {
 
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
+    this.handleFiles(files);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    if (event.dataTransfer && event.dataTransfer.files) {
+      this.handleFiles(event.dataTransfer.files);
+    }
+  }
+
+  private handleFiles(files: FileList) {
     Array.from(files).forEach(file => {
-      this.selectedFiles.push(file);
-      const reader = new FileReader();
-      reader.onload = (e: any) => this.previewUrls.push(e.target.result);
-      reader.readAsDataURL(file);
+      // Validate that it's an image
+      if (file.type.match(/image\/*/)) {
+        this.selectedFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = (e: any) => this.previewUrls.push(e.target.result);
+        reader.readAsDataURL(file);
+      }
     });
   }
 

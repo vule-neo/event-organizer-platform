@@ -1,0 +1,181 @@
+/* ============================================
+   WORKING HOURS — Premium Calendar UI
+   ============================================ */
+
+.wh-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.wh-day-card {
+  background: var(--card);
+  border: 1.5px solid var(--navy);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(30,58,95,0.06);
+}
+
+.wh-day-card.wh-closed {
+  border-color: var(--border);
+  background: var(--bg-secondary);
+  box-shadow: none;
+}
+
+/* Header */
+.wh-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  background: transparent;
+  transition: var(--transition);
+}
+
+.wh-day-header:hover {
+  background: rgba(30,58,95,0.02);
+}
+
+.wh-day-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wh-chk {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  transition: var(--transition);
+  background: #fff;
+}
+
+.wh-chk-active {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+
+.wh-day-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.3px;
+}
+
+.wh-closed .wh-day-name {
+  color: var(--text-muted);
+}
+
+.wh-badge-open {
+  background: rgba(22,163,74,0.1);
+  color: #16a34a;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wh-badge-closed {
+  background: rgba(100,116,139,0.1);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Time Panel (Expanded) */
+.wh-time-panel {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px 20px 58px;
+  border-top: 1px dashed rgba(30,58,95,0.15);
+  background: #fff;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wh-time-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wh-time-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wh-time-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.wh-time-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--navy);
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wh-time-input-wrap input {
+  width: 130px;
+  padding: 10px 10px 10px 36px;
+  background: rgba(30,58,95,0.03);
+  border: 1px solid rgba(30,58,95,0.1);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  transition: var(--transition);
+}
+
+.wh-time-input-wrap input:focus {
+  border-color: var(--navy);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(30,58,95,0.08);
+}
+
+.wh-time-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--border);
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .wh-time-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 20px;
+    gap: 12px;
+  }
+  .wh-time-divider {
+    display: none;
+  }
+}

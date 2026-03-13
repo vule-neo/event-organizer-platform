@@ -231,11 +231,16 @@
         </div>
 
         <!-- Upload area -->
-        <div class="vf-upload-area" (click)="fileInput.click()">
+        <div class="vf-upload-area" 
+             [class.drag-active]="isDragging"
+             (click)="fileInput.click()"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)">
           <input #fileInput type="file" (change)="onFileSelected($event)" multiple accept="image/*" style="display:none;" />
           <div class="vf-upload-inner">
             <div class="vf-upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
-            <p class="vf-upload-title">Kliknite za dodavanje slika</p>
+            <p class="vf-upload-title">Kliknite ili prevucite slike ovde</p>
             <p class="vf-upload-hint">JPG, PNG, WEBP — max 20 slika</p>
           </div>
         </div>

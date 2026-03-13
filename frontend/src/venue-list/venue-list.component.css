@@ -1829,3 +1829,127 @@
     justify-content: center;
   }
 }
+
+/* ============================================================
+   MAP SECTION — dodati u venue-list.component.css
+   ============================================================ */
+
+.map-section {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.map-section-header {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.map-section-title h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.map-section-title p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-legend-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--navy);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--navy);
+}
+
+.map-legend-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Map container */
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+}
+
+#venues-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Loading overlay */
+.map-loading {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  z-index: 10;
+}
+
+.map-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* No coords notice */
+.map-no-coords {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  z-index: 5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .map-wrapper {
+    height: 340px;
+  }
+
+  .map-section-header {
+    padding: 24px 16px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

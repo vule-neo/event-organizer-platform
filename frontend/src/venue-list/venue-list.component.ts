@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, NgZone, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { VenueService } from '../app/services/venue.service';
@@ -47,6 +47,14 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   mapReady = false;
   private mapInitAttempts = 0;
 
+  // Available today carousel
+  @ViewChild('carouselTrack') carouselTrackRef!: ElementRef<HTMLElement>;
+  availableToday: any[] = [];
+  availableTodayLoading = true;
+  private isDragging = false;
+  private dragStartX = 0;
+  private scrollStartX = 0;
+
   String = String;
   private searchTimeout: any;
 
@@ -61,12 +69,12 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadVenues();
     this.loadSports();
     this.loadStats();
+    this.loadAvailableToday();
     this.startAutoRotate();
     this.loadGoogleMapsScript();
   }
 
   ngAfterViewInit() {
-    // Try init map after view is ready (in case script already loaded)
     this.tryInitMap();
   }
 
@@ -75,25 +83,90 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.clearMarkers();
   }
 
-  // ---- GOOGLE MAPS SCRIPT LOADER ----
+  // ---- AVAILABLE TODAY ----
+  loadAvailableToday() {
+    this.availableTodayLoading = true;
+    this.venueService.getAvailableToday().subscribe({
+      next: (data: any) => {
+        this.availableToday = data;
+        this.availableTodayLoading = false;
+      },
+      error: () => {
+        this.availableTodayLoading = false;
+      }
+    });
+  }
+
+  // Carousel scroll buttons
+  carouselScroll(dir: 'left' | 'right') {
+    const track = this.carouselTrackRef?.nativeElement;
+    if (!track) return;
+    const amount = 340;
+    track.scrollBy({ left: dir === 'right' ? amount : -amount, behavior: 'smooth' });
+  }
+
+  // Drag-to-scroll
+  onCarouselMouseDown(e: MouseEvent) {
+    const track = this.carouselTrackRef?.nativeElement;
+    if (!track) return;
+    this.isDragging = true;
+    this.dragStartX = e.pageX;
+    this.scrollStartX = track.scrollLeft;
+    track.style.cursor = 'grabbing';
+    track.style.userSelect = 'none';
+  }
+
+  onCarouselMouseMove(e: MouseEvent) {
+    if (!this.isDragging) return;
+    const track = this.carouselTrackRef?.nativeElement;
+    if (!track) return;
+    const dx = e.pageX - this.dragStartX;
+    track.scrollLeft = this.scrollStartX - dx;
+  }
+
+  onCarouselMouseUp() {
+    const track = this.carouselTrackRef?.nativeElement;
+    if (track) {
+      track.style.cursor = 'grab';
+      track.style.userSelect = '';
+    }
+    this.isDragging = false;
+  }
+
+  onCarouselMouseLeave() {
+    if (this.isDragging) this.onCarouselMouseUp();
+  }
+
+  // Navigate only if not dragging (distinguish click vs drag)
+  private dragDistanceMoved = 0;
+  onCarouselDragStart(e: MouseEvent) {
+    this.dragDistanceMoved = 0;
+    this.onCarouselMouseDown(e);
+  }
+
+  onCarouselDragMove(e: MouseEvent) {
+    if (this.isDragging) {
+      this.dragDistanceMoved = Math.abs(e.pageX - this.dragStartX);
+      this.onCarouselMouseMove(e);
+    }
+  }
+
+  navigateToVenue(venueId: string) {
+    if (this.dragDistanceMoved < 8) {
+      this.router.navigate(['/venues/details', venueId]);
+    }
+  }
+
+  // ---- GOOGLE MAPS ----
   private loadGoogleMapsScript() {
-    if (typeof google !== 'undefined' && google.maps) {
-      this.tryInitMap();
-      return;
-    }
-    if (document.getElementById('google-maps-script')) {
-      // Script already added, wait for it
-      this.waitForGoogle();
-      return;
-    }
+    if (typeof google !== 'undefined' && google.maps) { this.tryInitMap(); return; }
+    if (document.getElementById('google-maps-script')) { this.waitForGoogle(); return; }
     const script = document.createElement('script');
     script.id = 'google-maps-script';
     script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=sr`;
     script.async = true;
     script.defer = true;
-    script.onload = () => {
-      this.ngZone.run(() => this.tryInitMap());
-    };
+    script.onload = () => this.ngZone.run(() => this.tryInitMap());
     document.head.appendChild(script);
   }
 
@@ -111,29 +184,20 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (typeof google === 'undefined' || !google.maps) return;
     const container = document.getElementById('venues-map');
     if (!container) {
-      // DOM not ready yet, retry
-      if (this.mapInitAttempts < 20) {
-        this.mapInitAttempts++;
-        setTimeout(() => this.tryInitMap(), 300);
-      }
+      if (this.mapInitAttempts < 20) { this.mapInitAttempts++; setTimeout(() => this.tryInitMap(), 300); }
       return;
     }
     this.initMap(container);
   }
 
   private initMap(container: HTMLElement) {
-    // Center on Serbia
-    const srbija = { lat: 44.0165, lng: 21.0059 };
-
     this.map = new google.maps.Map(container, {
-      center: srbija,
+      center: { lat: 44.0165, lng: 21.0059 },
       zoom: 7,
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
-      zoomControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_CENTER
-      },
+      zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
       styles: [
         { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
         { featureType: 'transit', stylers: [{ visibility: 'off' }] },
@@ -144,14 +208,9 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
         { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#c9c9c9' }] },
       ]
     });
-
     this.infoWindow = new google.maps.InfoWindow();
     this.mapReady = true;
-
-    // Place markers if venues already loaded
-    if (this.venues.length > 0) {
-      this.placeMarkers(this.filteredVenues);
-    }
+    if (this.venues.length > 0) this.placeMarkers(this.filteredVenues);
   }
 
   private clearMarkers() {
@@ -162,7 +221,6 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   private placeMarkers(venues: any[]) {
     if (!this.map || !this.mapReady) return;
     this.clearMarkers();
-
     const bounds = new google.maps.LatLngBounds();
     let hasValidCoords = false;
 
@@ -170,46 +228,22 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       const lat = parseFloat(venue.lat);
       const lng = parseFloat(venue.lng);
       if (isNaN(lat) || isNaN(lng)) return;
-
       hasValidCoords = true;
       const position = { lat, lng };
-
-      // Custom navy marker SVG
       const svgMarker = {
         path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
-        fillColor: '#1e3a5f',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 2,
-        scale: 1.8,
-        anchor: new google.maps.Point(12, 22),
+        fillColor: '#1e3a5f', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2,
+        scale: 1.8, anchor: new google.maps.Point(12, 22),
       };
-
-      const marker = new google.maps.Marker({
-        position,
-        map: this.map,
-        title: venue.name,
-        icon: svgMarker,
-        animation: google.maps.Animation.DROP,
-      });
-
-      marker.addListener('click', () => {
-        this.ngZone.run(() => {
-          this.selectedVenue = venue;
-          this.openInfoWindow(marker, venue);
-        });
-      });
-
+      const marker = new google.maps.Marker({ position, map: this.map, title: venue.name, icon: svgMarker, animation: google.maps.Animation.DROP });
+      marker.addListener('click', () => this.ngZone.run(() => { this.selectedVenue = venue; this.openInfoWindow(marker, venue); }));
       this.markers.push(marker);
       bounds.extend(position);
     });
 
     if (hasValidCoords && venues.length > 1) {
       this.map.fitBounds(bounds);
-      // Don't zoom in too much
-      google.maps.event.addListenerOnce(this.map, 'idle', () => {
-        if (this.map.getZoom() > 13) this.map.setZoom(13);
-      });
+      google.maps.event.addListenerOnce(this.map, 'idle', () => { if (this.map.getZoom() > 13) this.map.setZoom(13); });
     } else if (hasValidCoords && venues.length === 1) {
       this.map.setCenter(bounds.getCenter());
       this.map.setZoom(14);
@@ -221,11 +255,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     const rating = venue.avg_rating
       ? `<span class="map-popup-rating"><i class="bi bi-star-fill" style="color:#e8b86d;font-size:11px;"></i> ${Number(venue.avg_rating).toFixed(1)}</span>`
       : `<span class="map-popup-new">Novo</span>`;
-
-    const imgSrc = venue.main_image
-      ? `http://localhost:5000${venue.main_image}`
-      : 'assets/no-image.jpg';
-
+    const imgSrc = venue.main_image ? `http://localhost:5000${venue.main_image}` : 'assets/no-image.jpg';
     const content = `
       <div class="map-popup">
         <div class="map-popup-img">
@@ -234,22 +264,16 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
         </div>
         <div class="map-popup-body">
           <h4 class="map-popup-name">${venue.name}</h4>
-          <div class="map-popup-meta">
-            ${rating}
-            <span class="map-popup-price">${venue.price_per_slot} RSD</span>
-          </div>
+          <div class="map-popup-meta">${rating}<span class="map-popup-price">${venue.price_per_slot} RSD</span></div>
           <p class="map-popup-loc"><i class="bi bi-geo-alt" style="font-size:11px;margin-right:3px;"></i>${venue.city}</p>
-          <a class="map-popup-btn" href="/venues/details/${venue.id}">
-            Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i>
-          </a>
+          <a class="map-popup-btn" href="/venues/details/${venue.id}">Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>
         </div>
       </div>`;
-
     this.infoWindow.setContent(content);
     this.infoWindow.open(this.map, marker);
   }
 
-  // ---- VENUE LOADING ----
+  // ---- VENUES ----
   loadVenues() {
     this.venueService.getAllVenues().subscribe({
       next: (data) => {
@@ -257,18 +281,13 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.filteredVenues = data;
         this.cities = [...new Set(data.map((v: any) => v.city).filter(Boolean))].sort() as string[];
         this.loading = false;
-        // Markers after venues loaded
-        if (this.mapReady) {
-          this.placeMarkers(this.filteredVenues);
-        }
+        if (this.mapReady) this.placeMarkers(this.filteredVenues);
       },
       error: () => { this.errorMessage = 'Neuspešno učitavanje terena.'; this.loading = false; }
     });
   }
 
-  loadSports() {
-    this.venueService.getSports().subscribe({ next: (d) => this.sports = d, error: () => { } });
-  }
+  loadSports() { this.venueService.getSports().subscribe({ next: (d) => this.sports = d, error: () => { } }); }
 
   loadStats() {
     this.venueService.getPublicStats().subscribe({
@@ -279,51 +298,18 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent) {
-    if (!(e.target as HTMLElement).closest('.search-dropdown-wrap')) {
-      this.cityOpen = false;
-      this.sportOpen = false;
-    }
+    if (!(e.target as HTMLElement).closest('.search-dropdown-wrap')) { this.cityOpen = false; this.sportOpen = false; }
   }
 
-  toggleCityDropdown(e: MouseEvent) {
-    e.stopPropagation();
-    this.cityOpen = !this.cityOpen;
-    this.sportOpen = false;
-  }
+  toggleCityDropdown(e: MouseEvent) { e.stopPropagation(); this.cityOpen = !this.cityOpen; this.sportOpen = false; }
+  toggleSportDropdown(e: MouseEvent) { e.stopPropagation(); this.sportOpen = !this.sportOpen; this.cityOpen = false; }
 
-  toggleSportDropdown(e: MouseEvent) {
-    e.stopPropagation();
-    this.sportOpen = !this.sportOpen;
-    this.cityOpen = false;
-  }
+  selectCity(city: string, e?: MouseEvent) { e?.stopPropagation(); this.selectedCity = city; this.cityOpen = false; this.applyFilters(); }
+  selectSport(sportId: any, e?: MouseEvent) { e?.stopPropagation(); this.selectedSport = sportId; this.sportOpen = false; this.applyFilters(); }
 
-  selectCity(city: string, e?: MouseEvent) {
-    e?.stopPropagation();
-    this.selectedCity = city;
-    this.cityOpen = false;
-    this.applyFilters();
-  }
-
-  selectSport(sportId: any, e?: MouseEvent) {
-    e?.stopPropagation();
-    this.selectedSport = sportId;
-    this.sportOpen = false;
-    this.applyFilters();
-  }
-
-  onSearchInput() {
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => this.applyFilters(), 300);
-  }
-
+  onSearchInput() { clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(() => this.applyFilters(), 300); }
   clearSearch() { this.searchTerm = ''; this.applyFilters(); }
-
-  resetFilters() {
-    this.searchTerm = '';
-    this.selectedCity = '';
-    this.selectedSport = '';
-    this.applyFilters();
-  }
+  resetFilters() { this.searchTerm = ''; this.selectedCity = ''; this.selectedSport = ''; this.applyFilters(); }
 
   applyFilters() {
     this.isFiltering = !!(this.searchTerm || this.selectedCity || this.selectedSport);
@@ -334,12 +320,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       const matchSport = !this.selectedSport || String(v.sport_id) === String(this.selectedSport);
       return matchSearch && matchCity && matchSport;
     });
-
-    // Update map markers to match filters
-    if (this.mapReady) {
-      this.placeMarkers(this.filteredVenues);
-    }
-
+    if (this.mapReady) this.placeMarkers(this.filteredVenues);
     setTimeout(() => this.scrollToSearch(), 50);
   }
 
@@ -348,9 +329,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (searchCard) {
       const yOffset = -100;
       const y = searchCard.getBoundingClientRect().top + window.scrollY + yOffset;
-      if (Math.abs(window.scrollY - y) > 50) {
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
+      if (Math.abs(window.scrollY - y) > 50) window.scrollTo({ top: y, behavior: 'smooth' });
     }
   }
 
@@ -371,13 +350,9 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private stopAutoRotate() {
-    if (this.autoRotateInterval) {
-      clearInterval(this.autoRotateInterval);
-      this.autoRotateInterval = null;
-    }
+    if (this.autoRotateInterval) { clearInterval(this.autoRotateInterval); this.autoRotateInterval = null; }
   }
 
-  /** Da li nijedan filtrirani teren nema koordinate */
   get noVenueCoords(): boolean {
     return this.filteredVenues.length > 0 && this.filteredVenues.every(v => !v.lat || !v.lng);
   }

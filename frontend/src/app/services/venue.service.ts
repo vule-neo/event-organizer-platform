@@ -21,7 +21,7 @@ export class VenueService {
   private tagsUrl = 'http://localhost:5000/api/venues/tags';
   private baseUrl = 'http://localhost:5000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   createVenue(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/new`, data);
@@ -37,6 +37,10 @@ export class VenueService {
 
   getPublicStats(): Observable<{ total_venues: number; total_users: number; total_bookings: number }> {
     return this.http.get<any>(`${this.apiUrl}/stats`);
+  }
+
+  getAvailableToday(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/available-today`);
   }
 
   deleteVenue(id: string): Observable<any> {

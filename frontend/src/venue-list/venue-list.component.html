@@ -195,6 +195,7 @@
   </div>
 </section>
 
+
 <!-- ===== HOW IT WORKS ===== -->
 <section class="how-it-works" *ngIf="!isFiltering">
   <div class="section-container">
@@ -279,6 +280,75 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ===== AVAILABLE TODAY ===== -->
+<section class="avail-section" *ngIf="!isFiltering">
+  <div class="section-container">
+
+    <div class="avail-header">
+      <div>
+        <div class="avail-badge">
+          <span class="avail-pulse"></span>
+          Slobodno danas
+        </div>
+        <h2>Rezerviši <span class="text-navy">odmah</span></h2>
+        <p>Tereni sa slobodnim terminima danas — klikni i rezerviši za par minuta.</p>
+      </div>
+      <div class="avail-controls">
+        <button class="avail-arrow" (click)="carouselScroll('left')" aria-label="Prethodni">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="avail-arrow" (click)="carouselScroll('right')" aria-label="Sledeći">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div class="avail-loader" *ngIf="availableTodayLoading">
+      <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Empty -->
+    <div class="avail-empty" *ngIf="!availableTodayLoading && availableToday.length === 0">
+      <i class="bi bi-calendar-x"></i>
+      <span>Nema slobodnih terena za danas</span>
+    </div>
+
+    <!-- Carousel -->
+    <div class="avail-carousel-wrap" *ngIf="!availableTodayLoading && availableToday.length > 0">
+      <div class="avail-track" #carouselTrack (mousedown)="onCarouselDragStart($event)"
+        (mousemove)="onCarouselDragMove($event)" (mouseup)="onCarouselMouseUp()" (mouseleave)="onCarouselMouseLeave()">
+        <div class="avail-card" *ngFor="let venue of availableToday" (click)="navigateToVenue(venue.id)">
+          <div class="avail-card-img">
+            <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'"
+              [alt]="venue.name" draggable="false" />
+            <div class="avail-card-overlay"></div>
+            <span class="avail-sport-badge">{{ getSportName(venue.sport_id) }}</span>
+            <span class="avail-slots-badge">
+              <i class="bi bi-clock"></i> {{ venue.free_slots_today }} slobodnih
+            </span>
+          </div>
+          <div class="avail-card-body">
+            <h4 class="avail-card-name">{{ venue.name }}</h4>
+            <p class="avail-card-loc">
+              <i class="bi bi-geo-alt"></i> {{ venue.city }}
+            </p>
+            <div class="avail-card-footer">
+              <span class="avail-card-price">{{ venue.price_per_slot }} RSD</span>
+              <div class="avail-card-rating" *ngIf="venue.avg_rating">
+                <i class="bi bi-star-fill"></i>
+                {{ venue.avg_rating | number:'1.1-1' }}
+              </div>
+              <span class="avail-card-new" *ngIf="!venue.avg_rating">Novo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 

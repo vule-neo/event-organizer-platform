@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -49,13 +49,11 @@ export class VenueDetailComponent implements OnInit {
     private venueService: VenueService,
     private bookingService: BookingService,
     public authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadVenue(id);
-    }
+    if (id) this.loadVenue(id);
     this.generateCalendar();
   }
 
@@ -72,172 +70,109 @@ export class VenueDetailComponent implements OnInit {
         this.checkCanReview();
         this.loading = false;
       },
-      error: () => {
-        this.errorMessage = 'Greška pri učitavanju detalja terena.';
-        this.loading = false;
-      }
+      error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
     });
   }
 
   loadReviews() {
     this.venueService.getVenueReviews(this.venue.id).subscribe({
       next: (data) => this.reviews = data,
-      error: () => {}
+      error: () => { }
     });
   }
 
   checkCanReview() {
     const user = this.authService.getUser();
     if (!user || user.id === this.venue.owner_id) return;
-
-    // Provjeri da li ima completed booking za ovaj teren
     this.bookingService.getMyBookings().subscribe({
       next: (bookings: any[]) => {
-        this.canReview = bookings.some(b => 
-          b.venue_id === this.venue.id && 
-          b.status === 'completed' && 
-          !b.is_reviewed
+        this.canReview = bookings.some(b =>
+          b.venue_id === this.venue.id && b.status === 'completed' && !b.is_reviewed
         );
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
-  getCompletedBookingId(): string | null {
-    // Ovo se koristi kad submitujemo review — treba booking_id
-    return null; // Handled u submitReview
-  }
+  getCompletedBookingId(): string | null { return null; }
 
   submitReview() {
     if (!this.reviewComment.trim()) { this.reviewError = 'Unesite komentar.'; return; }
     this.reviewSubmitting = true;
     this.reviewError = '';
-
-    // Nađi completed booking_id
     this.bookingService.getMyBookings().subscribe({
       next: (bookings: any[]) => {
-        const booking = bookings.find(b => 
-          b.venue_id === this.venue.id && 
-          b.status === 'completed' && 
-          !b.is_reviewed
+        const booking = bookings.find(b =>
+          b.venue_id === this.venue.id && b.status === 'completed' && !b.is_reviewed
         );
-
         if (!booking) { this.reviewError = 'Nema završenih rezervacija za recenziju.'; this.reviewSubmitting = false; return; }
-
         this.venueService.submitReview({
           venue_id: this.venue.id,
           booking_id: booking.id,
           rating: this.reviewRating,
           comment: this.reviewComment
         }).subscribe({
-          next: () => {
-            this.reviewSuccess = true;
-            this.reviewSubmitting = false;
-            this.canReview = false;
-            this.loadReviews();
-            this.loadVenue(this.venue.id); // Osvježi avg_rating
-          },
-          error: (err) => {
-            this.reviewError = err.error?.message || 'Greška.';
-            this.reviewSubmitting = false;
-          }
+          next: () => { this.reviewSuccess = true; this.reviewSubmitting = false; this.canReview = false; this.loadReviews(); this.loadVenue(this.venue.id); },
+          error: (err) => { this.reviewError = err.error?.message || 'Greška.'; this.reviewSubmitting = false; }
         });
       }
     });
   }
 
-  setActiveImage(url: string) {
-    this.activeImageUrl = 'http://localhost:5000' + url;
-  }
+  setActiveImage(url: string) { this.activeImageUrl = 'http://localhost:5000' + url; }
 
-  // --- CUSTOM CALENDAR LOGIC ---
+  // --- CALENDAR ---
   generateCalendar() {
     this.calendarDays = [];
-    
-    // First day of logical month
     const firstDay = new Date(this.currentYear, this.currentMonth, 1);
     const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-    
-    // JS getDay(): 0 = Sun, 1 = Mon ... 6 = Sat
-    // We want Mon = 1, Sun = 7 logic for visual layout
     let startingDayOfWeek = firstDay.getDay();
     if (startingDayOfWeek === 0) startingDayOfWeek = 7;
-    
-    // Prev month days to fill the gap
     const prevMonthDays = startingDayOfWeek - 1;
     const prevMonthLastDay = new Date(this.currentYear, this.currentMonth, 0).getDate();
-    
     for (let i = prevMonthDays - 1; i >= 0; i--) {
-      const dayNum = prevMonthLastDay - i;
-      const d = new Date(this.currentYear, this.currentMonth - 1, dayNum);
+      const d = new Date(this.currentYear, this.currentMonth - 1, prevMonthLastDay - i);
       this.calendarDays.push(this.createCalendarDayObj(d, false));
     }
-    
-    // Current month days
     for (let i = 1; i <= lastDay.getDate(); i++) {
-      const d = new Date(this.currentYear, this.currentMonth, i);
-      this.calendarDays.push(this.createCalendarDayObj(d, true));
+      this.calendarDays.push(this.createCalendarDayObj(new Date(this.currentYear, this.currentMonth, i), true));
     }
-    
-    // Next month days to complete 42 cells (6 rows)
     const totalCells = 42;
-    const currentCells = this.calendarDays.length;
-    for (let i = 1; i <= totalCells - currentCells; i++) {
-      const d = new Date(this.currentYear, this.currentMonth + 1, i);
-      this.calendarDays.push(this.createCalendarDayObj(d, false));
+    for (let i = 1; i <= totalCells - this.calendarDays.length; i++) {
+      this.calendarDays.push(this.createCalendarDayObj(new Date(this.currentYear, this.currentMonth + 1, i), false));
     }
   }
 
   private createCalendarDayObj(dateObj: Date, isCurrentMonth: boolean) {
-    // Format YYYY-MM-DD local time adjusted
     const zOffset = dateObj.getTimezoneOffset() * 60000;
     const localISOTime = (new Date(dateObj.getTime() - zOffset)).toISOString().split('T')[0];
-    
-    const todayStr = this.today;
-    const isPast = localISOTime < todayStr;
-    const isToday = localISOTime === todayStr;
-    
     return {
       date: dateObj,
       dateString: localISOTime,
       dayNumber: dateObj.getDate(),
-      isCurrentMonth: isCurrentMonth,
-      isPast: isPast,
-      isToday: isToday
+      isCurrentMonth,
+      isPast: localISOTime < this.today,
+      isToday: localISOTime === this.today
     };
   }
 
   prevMonth() {
-    // Ne damo previse u proslost ako je to pre current month u stvarnosti (opciono)
-    const now = new Date();
-    if (this.currentYear < now.getFullYear() || (this.currentYear === now.getFullYear() && this.currentMonth <= now.getMonth())) {
-      // Allow it or block it. Let's allow but maybe the user won't be able to click past days anyway.
-    }
-    
     this.currentMonth--;
-    if (this.currentMonth < 0) {
-      this.currentMonth = 11;
-      this.currentYear--;
-    }
+    if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear--; }
     this.generateCalendar();
   }
 
   nextMonth() {
     this.currentMonth++;
-    if (this.currentMonth > 11) {
-      this.currentMonth = 0;
-      this.currentYear++;
-    }
+    if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++; }
     this.generateCalendar();
   }
 
   selectCalendarDate(day: any) {
     if (day.isPast) return;
     this.selectedDate = day.dateString;
-    this.selectedSlot = null; // reset slot na promenu dana
+    this.selectedSlot = null;
     this.loadOccupiedSlots();
-    
-    // Ako smo kliknuli na datum iz drugog meseca, fokusiraj taj mesec
     if (!day.isCurrentMonth) {
       this.currentMonth = day.date.getMonth();
       this.currentYear = day.date.getFullYear();
@@ -245,49 +180,85 @@ export class VenueDetailComponent implements OnInit {
     }
   }
 
-  // Obsolete but keep logic if needed by HTML elsewhere
-  onDateChange() {
-    this.selectedSlot = null;
-    this.loadOccupiedSlots();
-  }
+  onDateChange() { this.selectedSlot = null; this.loadOccupiedSlots(); }
 
+  // --- SLOTS: OVERNIGHT SUPPORT ---
   generateSlots() {
     if (!this.venue || !this.venue.working_hours) return;
-    const dateObj = new Date(this.selectedDate);
-    const dayOfWeek = dateObj.getDay();
+
+    const dateObj = new Date(this.selectedDate + 'T12:00:00');
+    const dayOfWeek = dateObj.getDay(); // 0=Sun, 1=Mon...
     const workingDay = this.venue.working_hours.find((h: any) => h.day_of_week === dayOfWeek);
-    if (!workingDay || !workingDay.is_open) { this.availableSlots = []; return; }
+
+    if (!workingDay || !workingDay.is_open) {
+      this.availableSlots = [];
+      return;
+    }
 
     const slots = [];
-    let currentTime = this.parseTime(workingDay.open_time);
-    const endTime = this.parseTime(workingDay.close_time);
+    const openMins = this.parseTime(workingDay.open_time);
+    let closeMins = this.parseTime(workingDay.close_time);
     const duration = this.venue.slot_duration_mins;
 
-    while (currentTime + duration <= endTime) {
+    // Overnight: ako close <= open, dodaj 24h na close
+    // npr. open=08:00 (480), close=02:00 (120) → closeMins = 120 + 1440 = 1560
+    const isOvernight = closeMins <= openMins;
+    if (isOvernight) closeMins += 24 * 60;
+
+    // Ako je odabrani datum danas, računaj trenutno vrijeme u Beogradu
+    const isToday = this.selectedDate === this.today;
+    let nowMins = 0;
+    if (isToday) {
+      const now = new Date();
+      // Beograd = UTC+1 (zimsko) ili UTC+2 (ljetno)
+      const belgradeOffset = this.getBelgradeOffsetMins();
+      const utcMins = now.getUTCHours() * 60 + now.getUTCMinutes();
+      nowMins = (utcMins + belgradeOffset) % (24 * 60);
+    }
+
+    let currentTime = openMins;
+    while (currentTime + duration <= closeMins) {
+      const displayStart = currentTime % (24 * 60);
+      const displayEnd = (currentTime + duration) % (24 * 60);
+      const startStr = this.formatTime(displayStart);
+      const endStr = this.formatTime(displayEnd);
+
+      // Preskoči prošle slotove za danas
+      // Za overnight slotove poslije ponoći, displayStart je mali broj (npr. 30 = 00:30)
+      // ali currentTime je > 1440, pa ih ne preskačemo zbog nowMins poređenja
+      const slotStartForComparison = isOvernight && currentTime >= 24 * 60
+        ? displayStart + 24 * 60  // sutrašnji slot, nikad u prošlosti za danas
+        : displayStart;
+
+      if (isToday && slotStartForComparison <= nowMins) {
+        currentTime += duration;
+        continue; // preskači prošle i trenutne slotove
+      }
+
       slots.push({
-        start: this.formatTime(currentTime),
-        end: this.formatTime(currentTime + duration),
-        isOccupied: this.occupiedSlots.includes(this.formatTime(currentTime))
+        start: startStr,
+        end: endStr,
+        isOvernight: isOvernight && currentTime >= 24 * 60,
+        isOccupied: this.occupiedSlots.includes(startStr)
       });
       currentTime += duration;
     }
     this.availableSlots = slots;
   }
 
-  private parseTime(t: string) {
+  private parseTime(t: string): number {
+    if (!t) return 0;
     const [h, m] = t.split(':').map(Number);
     return h * 60 + m;
   }
 
-  private formatTime(minutes: number) {
+  private formatTime(minutes: number): string {
     const h = Math.floor(minutes / 60).toString().padStart(2, '0');
     const m = (minutes % 60).toString().padStart(2, '0');
     return `${h}:${m}`;
   }
 
-  selectSlot(slot: any) {
-    if (!slot.isOccupied) this.selectedSlot = slot;
-  }
+  selectSlot(slot: any) { if (!slot.isOccupied) this.selectedSlot = slot; }
 
   blockSelectedSlot() {
     if (!this.selectedSlot || !this.venue) return;
@@ -312,7 +283,7 @@ export class VenueDetailComponent implements OnInit {
       next: (occupied: any[]) => {
         this.occupiedSlots = occupied.map(o => {
           const date = new Date(o.start_time);
-          return `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+          return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
         });
         this.generateSlots();
       },
@@ -335,35 +306,84 @@ export class VenueDetailComponent implements OnInit {
   }
 
   // Recurring
-recurringWeeks = 4;
-showRecurring = false;
-recurringResult: any = null;
-recurringLoading = false;
+  recurringWeeks = 4;
+  showRecurring = false;
+  recurringResult: any = null;
+  recurringLoading = false;
 
-confirmRecurringBooking() {
-  if (!this.selectedSlot || !this.venue) return;
-  this.recurringLoading = true;
-  this.recurringResult = null;
+  confirmRecurringBooking() {
+    if (!this.selectedSlot || !this.venue) return;
+    this.recurringLoading = true;
+    this.recurringResult = null;
+    const data = {
+      venue_id: this.venue.id,
+      start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
+      end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
+      price_paid: this.venue.price_per_slot,
+      weeks: this.recurringWeeks
+    };
+    this.bookingService.createRecurringBooking(data).subscribe({
+      next: (res: any) => { this.recurringResult = res; this.recurringLoading = false; this.loadOccupiedSlots(); },
+      error: (err) => { alert(err.error?.message || 'Greška'); this.recurringLoading = false; }
+    });
+  }
 
-  const data = {
-    venue_id: this.venue.id,
-    start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
-    end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
-    price_paid: this.venue.price_per_slot,
-    weeks: this.recurringWeeks
-  };
+  /** Vraća offset Beograda u minutima (60 zimsko, 120 ljetno) */
+  private getBelgradeOffsetMins(): number {
+    // Provjeravamo da li je ljetno računanje: CET=UTC+1, CEST=UTC+2
+    const jan = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset();
+    const jul = new Date(new Date().getFullYear(), 6, 1).getTimezoneOffset();
+    const isDST = new Date().getTimezoneOffset() < Math.max(jan, jul);
+    return isDST ? 120 : 60;
+  }
 
-  this.bookingService.createRecurringBooking(data).subscribe({
-    next: (res: any) => {
-      this.recurringResult = res;
-      this.recurringLoading = false;
-      this.loadOccupiedSlots();
-    },
-    error: (err) => {
-      alert(err.error?.message || 'Greška');
-      this.recurringLoading = false;
+  // ---- SHARE ----
+  shareMenuOpen = false;
+  linkCopied = false;
+  private copyTimeout: any;
+
+  toggleShareMenu(e: MouseEvent) {
+    e.stopPropagation();
+    this.shareMenuOpen = !this.shareMenuOpen;
+  }
+
+  @HostListener('document:click')
+  closeShareMenu() {
+    this.shareMenuOpen = false;
+  }
+
+  shareVia(platform: string) {
+    const url = window.location.href;
+    const text = `Pogledaj ovaj sportski teren: ${this.venue?.name} — `;
+
+    switch (platform) {
+      case 'copy':
+        navigator.clipboard.writeText(url).then(() => {
+          this.linkCopied = true;
+          clearTimeout(this.copyTimeout);
+          this.copyTimeout = setTimeout(() => {
+            this.linkCopied = false;
+            this.shareMenuOpen = false;
+          }, 2000);
+        });
+        break;
+      case 'whatsapp':
+        window.open(`https://wa.me/?text=${encodeURIComponent(text + url)}`, '_blank');
+        this.shareMenuOpen = false;
+        break;
+      case 'viber':
+        window.open(`viber://forward?text=${encodeURIComponent(text + url)}`, '_blank');
+        this.shareMenuOpen = false;
+        break;
+      case 'instagram':
+        // Instagram ne podržava direktan URL share — kopiraj link
+        navigator.clipboard.writeText(url).then(() => {
+          this.linkCopied = true;
+          alert('Link kopiran! Otvori Instagram i zalijepi ga u Story.');
+          clearTimeout(this.copyTimeout);
+          this.copyTimeout = setTimeout(() => { this.linkCopied = false; this.shareMenuOpen = false; }, 3000);
+        });
+        break;
     }
-  });
-}
-
+  }
 }

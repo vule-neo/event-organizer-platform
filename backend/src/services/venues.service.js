@@ -78,6 +78,9 @@ exports.createVenue = async (venueData, files) => {
   }
 };
 
+// ZAMIJENI exports.updateVenue u venues.service.js sa ovim:
+// Ključna razlika: lat/lng su opcionalni u edit modu — ako nisu poslani, zadržavaju staru vrijednost
+
 exports.updateVenue = async (venueId, body, files) => {
   const client = await pool.connect();
   try {
@@ -89,14 +92,31 @@ exports.updateVenue = async (venueId, body, files) => {
       working_hours, imagesToDelete, tags
     } = body;
 
-    await client.query(
-      `UPDATE venues 
-       SET name=$1, sport_id=$2, city=$3, street=$4, lat=$5, lng=$6,
-           price_per_slot=$7, slot_duration_mins=$8, description=$9, updated_at=NOW()
-       WHERE id=$10`,
-      [name, sport_id, city, street, lat, lng,
-        price_per_slot, slot_duration_mins, description, venueId]
-    );
+    // lat/lng mogu biti null/undefined u edit modu ako korisnik nije mijenjao lokaciju
+    // U tom slučaju zadržavamo stare vrijednosti iz baze
+    const hasCoords = lat !== undefined && lat !== null && lat !== '' &&
+      lng !== undefined && lng !== null && lng !== '';
+
+    if (hasCoords) {
+      await client.query(
+        `UPDATE venues 
+         SET name=$1, sport_id=$2, city=$3, street=$4, lat=$5, lng=$6,
+             price_per_slot=$7, slot_duration_mins=$8, description=$9, updated_at=NOW()
+         WHERE id=$10`,
+        [name, sport_id, city, street, lat, lng,
+          price_per_slot, slot_duration_mins, description, venueId]
+      );
+    } else {
+      // Bez lat/lng — zadržavamo stare koordinate
+      await client.query(
+        `UPDATE venues 
+         SET name=$1, sport_id=$2, city=$3, street=$4,
+             price_per_slot=$5, slot_duration_mins=$6, description=$7, updated_at=NOW()
+         WHERE id=$8`,
+        [name, sport_id, city, street,
+          price_per_slot, slot_duration_mins, description, venueId]
+      );
+    }
 
     if (working_hours) {
       await client.query('DELETE FROM working_hours WHERE venue_id = $1', [venueId]);
@@ -316,4 +336,98 @@ exports.getPublicStats = async () => {
       (SELECT COUNT(*) FROM bookings)::int AS total_bookings
   `);
   return result.rows[0];
+};
+
+
+// ============================================================
+// DODATI U: backend/src/services/venues.service.js
+// ============================================================
+
+// ZAMIJENI exports.getAvailableToday u venues.service.js
+
+exports.getAvailableToday = async () => {
+  const result = await pool.query(`
+    WITH today_info AS (
+      SELECT 
+        EXTRACT(DOW FROM NOW() AT TIME ZONE 'Europe/Belgrade')::int AS dow,
+        NOW() AT TIME ZONE 'Europe/Belgrade' AS now_local,
+        (NOW() AT TIME ZONE 'Europe/Belgrade')::time AS now_time,
+        CURRENT_DATE AS today
+    ),
+    open_venues AS (
+      SELECT 
+        v.id, v.name, v.city, v.street,
+        v.price_per_slot, v.slot_duration_mins,
+        v.avg_rating, v.review_count, v.sport_id, v.lat, v.lng,
+        wh.open_time, wh.close_time,
+        -- Overnight: close <= open (npr. 08:00 - 02:00)
+        CASE WHEN wh.close_time <= wh.open_time THEN TRUE ELSE FALSE END AS is_overnight,
+        (SELECT url FROM venue_images WHERE venue_id = v.id ORDER BY display_order ASC LIMIT 1) AS main_image,
+        COALESCE(
+          json_agg(json_build_object('id', vt.id, 'name', vt.name, 'icon', vt.icon))
+          FILTER (WHERE vt.id IS NOT NULL), '[]'
+        ) AS tags
+      FROM venues v
+      JOIN working_hours wh ON wh.venue_id = v.id
+      CROSS JOIN today_info ti
+      LEFT JOIN venue_tag_map vtm ON vtm.venue_id = v.id
+      LEFT JOIN venue_tags vt ON vt.id = vtm.tag_id
+      WHERE v.is_active = TRUE
+        AND wh.day_of_week = ti.dow
+        AND wh.is_open = TRUE
+        -- Teren još nije završio danas:
+        -- Normal:   close_time > now_time
+        -- Overnight: uvijek TRUE (radi do sutra ujutro)
+        AND (
+          (wh.close_time > wh.open_time AND wh.close_time > ti.now_time)
+          OR
+          (wh.close_time <= wh.open_time) -- overnight, još uvijek aktivan
+        )
+      GROUP BY v.id, wh.open_time, wh.close_time
+    ),
+    booked_slots AS (
+      SELECT venue_id, start_time, end_time
+      FROM bookings
+      CROSS JOIN today_info ti
+      WHERE status = 'confirmed' AND start_time::date = ti.today
+    ),
+    venues_with_free_slots AS (
+      SELECT ov.*,
+        (
+          SELECT COUNT(*) FROM generate_series(
+            0,
+            -- Overnight: generišemo do close + 24h (u minutima od open_time)
+            CASE 
+              WHEN ov.is_overnight 
+              THEN (EXTRACT(HOUR FROM ov.close_time)::int * 60 + EXTRACT(MINUTE FROM ov.close_time)::int + 1440)
+                   - (EXTRACT(HOUR FROM ov.open_time)::int * 60 + EXTRACT(MINUTE FROM ov.open_time)::int)
+                   - ov.slot_duration_mins
+              ELSE (EXTRACT(HOUR FROM ov.close_time)::int * 60 + EXTRACT(MINUTE FROM ov.close_time)::int)
+                   - (EXTRACT(HOUR FROM ov.open_time)::int * 60 + EXTRACT(MINUTE FROM ov.open_time)::int)
+                   - ov.slot_duration_mins
+            END,
+            ov.slot_duration_mins
+          ) AS offset_mins
+          CROSS JOIN today_info ti
+          WHERE
+            -- Slot je u budućnosti (još nije prošao)
+            (
+              CURRENT_DATE + ov.open_time + (offset_mins || ' minutes')::interval
+            ) > ti.now_local
+            -- Slot nije rezervisan
+            AND NOT EXISTS (
+              SELECT 1 FROM booked_slots bs
+              WHERE bs.venue_id = ov.id
+                AND bs.start_time <= CURRENT_DATE + ov.open_time + (offset_mins || ' minutes')::interval
+                AND bs.end_time   >  CURRENT_DATE + ov.open_time + (offset_mins || ' minutes')::interval
+            )
+        ) AS free_slots_today
+      FROM open_venues ov
+    )
+    SELECT * FROM venues_with_free_slots
+    WHERE free_slots_today > 0
+    ORDER BY free_slots_today DESC, avg_rating DESC NULLS LAST
+    LIMIT 20
+  `);
+  return result.rows;
 };

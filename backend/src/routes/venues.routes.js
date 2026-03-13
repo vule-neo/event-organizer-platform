@@ -5,6 +5,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 const roleMiddleware = require('../middleware/role.middleware');
 const upload = require('../config/multer');
 
+router.get('/available-today', venueController.getAvailableToday);
 router.post('/new', authMiddleware, roleMiddleware(['owner']), upload.array('images', 20), venueController.createVenue);
 router.get('/owner/:ownerId', authMiddleware, roleMiddleware(['owner', 'admin']), venueController.getVenuesForOwner);
 router.patch('/:id/toggle-active', authMiddleware, roleMiddleware(['owner']), venueController.toggleActive);

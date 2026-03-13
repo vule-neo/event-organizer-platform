@@ -98,3 +98,13 @@ exports.getPublicStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getAvailableToday = async (req, res) => {
+  try {
+    const venues = await venueService.getAvailableToday();
+    res.json(venues);
+  } catch (err) {
+    console.error('getAvailableToday error:', err);
+    res.status(500).json({ message: 'Greška pri učitavanju slobodnih terena.' });
+  }
+};

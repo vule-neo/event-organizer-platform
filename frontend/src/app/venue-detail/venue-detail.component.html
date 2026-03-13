@@ -34,10 +34,8 @@
 
       <!-- Thumbnails -->
       <div class="thumbnails" *ngIf="venue.images?.length > 1">
-        <div *ngFor="let img of venue.images"
-             class="thumb-item"
-             [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url"
-             (click)="setActiveImage(img.url)">
+        <div *ngFor="let img of venue.images" class="thumb-item"
+          [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url" (click)="setActiveImage(img.url)">
           <img [src]="'http://localhost:5000' + img.url" [alt]="venue.name" />
         </div>
       </div>
@@ -46,12 +44,37 @@
       <div class="venue-header">
         <h1>{{ venue.name }}</h1>
 
+        <!-- SHARE DUGME — jedina promjena -->
+        <div class="share-wrap">
+          <button class="btn-share" (click)="toggleShareMenu($event)" title="Podijeli teren">
+            <i class="bi bi-share-fill"></i>
+            <span>Dijeli</span>
+          </button>
+          <div class="share-menu" [class.show]="shareMenuOpen" (click)="$event.stopPropagation()">
+            <button class="share-option" (click)="shareVia('copy')">
+              <i class="bi bi-link-45deg"></i> Kopiraj link
+            </button>
+            <button class="share-option" (click)="shareVia('whatsapp')">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </button>
+            <button class="share-option" (click)="shareVia('viber')">
+              <i class="bi bi-phone-vibrate-fill"></i> Viber
+            </button>
+            <button class="share-option" (click)="shareVia('instagram')">
+              <i class="bi bi-instagram"></i> Instagram Story
+            </button>
+            <div class="share-copied" *ngIf="linkCopied">
+              <i class="bi bi-check-circle-fill"></i> Link kopiran!
+            </div>
+          </div>
+        </div>
+
         <div class="venue-meta">
           <!-- Rating -->
           <div class="venue-rating-row" *ngIf="venue.avg_rating">
             <div class="stars">
               <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                 [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
+                [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
             </div>
             <span class="rating-value">{{ venue.avg_rating }}</span>
             <span class="rating-count">({{ venue.review_count }} recenzija)</span>
@@ -127,20 +150,15 @@
           <h5>Ostavite recenziju</h5>
 
           <div class="star-selector">
-            <button type="button" class="star-btn"
-                    *ngFor="let star of [1,2,3,4,5]"
-                    [class.lit]="star <= (hoverRating || reviewRating)"
-                    (mouseenter)="hoverRating = star"
-                    (mouseleave)="hoverRating = 0"
-                    (click)="reviewRating = star">
+            <button type="button" class="star-btn" *ngFor="let star of [1,2,3,4,5]"
+              [class.lit]="star <= (hoverRating || reviewRating)" (mouseenter)="hoverRating = star"
+              (mouseleave)="hoverRating = 0" (click)="reviewRating = star">
               <i class="bi bi-star-fill"></i>
             </button>
           </div>
 
-          <textarea class="review-textarea"
-                    rows="3"
-                    [(ngModel)]="reviewComment"
-                    placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
+          <textarea class="review-textarea" rows="3" [(ngModel)]="reviewComment"
+            placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
 
           <div class="review-error" *ngIf="reviewError">
             <i class="bi bi-exclamation-circle"></i> {{ reviewError }}
@@ -174,7 +192,7 @@
                 <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
                 <div class="review-stars">
                   <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                     [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                    [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
                 </div>
               </div>
             </div>
@@ -198,7 +216,7 @@
           <div class="booking-rating-row" *ngIf="venue.avg_rating">
             <div class="stars">
               <i class="bi bi-star-fill" *ngFor="let s of [1,2,3,4,5]"
-                 [style.opacity]="s <= venue.avg_rating ? '1' : '0.3'"></i>
+                [style.opacity]="s <= venue.avg_rating ? '1' : '0.3'"></i>
             </div>
             <span>{{ venue.avg_rating }} · {{ venue.review_count }} ocena</span>
           </div>
@@ -222,22 +240,19 @@
                 <i class="bi bi-chevron-right"></i>
               </button>
             </div>
-            
+
             <!-- Dani u nedelji -->
             <div class="calendar-weekdays">
               <span *ngFor="let wk of shortDayNames">{{ wk }}</span>
             </div>
-            
+
             <!-- Grid sa datumima -->
             <div class="calendar-grid">
-              <button *ngFor="let day of calendarDays" 
-                      class="cal-day-btn"
-                      [class.cal-day-other-month]="!day.isCurrentMonth"
-                      [class.cal-day-past]="day.isPast"
-                      [class.cal-day-today]="day.isToday && selectedDate !== day.dateString"
-                      [class.cal-day-selected]="selectedDate === day.dateString"
-                      [disabled]="day.isPast"
-                      (click)="selectCalendarDate(day)">
+              <button *ngFor="let day of calendarDays" class="cal-day-btn"
+                [class.cal-day-other-month]="!day.isCurrentMonth" [class.cal-day-past]="day.isPast"
+                [class.cal-day-today]="day.isToday && selectedDate !== day.dateString"
+                [class.cal-day-selected]="selectedDate === day.dateString" [disabled]="day.isPast"
+                (click)="selectCalendarDate(day)">
                 <span>{{ day.dayNumber }}</span>
               </button>
             </div>
@@ -247,12 +262,8 @@
           <div class="slots-wrap" *ngIf="availableSlots.length > 0">
             <span class="booking-label">Dostupni termini</span>
             <div class="slots-grid">
-              <button *ngFor="let slot of availableSlots"
-                      class="slot-btn"
-                      [class.slot-selected]="selectedSlot === slot"
-                      [class.slot-occupied]="slot.isOccupied"
-                      [disabled]="slot.isOccupied"
-                      (click)="selectSlot(slot)">
+              <button *ngFor="let slot of availableSlots" class="slot-btn" [class.slot-selected]="selectedSlot === slot"
+                [class.slot-occupied]="slot.isOccupied" [disabled]="slot.isOccupied" (click)="selectSlot(slot)">
                 {{ slot.start }}
               </button>
             </div>
@@ -272,10 +283,8 @@
           </div>
 
           <!-- Book button (single) -->
-          <button class="btn-book"
-                  *ngIf="venue?.owner_id !== authService.getUser().id && !showRecurring"
-                  [disabled]="!selectedSlot"
-                  (click)="confirmBooking()">
+          <button class="btn-book" *ngIf="venue?.owner_id !== authService.getUser().id && !showRecurring"
+            [disabled]="!selectedSlot" (click)="confirmBooking()">
             <i class="bi bi-check-circle"></i> Potvrdi rezervaciju
           </button>
 
@@ -296,9 +305,7 @@
               Ukupno: <strong>{{ recurringWeeks * venue.price_per_slot }} RSD</strong>
             </div>
 
-            <button class="btn-recurring-book"
-                    [disabled]="recurringLoading"
-                    (click)="confirmRecurringBooking()">
+            <button class="btn-recurring-book" [disabled]="recurringLoading" (click)="confirmRecurringBooking()">
               <i class="bi bi-arrow-repeat"></i>
               {{ recurringLoading ? 'Rezervisanje...' : 'Rezerviši ' + recurringWeeks + ' termina' }}
             </button>
@@ -325,8 +332,7 @@
       </div>
 
       <!-- Owner tools -->
-      <div class="owner-tools"
-           *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id">
+      <div class="owner-tools" *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id">
         <h6><i class="bi bi-tools"></i> Alati za vlasnika</h6>
         <p>Blokiraj selektovani termin za ovaj dan.</p>
         <button class="btn-block" [disabled]="!selectedSlot" (click)="blockSelectedSlot()">

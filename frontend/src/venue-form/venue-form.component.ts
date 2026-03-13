@@ -194,6 +194,8 @@ export class VenueFormComponent implements OnInit {
     this.existingImages.splice(index, 1);
   }
 
+  // ZAMIJENI createVenue() metodu u venue-form.component.ts
+
   createVenue() {
     if (this.venueForm.invalid) {
       this.message = 'Podaci o terenu nisu ispravni ili niste odabrali lokaciju.';
@@ -207,12 +209,19 @@ export class VenueFormComponent implements OnInit {
 
     const formData = new FormData();
     const formValues = this.venueForm.value;
+
     Object.keys(formValues).forEach(key => {
-      if (formValues[key] !== null && formValues[key] !== undefined) {
-        formData.append(key, formValues[key]);
+      const val = formValues[key];
+      // Šalji i null vrijednosti kao prazan string — backend treba sva polja
+      // Za lat/lng šalji kao broj ili preskoči ako null (backend će zadržati staru vrijednost)
+      if (val !== null && val !== undefined && val !== '') {
+        formData.append(key, val);
       }
     });
 
+    // Ako je edit mode i lat/lng nisu promijenjeni (null u formi),
+    // ne šalji ih — backend će zadržati stare vrijednosti
+    // ALI moramo osigurati da UPDATE ne pokuša SET lat=undefined
     formData.append('working_hours', JSON.stringify(this.savedWorkingHours));
     formData.append('tags', JSON.stringify(this.selectedTagIds));
     this.selectedFiles.forEach(file => formData.append('images', file));
@@ -223,12 +232,12 @@ export class VenueFormComponent implements OnInit {
       formData.append('imagesToDelete', JSON.stringify(this.imagesToDelete));
       this.venueService.updateVenue(this.venueId!, formData).subscribe({
         next: () => this.router.navigate(['/venues/ownerVenues']),
-        error: () => this.message = 'Greška pri ažuriranju.'
+        error: (err) => this.message = 'Greška pri ažuriranju: ' + (err?.error?.message || 'Pokušaj ponovo.')
       });
     } else {
       this.venueService.createVenue(formData).subscribe({
         next: () => this.router.navigate(['/venues/ownerVenues']),
-        error: () => this.message = 'Greška pri kreiranju.'
+        error: (err) => this.message = 'Greška pri kreiranju: ' + (err?.error?.message || 'Pokušaj ponovo.')
       });
     }
   }

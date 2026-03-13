@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
   styleUrl: './reset-password.component.css'
 })
 export class ResetPasswordComponent implements OnInit {
+  showPassword = false
   token = '';
   password = '';
   confirm = '';

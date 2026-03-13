@@ -1,263 +1,313 @@
-<div class="container py-4" *ngIf="!loading && venue">
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="main-image-container mb-3">
-        <img [src]="activeImageUrl || 'assets/no-image.jpg'" class="img-fluid rounded shadow" alt="Teren">
+<!-- LOADING -->
+<div class="page-loading" *ngIf="loading">
+  <div class="page-spinner"></div>
+  <p>Učitavanje podataka...</p>
+</div>
+
+<!-- ERROR -->
+<div class="page-error" *ngIf="errorMessage && !loading">
+  <i class="bi bi-exclamation-triangle" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+  {{ errorMessage }}
+</div>
+
+<!-- MAIN -->
+<div class="venue-detail-page" *ngIf="!loading && venue">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a routerLink="/explore"><i class="bi bi-house"></i> Istraži</a>
+    <i class="bi bi-chevron-right"></i>
+    <a routerLink="/explore">{{ venue.city }}</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>{{ venue.name }}</span>
+  </nav>
+
+  <div class="detail-layout">
+
+    <!-- ===== LEFT COLUMN ===== -->
+    <div class="detail-left">
+
+      <!-- Main image -->
+      <div class="main-image-wrap">
+        <img [src]="activeImageUrl || 'assets/no-image.jpg'" [alt]="venue.name" />
       </div>
 
-      <div class="d-flex gap-2 mb-4 overflow-auto pb-2" *ngIf="venue.images?.length > 1">
+      <!-- Thumbnails -->
+      <div class="thumbnails" *ngIf="venue.images?.length > 1">
         <div *ngFor="let img of venue.images"
-             (click)="setActiveImage(img.url)"
              class="thumb-item"
-             [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url">
-          <img [src]="'http://localhost:5000' + img.url" class="rounded cursor-pointer shadow-sm">
+             [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url"
+             (click)="setActiveImage(img.url)">
+          <img [src]="'http://localhost:5000' + img.url" [alt]="venue.name" />
         </div>
       </div>
 
-      <div class="venue-header mb-4">
-        <h1 class="display-5 fw-bold">{{ venue.name }}</h1>
+      <!-- Header -->
+      <div class="venue-header">
+        <h1>{{ venue.name }}</h1>
 
-        <div class="d-flex align-items-center mb-3">
-          <ng-container *ngIf="venue.avg_rating; else noRating">
-            <div class="text-warning me-2 fs-4">
-              <span *ngFor="let star of [1,2,3,4,5]">
-                <i class="bi" [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
-              </span>
+        <div class="venue-meta">
+          <!-- Rating -->
+          <div class="venue-rating-row" *ngIf="venue.avg_rating">
+            <div class="stars">
+              <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                 [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
             </div>
-            <span class="fw-bold fs-5 me-2">{{ venue.avg_rating }}</span>
-            <span class="text-muted">({{ venue.review_count }} recenzija)</span>
-          </ng-container>
-          <ng-template #noRating>
-            <span class="badge bg-light text-dark border">✨ Novo na platformi</span>
-          </ng-template>
+            <span class="rating-value">{{ venue.avg_rating }}</span>
+            <span class="rating-count">({{ venue.review_count }} recenzija)</span>
+          </div>
+          <div class="venue-new-pill" *ngIf="!venue.avg_rating">
+            <i class="bi bi-stars"></i> Novo na platformi
+          </div>
+
+          <!-- Location -->
+          <div class="venue-location">
+            <i class="bi bi-geo-alt-fill"></i>
+            {{ venue.street }}, {{ venue.city }}
+          </div>
         </div>
 
-        <p class="text-muted fs-5">
-          <span class="me-2">📍</span>{{ venue.street }}, {{ venue.city }}
-        </p>
-        <div class="text-success fw-bold fs-3">
-          {{ venue.price_per_slot }} RSD <span class="fs-6 text-muted fw-normal">/ termin</span>
+        <!-- Price -->
+        <div class="venue-price">
+          {{ venue.price_per_slot }} RSD <span>/ termin</span>
         </div>
       </div>
 
-      <hr>
+      <div class="section-divider"></div>
 
-      <div class="venue-description mb-4">
+      <!-- Description -->
+      <div class="detail-section">
         <h3>O terenu</h3>
-        <p class="lead">{{ venue.description || 'Vlasnik nije uneo opis za ovaj teren.' }}</p>
+        <p class="description-text">
+          {{ venue.description || 'Vlasnik nije uneo opis za ovaj teren.' }}
+        </p>
       </div>
 
-      <!-- TAGOVI -->
-      <div class="venue-tags mb-5" *ngIf="venue.tags?.length > 0">
+      <!-- Tags -->
+      <div class="detail-section" *ngIf="venue.tags?.length > 0">
         <h3>Pogodnosti</h3>
-        <div class="d-flex flex-wrap gap-2 mt-3">
-          <span *ngFor="let tag of venue.tags"
-                class="badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill"
-                style="background-color: #f0f4ff; color: #0d6efd; border: 1px solid #c7d7fd; font-size: 13px; font-weight: 500;">
+        <div class="tags-wrap">
+          <span class="tag-pill" *ngFor="let tag of venue.tags">
             <i class="bi {{ tag.icon }}"></i>
             {{ tag.name }}
           </span>
         </div>
       </div>
 
-      <div class="working-hours">
+      <div class="section-divider"></div>
+
+      <!-- Working hours -->
+      <div class="detail-section">
         <h3>Radno vreme</h3>
-        <div class="card border-0 bg-light">
-          <div class="card-body">
-            <div *ngFor="let day of venue.working_hours" class="d-flex justify-content-between py-2 border-bottom">
-              <span class="fw-bold">{{ dayNames[day.day_of_week] }}</span>
-              <span *ngIf="day.is_open" class="text-dark">
-                <span class="badge bg-white text-success border border-success-subtle fw-medium">
-                  {{ day.open_time.substring(0,5) }} - {{ day.close_time.substring(0,5) }}
-                </span>
-              </span>
-              <span *ngIf="!day.is_open" class="text-danger-emphasis small fw-bold">Zatvoreno</span>
-            </div>
+        <div class="hours-grid">
+          <div class="hours-row" *ngFor="let day of venue.working_hours">
+            <span class="day-name">{{ dayNames[day.day_of_week] }}</span>
+            <span class="hours-time" *ngIf="day.is_open">
+              <i class="bi bi-clock"></i>
+              {{ day.open_time.substring(0,5) }} – {{ day.close_time.substring(0,5) }}
+            </span>
+            <span class="hours-closed" *ngIf="!day.is_open">
+              <i class="bi bi-x-circle"></i> Zatvoreno
+            </span>
           </div>
         </div>
       </div>
-      <!-- RECENZIJE -->
-<div class="reviews-section mt-5">
-  <h3 class="mb-4">Recenzije 
-    <span class="text-muted fs-6 fw-normal" *ngIf="reviews.length > 0">({{ reviews.length }})</span>
-  </h3>
 
-  <!-- Forma za ostavljanje recenzije -->
-  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" *ngIf="canReview && !reviewSuccess">
-    <h5 class="fw-bold mb-3">Ostavite recenziju</h5>
+      <div class="section-divider"></div>
 
-    <!-- Zvjezdice -->
-    <div class="d-flex gap-1 mb-3">
-      <span *ngFor="let star of [1,2,3,4,5]"
-            class="star-select"
-            [class.active]="star <= (hoverRating || reviewRating)"
-            (mouseenter)="hoverRating = star"
-            (mouseleave)="hoverRating = 0"
-            (click)="reviewRating = star">
-        <i class="bi bi-star-fill"></i>
-      </span>
-    </div>
-
-    <textarea class="form-control mb-3" rows="3"
-              [(ngModel)]="reviewComment"
-              placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
-
-    <div class="alert alert-danger small py-2" *ngIf="reviewError">{{ reviewError }}</div>
-
-    <button class="btn btn-primary" (click)="submitReview()" [disabled]="reviewSubmitting">
-      {{ reviewSubmitting ? 'Slanje...' : 'Objavi recenziju' }}
-    </button>
-  </div>
-
-  <div class="alert alert-success" *ngIf="reviewSuccess">
-    ✅ Recenzija uspješno objavljena!
-  </div>
-
-  <!-- Lista recenzija -->
-  <div *ngIf="reviews.length === 0" class="text-muted fst-italic">
-    Još nema recenzija za ovaj teren.
-  </div>
-
-  <div *ngFor="let review of reviews" class="card border-0 bg-light rounded-4 p-3 mb-3">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <span class="fw-bold">{{ review.first_name }} {{ review.last_name }}</span>
-        <div class="text-warning mt-1">
-          <span *ngFor="let star of [1,2,3,4,5]">
-            <i class="bi" [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
-          </span>
+      <!-- ===== REVIEWS ===== -->
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <h3>Recenzije</h3>
+          <span class="review-count-badge" *ngIf="reviews.length > 0">{{ reviews.length }}</span>
         </div>
-      </div>
-      <small class="text-muted">{{ review.created_at | date:'dd.MM.yyyy' }}</small>
-    </div>
-    <p class="mb-0 text-dark">{{ review.comment }}</p>
-  </div>
-</div>
-    </div>
-    
-    <div class="col-lg-4">
-      <div class="sticky-top" style="top: 100px;">
-        <div class="card shadow-sm border-0 rounded-4">
-          <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="venue.avg_rating">
-              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
-                ★ {{ venue.avg_rating }}
-              </span>
-              <small class="text-muted">{{ venue.review_count }} ocena korisnika</small>
-            </div>
-            <h4 class="mb-3 fw-bold">Rezerviši termin</h4>
 
-            <div class="mb-4">
-              <label class="form-label small fw-bold text-uppercase text-muted">Izaberi datum</label>
-              <input type="date" class="form-control form-control-lg border-2"
-                     [(ngModel)]="selectedDate"
-                     (change)="onDateChange()"
-                     [min]="today">
-            </div>
+        <!-- Review form -->
+        <div class="review-form-card" *ngIf="canReview && !reviewSuccess">
+          <h5>Ostavite recenziju</h5>
 
-            <div class="mb-4" *ngIf="availableSlots.length > 0">
-              <label class="form-label small fw-bold text-uppercase text-muted">Dostupni termini</label>
-              <div class="d-flex flex-wrap gap-2">
-                <button *ngFor="let slot of availableSlots"
-                        class="btn btn-sm px-3 py-2 fw-bold"
-                        [class.btn-outline-success]="!slot.isOccupied && selectedSlot !== slot"
-                        [class.btn-success]="selectedSlot === slot"
-                        [class.btn-secondary]="slot.isOccupied"
-                        [disabled]="slot.isOccupied"
-                        (click)="selectSlot(slot)">
-                  {{ slot.start }}
-                </button>
+          <div class="star-selector">
+            <button type="button" class="star-btn"
+                    *ngFor="let star of [1,2,3,4,5]"
+                    [class.lit]="star <= (hoverRating || reviewRating)"
+                    (mouseenter)="hoverRating = star"
+                    (mouseleave)="hoverRating = 0"
+                    (click)="reviewRating = star">
+              <i class="bi bi-star-fill"></i>
+            </button>
+          </div>
+
+          <textarea class="review-textarea"
+                    rows="3"
+                    [(ngModel)]="reviewComment"
+                    placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
+
+          <div class="review-error" *ngIf="reviewError">
+            <i class="bi bi-exclamation-circle"></i> {{ reviewError }}
+          </div>
+
+          <button class="btn-submit-review" (click)="submitReview()" [disabled]="reviewSubmitting">
+            {{ reviewSubmitting ? 'Slanje...' : 'Objavi recenziju' }}
+          </button>
+        </div>
+
+        <!-- Success -->
+        <div class="review-success" *ngIf="reviewSuccess">
+          <i class="bi bi-check-circle-fill"></i>
+          Recenzija uspješno objavljena!
+        </div>
+
+        <!-- No reviews -->
+        <div class="no-reviews" *ngIf="reviews.length === 0">
+          <i class="bi bi-chat-square-text"></i>
+          Još nema recenzija za ovaj teren.
+        </div>
+
+        <!-- Review list -->
+        <div class="review-card" *ngFor="let review of reviews">
+          <div class="review-card-header">
+            <div class="reviewer-info">
+              <div class="reviewer-avatar">
+                {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
               </div>
-            </div>
-
-            <div *ngIf="availableSlots.length === 0" class="alert alert-warning border-0 small">
-              Teren ne radi na odabrani datum.
-            </div>
-
-            <hr *ngIf="selectedSlot">
-            <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="selectedSlot">
               <div>
-                <span class="d-block small text-muted">Termin:</span>
-                <strong class="text-success">{{ selectedSlot.start }} - {{ selectedSlot.end }}</strong>
-              </div>
-              <div class="text-end">
-                <span class="h3 mb-0 fw-bold">{{ venue.price_per_slot }} RSD</span>
+                <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
+                <div class="review-stars">
+                  <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                     [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                </div>
               </div>
             </div>
-
-            <button *ngIf="venue?.owner_id !== authService.getUser().id && !showRecurring"
-        class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mt-2"
-        [disabled]="!selectedSlot"
-        (click)="confirmBooking()">
-  POTVRDI REZERVACIJU
-</button>
-
-<!-- Recurring toggle -->
-<div *ngIf="selectedSlot && venue?.owner_id !== authService.getUser().id" class="mt-2">
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="recurringCheck" [(ngModel)]="showRecurring">
-    <label class="form-check-label small" for="recurringCheck">
-      🔁 Ponavljaj svake sedmice
-    </label>
-  </div>
-
-  <div *ngIf="showRecurring" class="mt-2 p-3 bg-light rounded-3">
-    <label class="form-label small fw-bold">Broj sedmica (uključujući prvu):</label>
-    <div class="d-flex align-items-center gap-2">
-      <input type="range" class="form-range" min="2" max="8" [(ngModel)]="recurringWeeks">
-      <span class="badge bg-primary px-3 py-2">{{ recurringWeeks }} sed.</span>
-    </div>
-    <p class="small text-muted mb-2">
-      Ukupno: <strong>{{ recurringWeeks * venue.price_per_slot }} RSD</strong>
-    </p>
-    <button class="btn btn-primary w-100 fw-bold"
-            [disabled]="recurringLoading"
-            (click)="confirmRecurringBooking()">
-      {{ recurringLoading ? 'Rezervisanje...' : '🔁 REZERVIŠI ' + recurringWeeks + ' TERMINA' }}
-    </button>
-  </div>
-
-  <!-- Rezultat -->
-  <div *ngIf="recurringResult" class="mt-2">
-    <div class="alert alert-success small py-2">
-      ✅ Rezervisano {{ recurringResult.created }} termina.
-    </div>
-    <div class="alert alert-warning small py-2" *ngIf="recurringResult.failed?.length > 0">
-      ⚠️ Zauzeto: {{ recurringResult.failed.join(', ') }}
-    </div>
-  </div>
-</div>
-
-<div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
-  Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.
-</div>
-
-            <div *ngIf="venue?.owner_id === authService.getUser().id" class="alert alert-info mt-2 small text-center">
-              Kao vlasnik, koristite "Alate za vlasnika" ispod za upravljanje terminima.
-            </div>
+            <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy' }}</span>
           </div>
+          <p class="review-comment">{{ review.comment }}</p>
         </div>
+
       </div>
     </div>
+
+    <!-- ===== RIGHT COLUMN — BOOKING PANEL ===== -->
+    <div class="booking-panel">
+      <div class="booking-card">
+
+        <!-- Card header -->
+        <div class="booking-card-header">
+          <div class="booking-price">
+            {{ venue.price_per_slot }} RSD <span>/ termin</span>
+          </div>
+          <div class="booking-rating-row" *ngIf="venue.avg_rating">
+            <div class="stars">
+              <i class="bi bi-star-fill" *ngFor="let s of [1,2,3,4,5]"
+                 [style.opacity]="s <= venue.avg_rating ? '1' : '0.3'"></i>
+            </div>
+            <span>{{ venue.avg_rating }} · {{ venue.review_count }} ocena</span>
+          </div>
+        </div>
+
+        <!-- Card body -->
+        <div class="booking-card-body">
+
+          <!-- Date -->
+          <span class="booking-label">Izaberi datum</span>
+          <div class="date-input-wrap">
+            <i class="bi bi-calendar3"></i>
+            <input type="date"
+                   [(ngModel)]="selectedDate"
+                   (change)="onDateChange()"
+                   [min]="today" />
+          </div>
+
+          <!-- Slots -->
+          <div class="slots-wrap" *ngIf="availableSlots.length > 0">
+            <span class="booking-label">Dostupni termini</span>
+            <div class="slots-grid">
+              <button *ngFor="let slot of availableSlots"
+                      class="slot-btn"
+                      [class.slot-selected]="selectedSlot === slot"
+                      [class.slot-occupied]="slot.isOccupied"
+                      [disabled]="slot.isOccupied"
+                      (click)="selectSlot(slot)">
+                {{ slot.start }}
+              </button>
+            </div>
+          </div>
+
+          <div class="no-slots-msg" *ngIf="selectedDate && availableSlots.length === 0">
+            <i class="bi bi-calendar-x"></i> Teren ne radi na odabrani datum.
+          </div>
+
+          <!-- Selected slot summary -->
+          <div class="slot-summary" *ngIf="selectedSlot">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Termin</div>
+              <div class="slot-summary-time">{{ selectedSlot.start }} – {{ selectedSlot.end }}</div>
+            </div>
+            <div class="slot-summary-price">{{ venue.price_per_slot }} RSD</div>
+          </div>
+
+          <!-- Book button (single) -->
+          <button class="btn-book"
+                  *ngIf="venue?.owner_id !== authService.getUser().id && !showRecurring"
+                  [disabled]="!selectedSlot"
+                  (click)="confirmBooking()">
+            <i class="bi bi-check-circle"></i> Potvrdi rezervaciju
+          </button>
+
+          <!-- Recurring toggle -->
+          <label class="recurring-toggle" *ngIf="selectedSlot && venue?.owner_id !== authService.getUser().id">
+            <input type="checkbox" [(ngModel)]="showRecurring" />
+            <span><i class="bi bi-arrow-repeat"></i> Ponavljaj svake sedmice</span>
+          </label>
+
+          <!-- Recurring panel -->
+          <div class="recurring-panel" *ngIf="showRecurring && venue?.owner_id !== authService.getUser().id">
+            <span class="booking-label">Broj sedmica (uključujući prvu)</span>
+            <div class="recurring-slider-row">
+              <input type="range" min="2" max="8" [(ngModel)]="recurringWeeks" />
+              <span class="weeks-badge">{{ recurringWeeks }} sed.</span>
+            </div>
+            <div class="recurring-total">
+              Ukupno: <strong>{{ recurringWeeks * venue.price_per_slot }} RSD</strong>
+            </div>
+
+            <button class="btn-recurring-book"
+                    [disabled]="recurringLoading"
+                    (click)="confirmRecurringBooking()">
+              <i class="bi bi-arrow-repeat"></i>
+              {{ recurringLoading ? 'Rezervisanje...' : 'Rezerviši ' + recurringWeeks + ' termina' }}
+            </button>
+
+            <div *ngIf="recurringResult">
+              <div class="recurring-result-success" *ngIf="recurringResult.created > 0">
+                <i class="bi bi-check-circle-fill"></i>
+                Rezervisano {{ recurringResult.created }} termina.
+              </div>
+              <div class="recurring-result-warning" *ngIf="recurringResult.failed?.length > 0">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Zauzeto: {{ recurringResult.failed.join(', ') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Owner info -->
+          <div class="owner-info-msg" *ngIf="venue?.owner_id === authService.getUser().id">
+            <i class="bi bi-info-circle"></i>
+            Koristite Alate za vlasnika za upravljanje terminima.
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Owner tools -->
+      <div class="owner-tools"
+           *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id">
+        <h6><i class="bi bi-tools"></i> Alati za vlasnika</h6>
+        <p>Blokiraj selektovani termin za ovaj dan.</p>
+        <button class="btn-block" [disabled]="!selectedSlot" (click)="blockSelectedSlot()">
+          <i class="bi bi-slash-circle"></i> Blokiraj termin
+        </button>
+      </div>
+
+    </div>
   </div>
-</div>
-
-<div *ngIf="authService.hasRole('owner') && venue?.owner_id === authService.getUser().id"
-     class="mt-3 p-3 border rounded-3 bg-light">
-  <h6 class="fw-bold text-danger">Alati za vlasnika</h6>
-  <p class="small text-muted">Blokiraj selektovani termin za ovaj dan.</p>
-  <button class="btn btn-danger btn-sm w-100"
-          [disabled]="!selectedSlot"
-          (click)="blockSelectedSlot()">
-    ⛔ BLOKIRAJ TERMIN
-  </button>
-</div>
-
-<div *ngIf="loading" class="text-center my-5">
-  <div class="spinner-grow text-success" role="status"></div>
-  <p class="mt-2">Učitavanje podataka...</p>
-</div>
-
-<div *ngIf="errorMessage" class="container mt-4">
-  <div class="alert alert-danger">{{ errorMessage }}</div>
 </div>

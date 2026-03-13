@@ -1,0 +1,119 @@
+/* ============================================
+   ADMIN PAGES
+   Dodaj u svaki admin component CSS ili styles.css
+   ============================================ */
+
+/* Shared: koristi .owner-page, .stats-grid, .stat-card,
+   .table-card, .data-table, .ovc-btn iz owner stilova */
+
+/* ---- STAT GOLD & DARK ---- */
+.stat-gold {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+}
+
+.stat-dark {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff;
+}
+
+/* ---- ADMIN NAV CARDS ---- */
+.admin-nav-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.admin-nav-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 24px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.admin-nav-card:hover {
+  border-color: var(--navy);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.admin-nav-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.admin-nav-icon-navy  { background: rgba(30,58,95,0.1);  color: var(--navy); }
+.admin-nav-icon-green { background: rgba(22,163,74,0.1); color: #16a34a; }
+
+.admin-nav-body {
+  flex: 1;
+}
+
+.admin-nav-body h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.admin-nav-body p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.admin-nav-arrow {
+  font-size: 20px;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+
+.admin-nav-card:hover .admin-nav-arrow {
+  color: var(--navy);
+  transform: translateX(4px);
+}
+
+/* ---- TABLE EXTRAS ---- */
+.td-muted  { color: var(--text-secondary); font-size: 14px; }
+.td-small  { font-size: 13px; }
+.td-micro  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.row-inactive td {
+  opacity: 0.55;
+}
+
+.venue-thumb-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.venue-thumb-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .admin-nav-grid {
+    grid-template-columns: 1fr;
+  }
+}

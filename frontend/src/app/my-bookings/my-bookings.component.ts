@@ -73,4 +73,15 @@ export class MyBookingsComponent implements OnInit {
     // kako bi status bookinga osvežio ili sklonio dugme za ocenu
   }
 
+  getStatusLabel(status: string): string {
+    const map: any = {
+      'confirmed': 'Potvrđeno',
+      'completed': 'Završeno',
+      'cancelled_by_client': 'Otkazano',
+      'cancelled_late': 'Kasno otkazano',
+      'cancelled_by_owner': 'Otkazao vlasnik'
+    };
+    return map[status] || status;
+  }
+
 }

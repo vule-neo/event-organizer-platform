@@ -1,55 +1,67 @@
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">👥 Korisnici</h4>
-    <a routerLink="/admin" class="btn btn-outline-secondary btn-sm">← Nazad</a>
+<div class="owner-page">
+
+  <!-- Header -->
+  <div class="owner-page-header">
+    <div class="owner-page-title">
+      <h1>Korisnici</h1>
+      <p>Upravljanje korisničkim nalozima</p>
+    </div>
+    <a routerLink="/admin" class="btn-add-venue" style="background:var(--bg-secondary); color:var(--text); border:1.5px solid var(--border);">
+      <i class="bi bi-arrow-left"></i> Nazad
+    </a>
   </div>
 
-  <div *ngIf="loading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status"></div>
+  <div class="page-loading" *ngIf="loading">
+    <div class="page-spinner"></div>
   </div>
 
-  <div class="card border-0 shadow-sm rounded-4 overflow-hidden" *ngIf="!loading">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
+  <div class="table-card" *ngIf="!loading">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
           <tr>
-            <th class="ps-4">Ime i Prezime</th>
+            <th>Ime i prezime</th>
             <th>Email</th>
             <th>Telefon</th>
             <th>Rola</th>
             <th>Registrovan</th>
             <th>Status</th>
-            <th class="pe-4 text-center">Akcija</th>
+            <th class="text-center">Akcija</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let u of users" [class.opacity-50]="!u.is_active">
-            <td class="ps-4 fw-bold">{{ u.first_name }} {{ u.last_name }}</td>
-            <td class="text-muted">{{ u.email }}</td>
-            <td class="text-muted">{{ u.phone || '-' }}</td>
+          <tr *ngFor="let u of users" [class.row-inactive]="!u.is_active">
+            <td class="td-bold">{{ u.first_name }} {{ u.last_name }}</td>
+            <td class="td-muted">{{ u.email }}</td>
+            <td class="td-muted">{{ u.phone || '–' }}</td>
             <td>
-              <span class="badge rounded-pill"
-                    [class.bg-primary]="u.role === 'owner'"
-                    [class.bg-secondary]="u.role === 'customer'">
-                {{ u.role === 'owner' ? 'Vlasnik' : 'Korisnik' }}
+              <span class="table-status-badge"
+                    [class.badge-confirmed]="u.role === 'owner'"
+                    [class.badge-completed]="u.role === 'customer'"
+                    [class.badge-cancelled-owner]="u.role === 'admin'">
+                {{ u.role === 'owner' ? 'Vlasnik' : u.role === 'admin' ? 'Admin' : 'Korisnik' }}
               </span>
             </td>
-            <td class="text-muted small">{{ u.created_at | date:'dd.MM.yyyy' }}</td>
+            <td class="td-muted td-small">{{ u.created_at | date:'dd.MM.yyyy' }}</td>
             <td>
-              <span class="badge rounded-pill"
-                    [class.bg-success]="u.is_active"
-                    [class.bg-danger]="!u.is_active">
+              <span class="table-status-badge"
+                    [class.badge-confirmed]="u.is_active"
+                    [class.badge-cancelled-owner]="!u.is_active">
                 {{ u.is_active ? 'Aktivan' : 'Blokiran' }}
               </span>
             </td>
-            <td class="pe-4 text-center">
-              <button class="btn btn-sm rounded-3"
-                      [class.btn-outline-danger]="u.is_active"
-                      [class.btn-outline-success]="!u.is_active"
+            <td class="text-center">
+              <button class="ovc-btn"
+                      [class.ovc-btn-delete]="u.is_active"
+                      [class.ovc-btn-activate]="!u.is_active"
                       (click)="toggleUser(u)">
+                <i class="bi" [class.bi-slash-circle]="u.is_active" [class.bi-check-circle]="!u.is_active"></i>
                 {{ u.is_active ? 'Blokiraj' : 'Odblokiraj' }}
               </button>
             </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="7" class="table-empty">Nema korisnika.</td>
           </tr>
         </tbody>
       </table>

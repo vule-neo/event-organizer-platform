@@ -1,57 +1,59 @@
-import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // <--- DODATO
-import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { RouterModule, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-user-register',
-  templateUrl: './user-register.component.html',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule, HttpClientModule] // <--- Zamenjen FormsModule sa ReactiveFormsModule
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  templateUrl: './user-register.component.html',
+  styleUrl: './user-register.component.css'
 })
-export class UserRegisterComponent implements OnInit {
-  registerForm!: FormGroup; // <--- Definisanje forme
+export class UserRegisterComponent {
+  registerForm: FormGroup;
   message = '';
+  isError = false;
+  loading = false;
+  showPassword = false;
 
   constructor(
-    private fb: FormBuilder, // <--- Injektovan FormBuilder
-    private http: HttpClient, 
-    private router: Router,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit() {
-    // Inicijalizacija forme sa tvojim poljima
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.registerForm = this.fb.group({
       first_name: ['', Validators.required],
-      last_name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['customer', Validators.required] // Default je 'customer' (Igrač)
+      last_name:  ['', Validators.required],
+      email:      ['', [Validators.required, Validators.email]],
+      phone:      [''],
+      password:   ['', [Validators.required, Validators.minLength(6)]],
+      role:       ['customer', Validators.required]
     });
   }
 
   register() {
     if (this.registerForm.invalid) {
-      this.message = 'Molimo popunite sva polja ispravno.';
+      this.registerForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
+    this.message = '';
 
-    // Uzimamo podatke direktno iz forme (payload je identičan tvom starom)
-    const payload = this.registerForm.value;
-
-    this.authService.register(payload).subscribe({
+    this.authService.register(this.registerForm.value).subscribe({
       next: (res: any) => {
+        this.isError = false;
+        this.message = 'Nalog uspješno kreiran! Preusmjeravamo vas...';
+        this.loading = false;
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
-        this.router.navigate(['']);
+        setTimeout(() => this.router.navigate(['']), 1500);
       },
       error: (err) => {
-        console.error(err);
-        this.message = err.error?.error || 'Greška pri registraciji';
+        this.isError = true;
+        this.message = err.error?.message || 'Greška pri registraciji.';
+        this.loading = false;
       }
     });
   }

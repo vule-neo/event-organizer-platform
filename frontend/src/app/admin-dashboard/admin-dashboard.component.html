@@ -1,43 +1,77 @@
-<div class="container py-4">
-  <h2 class="fw-bold mb-4">⚙️ Admin Panel</h2>
+<div class="owner-page">
 
-  <div *ngIf="loading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status"></div>
-  </div>
-
-  <div *ngIf="stats" class="row g-3 mb-5">
-    <div class="col-6 col-md-3">
-      <div class="card bg-primary text-white border-0 rounded-4 p-3 shadow-sm">
-        <small class="opacity-75">Korisnici</small>
-        <h3 class="fw-bold mb-0">{{ stats.totalUsers }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card bg-success text-white border-0 rounded-4 p-3 shadow-sm">
-        <small class="opacity-75">Tereni</small>
-        <h3 class="fw-bold mb-0">{{ stats.totalVenues }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card bg-warning text-dark border-0 rounded-4 p-3 shadow-sm">
-        <small class="opacity-75">Aktivne Rezervacije</small>
-        <h3 class="fw-bold mb-0">{{ stats.activeBookings }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card bg-dark text-white border-0 rounded-4 p-3 shadow-sm">
-        <small class="opacity-75">Ukupna Zarada</small>
-        <h3 class="fw-bold mb-0">{{ stats.totalEarnings | number }} RSD</h3>
-      </div>
+  <!-- Header -->
+  <div class="owner-page-header">
+    <div class="owner-page-title">
+      <h1>Admin Panel</h1>
+      <p>Pregled i upravljanje platformom</p>
     </div>
   </div>
 
-  <div class="d-flex gap-3">
-    <a routerLink="/admin/users" class="btn btn-outline-primary rounded-3 px-4 py-3 fw-bold">
-      👥 Upravljaj Korisnicima
-    </a>
-    <a routerLink="/admin/venues" class="btn btn-outline-success rounded-3 px-4 py-3 fw-bold">
-      🏟️ Upravljaj Terenima
-    </a>
+  <!-- Loading -->
+  <div class="page-loading" *ngIf="loading">
+    <div class="page-spinner"></div>
+    <p>Učitavanje...</p>
   </div>
+
+  <ng-container *ngIf="!loading && stats">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card stat-navy">
+        <div class="stat-icon"><i class="bi bi-people"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Korisnici</span>
+          <span class="stat-value">{{ stats.totalUsers }}</span>
+        </div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-icon"><i class="bi bi-building"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Tereni</span>
+          <span class="stat-value">{{ stats.totalVenues }}</span>
+        </div>
+      </div>
+      <div class="stat-card stat-gold">
+        <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Aktivne rezervacije</span>
+          <span class="stat-value">{{ stats.activeBookings }}</span>
+        </div>
+      </div>
+      <div class="stat-card stat-dark">
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Ukupna zarada</span>
+          <span class="stat-value">{{ stats.totalEarnings | number }} RSD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick nav cards -->
+    <div class="admin-nav-grid">
+      <a routerLink="/admin/users" class="admin-nav-card">
+        <div class="admin-nav-icon admin-nav-icon-navy">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="admin-nav-body">
+          <h3>Korisnici</h3>
+          <p>Upravljajte korisničkim nalozima, blokirajte ili odblokirajte korisnike.</p>
+        </div>
+        <i class="bi bi-arrow-right admin-nav-arrow"></i>
+      </a>
+
+      <a routerLink="/admin/venues" class="admin-nav-card">
+        <div class="admin-nav-icon admin-nav-icon-green">
+          <i class="bi bi-building-fill"></i>
+        </div>
+        <div class="admin-nav-body">
+          <h3>Tereni</h3>
+          <p>Pregledajte sve terene, aktivirajte, deaktivirajte ili brišite objekte.</p>
+        </div>
+        <i class="bi bi-arrow-right admin-nav-arrow"></i>
+      </a>
+    </div>
+
+  </ng-container>
 </div>

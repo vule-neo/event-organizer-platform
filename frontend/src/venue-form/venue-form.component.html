@@ -1,145 +1,271 @@
-<div class="container">
-  <div class="stepper">
-    <div [class.active]="step === 1">1. Osnovni podaci</div>
-    <div [class.active]="step === 2">2. Radno vrijeme</div>
-    <div [class.active]="step === 3">3. Tagovi</div>
-    <div [class.active]="step === 4">4. Slike</div>
-  </div>
+<div class="vf-page">
 
-  <form [formGroup]="venueForm">
-
-    <!-- KORAK 1 -->
-    <div *ngIf="step === 1" class="form-step">
-      <h2>{{ isEditMode ? 'Izmeni osnovne podatke' : 'Informacije o terenu' }}</h2>
-
-      <div class="field">
-        <label>Naziv terena *</label>
-        <input type="text" formControlName="name" placeholder="npr. Arena Sport" />
-      </div>
-
-      <div class="field">
-        <label>Tip sporta *</label>
-        <select formControlName="sport_id">
-          <option value="" disabled>Odaberite sport</option>
-          <option *ngFor="let s of sports" [value]="s.id">{{ s.name }}</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <app-address-picker (addressSelected)="onAddressChange($event)"></app-address-picker>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label>Grad</label>
-          <input type="text" formControlName="city" readonly placeholder="Automatski iz mape..." />
-        </div>
-        <div class="field">
-          <label>Ulica i broj</label>
-          <input type="text" formControlName="street" readonly placeholder="Automatski iz mape..." />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label>Cijena po terminu (RSD) *</label>
-          <input type="number" formControlName="price_per_slot" />
-        </div>
-        <div class="field">
-          <label>Trajanje termina *</label>
-          <select formControlName="slot_duration_mins">
-            <option [value]="60">60 minuta</option>
-            <option [value]="90">90 minuta</option>
-            <option [value]="120">120 minuta</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Opis terena</label>
-        <textarea formControlName="description" rows="4" class="description-area"></textarea>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="btn-next" (click)="nextStep()">Dalje: Radno vrijeme →</button>
-      </div>
+  <!-- Sidebar stepper -->
+  <div class="vf-sidebar">
+    <div class="vf-sidebar-logo">
+      <div class="logo-icon"><i class="bi bi-trophy-fill"></i></div>
+      <span>Sportski<em>Termin</em></span>
     </div>
 
-    <!-- KORAK 2 -->
-    <div *ngIf="step === 2" class="form-step">
-      <h2>Radno vrijeme</h2>
-      <app-working-hours #workingHoursComp></app-working-hours>
-      <div class="actions">
-        <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
-        <button type="button" class="btn-next" (click)="nextStep()">Dalje: Tagovi →</button>
+    <div class="vf-steps">
+      <div class="vf-step" [class.step-done]="step > 1" [class.step-active]="step === 1">
+        <div class="vf-step-circle">
+          <i class="bi bi-check-lg" *ngIf="step > 1"></i>
+          <span *ngIf="step <= 1">1</span>
+        </div>
+        <div class="vf-step-info">
+          <span class="vf-step-title">Osnovni podaci</span>
+          <span class="vf-step-desc">Naziv, sport, lokacija, cijena</span>
+        </div>
       </div>
-    </div>
 
-    <!-- KORAK 3 - TAGOVI -->
-<div *ngIf="step === 3" class="form-step">
-  <h2>Sadržaj i pogodnosti</h2>
-  <p class="text-muted">Označite šta vaš teren nudi korisnicima.</p>
+      <div class="vf-step-line"></div>
 
-  <div class="tags-grid">
-    <div *ngFor="let tag of allTags"
-         class="tag-item"
-         [class.tag-selected]="isTagSelected(tag.id)"
-         (click)="toggleTag(tag.id)">
-      <i class="bi {{ tag.icon }}"></i>
-      <span>{{ tag.name }}</span>
-      <i class="bi bi-check-circle-fill ms-auto check-icon" *ngIf="isTagSelected(tag.id)"></i>
+      <div class="vf-step" [class.step-done]="step > 2" [class.step-active]="step === 2">
+        <div class="vf-step-circle">
+          <i class="bi bi-check-lg" *ngIf="step > 2"></i>
+          <span *ngIf="step <= 2">2</span>
+        </div>
+        <div class="vf-step-info">
+          <span class="vf-step-title">Radno vrijeme</span>
+          <span class="vf-step-desc">Dani i sati rada</span>
+        </div>
+      </div>
+
+      <div class="vf-step-line"></div>
+
+      <div class="vf-step" [class.step-done]="step > 3" [class.step-active]="step === 3">
+        <div class="vf-step-circle">
+          <i class="bi bi-check-lg" *ngIf="step > 3"></i>
+          <span *ngIf="step <= 3">3</span>
+        </div>
+        <div class="vf-step-info">
+          <span class="vf-step-title">Tagovi</span>
+          <span class="vf-step-desc">Sadržaj i pogodnosti</span>
+        </div>
+      </div>
+
+      <div class="vf-step-line"></div>
+
+      <div class="vf-step" [class.step-active]="step === 4">
+        <div class="vf-step-circle">
+          <span>4</span>
+        </div>
+        <div class="vf-step-info">
+          <span class="vf-step-title">Slike</span>
+          <span class="vf-step-desc">Fotografije terena</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="selected-count" *ngIf="selectedTagIds.length > 0">
-    ✅ Odabrano: {{ selectedTagIds.length }} {{ selectedTagIds.length === 1 ? 'pogodnost' : 'pogodnosti' }}
-  </div>
+  <!-- Main content -->
+  <div class="vf-main">
+    <form [formGroup]="venueForm">
 
-  <div class="actions">
-    <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
-    <button type="button" class="btn-next" (click)="nextStep()">Dalje: Slike →</button>
-  </div>
-</div>
+      <!-- ===== KORAK 1 ===== -->
+      <div *ngIf="step === 1" class="vf-step-content">
+        <div class="vf-step-header">
+          <h1>{{ isEditMode ? 'Izmeni osnovne podatke' : 'Informacije o terenu' }}</h1>
+          <p>Unesite osnovne informacije o vašem sportskom objektu.</p>
+        </div>
 
-    <!-- KORAK 4 - SLIKE -->
-    <div *ngIf="step === 4" class="form-step">
-      <h2>Slike terena (Max 20)</h2>
+        <div class="vf-fields">
 
-      <div *ngIf="existingImages.length > 0">
-        <p>Trenutne slike na serveru:</p>
-        <div class="preview-grid mb-3">
-          <div *ngFor="let img of existingImages; let i = index" class="preview-item">
-            <img [src]="'http://localhost:5000' + img.url" />
-            <button type="button" class="btn-remove" (click)="removeExistingImage(img.id, i)">×</button>
+          <div class="vf-field">
+            <label>Naziv terena <span class="req">*</span></label>
+            <div class="input-wrap">
+              <i class="bi bi-building input-icon"></i>
+              <input type="text" formControlName="name" placeholder="npr. Arena Sport Centar"
+                [class.input-error]="venueForm.get('name')?.invalid && venueForm.get('name')?.touched" />
+            </div>
+          </div>
+
+          <div class="vf-field">
+            <label>Tip sporta <span class="req">*</span></label>
+            <div class="input-wrap">
+              <i class="bi bi-dribbble input-icon"></i>
+              <select formControlName="sport_id" class="vf-select">
+                <option value="" disabled>Odaberite sport</option>
+                <option *ngFor="let s of sports" [value]="s.id">{{ s.name }}</option>
+              </select>
+              <i class="bi bi-chevron-down select-arrow"></i>
+            </div>
+          </div>
+
+          <div class="vf-field">
+            <label>Lokacija <span class="req">*</span></label>
+            <app-address-picker (addressSelected)="onAddressChange($event)"></app-address-picker>
+          </div>
+
+          <div class="vf-row">
+            <div class="vf-field">
+              <label>Grad</label>
+              <div class="input-wrap">
+                <i class="bi bi-geo-alt input-icon"></i>
+                <input type="text" formControlName="city" readonly placeholder="Automatski iz mape..." class="input-readonly" />
+              </div>
+            </div>
+            <div class="vf-field">
+              <label>Ulica i broj</label>
+              <div class="input-wrap">
+                <i class="bi bi-signpost input-icon"></i>
+                <input type="text" formControlName="street" readonly placeholder="Automatski iz mape..." class="input-readonly" />
+              </div>
+            </div>
+          </div>
+
+          <div class="vf-row">
+            <div class="vf-field">
+              <label>Cijena po terminu (RSD) <span class="req">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-cash input-icon"></i>
+                <input type="number" formControlName="price_per_slot" placeholder="npr. 1500"
+                  [class.input-error]="venueForm.get('price_per_slot')?.invalid && venueForm.get('price_per_slot')?.touched" />
+              </div>
+            </div>
+            <div class="vf-field">
+              <label>Trajanje termina <span class="req">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-clock input-icon"></i>
+                <select formControlName="slot_duration_mins" class="vf-select">
+                  <option [value]="60">60 minuta</option>
+                  <option [value]="90">90 minuta</option>
+                  <option [value]="120">120 minuta</option>
+                </select>
+                <i class="bi bi-chevron-down select-arrow"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="vf-field">
+            <label>Opis terena</label>
+            <textarea formControlName="description" rows="4" class="vf-textarea"
+                      placeholder="Opišite vaš teren — oprema, podloga, kapacitet, posebne pogodnosti..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="vf-actions">
+          <div></div>
+          <button type="button" class="vf-btn-next" (click)="nextStep()">
+            Dalje: Radno vrijeme <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== KORAK 2 ===== -->
+      <div *ngIf="step === 2" class="vf-step-content">
+        <div class="vf-step-header">
+          <h1>Radno vrijeme</h1>
+          <p>Postavite dane i sate kada je teren dostupan za rezervacije.</p>
+        </div>
+
+        <app-working-hours #workingHoursComp></app-working-hours>
+
+        <div class="vf-actions">
+          <button type="button" class="vf-btn-back" (click)="prevStep()">
+            <i class="bi bi-arrow-left"></i> Nazad
+          </button>
+          <button type="button" class="vf-btn-next" (click)="nextStep()">
+            Dalje: Tagovi <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== KORAK 3 ===== -->
+      <div *ngIf="step === 3" class="vf-step-content">
+        <div class="vf-step-header">
+          <h1>Sadržaj i pogodnosti</h1>
+          <p>Označite šta vaš teren nudi korisnicima.</p>
+        </div>
+
+        <div class="tags-select-grid">
+          <div *ngFor="let tag of allTags"
+               class="tag-select-item"
+               [class.tag-select-active]="isTagSelected(tag.id)"
+               (click)="toggleTag(tag.id)">
+            <div class="tag-select-icon">
+              <i class="bi {{ tag.icon }}"></i>
+            </div>
+            <span class="tag-select-name">{{ tag.name }}</span>
+            <i class="bi bi-check-circle-fill tag-select-check"></i>
           </div>
         </div>
-        <hr>
-      </div>
 
-      <div class="upload-area" (click)="fileInput.click()">
-        <input #fileInput type="file" (change)="onFileSelected($event)" multiple accept="image/*" style="display: none;" />
-        <div class="upload-placeholder">
-          <span class="icon">📷</span>
-          <p>Dodaj nove slike</p>
+        <div class="vf-tag-count" *ngIf="selectedTagIds.length > 0">
+          <i class="bi bi-check-circle-fill"></i>
+          Odabrano {{ selectedTagIds.length }} {{ selectedTagIds.length === 1 ? 'pogodnost' : 'pogodnosti' }}
+        </div>
+
+        <div class="vf-actions">
+          <button type="button" class="vf-btn-back" (click)="prevStep()">
+            <i class="bi bi-arrow-left"></i> Nazad
+          </button>
+          <button type="button" class="vf-btn-next" (click)="nextStep()">
+            Dalje: Slike <i class="bi bi-arrow-right"></i>
+          </button>
         </div>
       </div>
 
-      <div class="preview-grid" *ngIf="previewUrls.length > 0">
-        <div *ngFor="let url of previewUrls; let i = index" class="preview-item new-image-preview">
-          <img [src]="url" />
-          <button type="button" class="btn-remove" (click)="removeImage(i)">×</button>
-          <span class="badge">Novo</span>
+      <!-- ===== KORAK 4 ===== -->
+      <div *ngIf="step === 4" class="vf-step-content">
+        <div class="vf-step-header">
+          <h1>Slike terena</h1>
+          <p>Dodajte do 20 fotografija. Prva slika biće naslovna.</p>
+        </div>
+
+        <!-- Existing images (edit mode) -->
+        <div *ngIf="existingImages.length > 0" class="vf-existing-images">
+          <label class="vf-images-label">Trenutne slike</label>
+          <div class="vf-preview-grid">
+            <div *ngFor="let img of existingImages; let i = index" class="vf-preview-item">
+              <img [src]="'http://localhost:5000' + img.url" />
+              <button type="button" class="vf-remove-btn" (click)="removeExistingImage(img.id, i)">
+                <i class="bi bi-x"></i>
+              </button>
+              <div class="vf-img-badge" *ngIf="i === 0">Naslovna</div>
+            </div>
+          </div>
+          <div class="vf-divider"></div>
+        </div>
+
+        <!-- Upload area -->
+        <div class="vf-upload-area" (click)="fileInput.click()">
+          <input #fileInput type="file" (change)="onFileSelected($event)" multiple accept="image/*" style="display:none;" />
+          <div class="vf-upload-inner">
+            <div class="vf-upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+            <p class="vf-upload-title">Kliknite za dodavanje slika</p>
+            <p class="vf-upload-hint">JPG, PNG, WEBP — max 20 slika</p>
+          </div>
+        </div>
+
+        <!-- New images preview -->
+        <div class="vf-preview-grid" *ngIf="previewUrls.length > 0">
+          <div *ngFor="let url of previewUrls; let i = index" class="vf-preview-item">
+            <img [src]="url" />
+            <button type="button" class="vf-remove-btn" (click)="removeImage(i)">
+              <i class="bi bi-x"></i>
+            </button>
+            <div class="vf-img-badge vf-img-badge-new">Novo</div>
+          </div>
+        </div>
+
+        <div class="error-msg" *ngIf="message" style="margin-top:16px;">
+          <i class="bi bi-exclamation-circle"></i> {{ message }}
+        </div>
+
+        <div class="vf-actions">
+          <button type="button" class="vf-btn-back" (click)="prevStep()">
+            <i class="bi bi-arrow-left"></i> Nazad
+          </button>
+          <button type="button" class="vf-btn-submit" (click)="createVenue()" [disabled]="venueForm.invalid">
+            <i class="bi" [class.bi-check-circle]="!isEditMode" [class.bi-floppy]="isEditMode"></i>
+            {{ isEditMode ? 'Sačuvaj izmene' : 'Kreiraj teren' }}
+          </button>
         </div>
       </div>
 
-      <div class="actions">
-        <button type="button" class="btn-back" (click)="prevStep()">← Nazad</button>
-        <button type="button" class="btn-submit" (click)="createVenue()" [disabled]="venueForm.invalid">
-          {{ isEditMode ? 'Sačuvaj izmene' : 'Završi i kreiraj teren' }}
-        </button>
-      </div>
-    </div>
-
-    <p class="msg-error" *ngIf="message">{{ message }}</p>
-  </form>
+    </form>
+  </div>
 </div>

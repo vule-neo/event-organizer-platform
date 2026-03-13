@@ -1,107 +1,99 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">Moji Tereni</h2>
-    <button class="btn btn-primary shadow-sm" routerLink="/venues/new">+ Dodaj novi teren</button>
+<div class="owner-page">
+
+  <!-- Page header -->
+  <div class="owner-page-header">
+    <div class="owner-page-title">
+      <h1>Moji Tereni</h1>
+      <p>Upravljajte svojim sportskim objektima</p>
+    </div>
+    <button class="btn-add-venue" routerLink="/venues/new">
+      <i class="bi bi-plus-lg"></i> Dodaj novi teren
+    </button>
   </div>
 
-  <div *ngIf="loading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="mt-2 text-muted">Učitavanje terena...</p>
+  <!-- Loading -->
+  <div class="page-loading" *ngIf="loading">
+    <div class="page-spinner"></div>
+    <p>Učitavanje terena...</p>
   </div>
 
-  <div *ngIf="errorMessage" class="alert alert-danger shadow-sm">
-    <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage }}
+  <!-- Error -->
+  <div class="owner-error" *ngIf="errorMessage">
+    <i class="bi bi-exclamation-triangle"></i> {{ errorMessage }}
   </div>
 
-  <div *ngIf="!loading && venues.length === 0" class="text-center py-5">
-    <div class="mb-3 fs-1 text-muted">🏟️</div>
-    <h4>Nemate kreiranih terena.</h4>
-    <p class="text-muted">Kliknite na dugme iznad da dodate svoj prvi sportski objekat.</p>
+  <!-- Empty state -->
+  <div class="owner-empty" *ngIf="!loading && venues.length === 0">
+    <div class="owner-empty-icon"><i class="bi bi-building"></i></div>
+    <h3>Nemate kreiranih terena</h3>
+    <p>Kliknite na dugme iznad da dodate svoj prvi sportski objekat.</p>
+    <button class="btn-add-venue" routerLink="/venues/new">
+      <i class="bi bi-plus-lg"></i> Dodaj teren
+    </button>
   </div>
 
-  <div class="row" *ngIf="venues.length > 0">
-    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let venue of venues">
-      <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden"
-           [class.opacity-50]="!venue.is_active">
+  <!-- Venues grid -->
+  <div class="owner-venues-grid" *ngIf="!loading && venues.length > 0">
+    <div class="owner-venue-card" *ngFor="let venue of venues" [class.card-inactive]="!venue.is_active">
 
-        <div class="position-relative">
-          <img
-            [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.png'"
-            class="card-img-top"
-            style="height: 200px; object-fit: cover;"
-            alt="{{ venue.name }}"
-          >
-          <div *ngIf="venue.avg_rating" class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm py-2 px-3 rounded-pill">
-            <span class="text-warning fw-bold">★</span> {{ venue.avg_rating }}
-            <small class="text-muted">({{ venue.review_count }})</small>
-          </div>
-          <div class="position-absolute top-0 start-0 m-3">
-            <span class="badge rounded-pill px-3 py-2"
-                  [class.bg-success]="venue.is_active"
-                  [class.bg-secondary]="!venue.is_active">
-              {{ venue.is_active ? '● Aktivan' : '● Neaktivan' }}
-            </span>
-          </div>
+      <!-- Image -->
+      <div class="ovc-image">
+        <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.png'"
+             [alt]="venue.name" />
+        <div class="ovc-status-badge" [class.badge-active]="venue.is_active" [class.badge-inactive]="!venue.is_active">
+          <span class="status-dot"></span>
+          {{ venue.is_active ? 'Aktivan' : 'Neaktivan' }}
         </div>
-
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="card-title fw-bold mb-0 text-truncate" style="max-width: 70%;">{{ venue.name }}</h5>
-            <div *ngIf="!venue.avg_rating" class="small text-muted">Bez ocena</div>
-          </div>
-
-          <p class="card-text text-muted small mb-3">
-            <i class="bi bi-geo-alt-fill text-danger"></i> {{ venue.city }}, {{ venue.street }}
-          </p>
-
-          <div class="bg-light p-3 rounded-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="small text-muted">Cena po terminu:</span>
-              <span class="fw-bold text-primary">{{ venue.price_per_slot }} RSD</span>
-            </div>
-          </div>
-
-          <!-- TAGOVI -->
-          <div class="d-flex flex-wrap gap-1" *ngIf="venue.tags?.length > 0">
-            <span *ngFor="let tag of venue.tags.slice(0, 5)"
-                  class="badge rounded-pill d-flex align-items-center gap-1 px-2 py-1"
-                  style="background:#f0f4ff; color:#0d6efd; border:1px solid #c7d7fd; font-size:11px;"
-                  [title]="tag.name">
-              <i class="bi {{ tag.icon }}"></i>
-              {{ tag.name }}
-            </span>
-            <span *ngIf="venue.tags.length > 5"
-                  class="badge rounded-pill px-2 py-1"
-                  style="background:#f8f9fa; color:#6c757d; border:1px solid #dee2e6; font-size:11px;">
-              +{{ venue.tags.length - 5 }} još
-            </span>
-          </div>
-
-        </div>
-
-        <div class="card-footer bg-white border-0 d-flex justify-content-between p-3 gap-1">
-          <button class="btn btn-outline-primary btn-sm rounded-3 px-2" (click)="onView(venue.id)">
-            <i class="bi bi-eye"></i> Pogledaj
-          </button>
-
-          <button class="btn btn-outline-secondary btn-sm rounded-3 px-2" (click)="onEdit(venue.id)">
-            <i class="bi bi-pencil"></i> Uredi
-          </button>
-
-          <button
-            class="btn btn-sm rounded-3 px-2"
-            [class.btn-outline-success]="!venue.is_active"
-            [class.btn-outline-warning]="venue.is_active"
-            (click)="onToggleActive(venue)">
-            <i class="bi" [class.bi-toggle-off]="!venue.is_active" [class.bi-toggle-on]="venue.is_active"></i>
-            {{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}
-          </button>
-
-          <button class="btn btn-outline-danger btn-sm rounded-3 px-2" (click)="onDelete(venue.id)">
-            <i class="bi bi-trash"></i> Obriši
-          </button>
+        <div class="ovc-rating-badge" *ngIf="venue.avg_rating">
+          <i class="bi bi-star-fill"></i> {{ venue.avg_rating }}
+          <span>({{ venue.review_count }})</span>
         </div>
       </div>
+
+      <!-- Body -->
+      <div class="ovc-body">
+        <h3 class="ovc-name">{{ venue.name }}</h3>
+        <div class="ovc-location">
+          <i class="bi bi-geo-alt-fill"></i>
+          {{ venue.city }}, {{ venue.street }}
+        </div>
+
+        <div class="ovc-price-row">
+          <span class="ovc-price-label">Cena po terminu</span>
+          <span class="ovc-price">{{ venue.price_per_slot }} RSD</span>
+        </div>
+
+        <!-- Tags -->
+        <div class="ovc-tags" *ngIf="venue.tags?.length > 0">
+          <span class="ovc-tag" *ngFor="let tag of venue.tags.slice(0, 4)" [title]="tag.name">
+            <i class="bi {{ tag.icon }}"></i> {{ tag.name }}
+          </span>
+          <span class="ovc-tag ovc-tag-more" *ngIf="venue.tags.length > 4">
+            +{{ venue.tags.length - 4 }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="ovc-actions">
+        <button class="ovc-btn ovc-btn-view" (click)="onView(venue.id)" title="Pogledaj">
+          <i class="bi bi-eye"></i> Pogledaj
+        </button>
+        <button class="ovc-btn ovc-btn-edit" (click)="onEdit(venue.id)" title="Uredi">
+          <i class="bi bi-pencil"></i> Uredi
+        </button>
+        <button class="ovc-btn" (click)="onToggleActive(venue)"
+                [class.ovc-btn-activate]="!venue.is_active"
+                [class.ovc-btn-deactivate]="venue.is_active"
+                title="{{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}">
+          <i class="bi" [class.bi-toggle-off]="!venue.is_active" [class.bi-toggle-on]="venue.is_active"></i>
+          {{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}
+        </button>
+        <button class="ovc-btn ovc-btn-delete" (click)="onDelete(venue.id)" title="Obriši">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

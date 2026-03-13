@@ -1,33 +1,88 @@
-<div style="max-width: 400px; margin: 50px auto;">
-  <h2>Login</h2>
-
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-
-    <div>
-      <label>Email</label>
-      <input type="email" formControlName="email" />
-    </div>
-
-    <div>
-      <label>Password</label>
-      <input type="password" formControlName="password" />
-    </div>
-
-    <button type="submit" [disabled]="loading">
-      {{ loading ? 'Logging in...' : 'Login' }}
-    </button>
-
-    <div style="margin-top: 10px; text-align: right;">
-      <a routerLink="/forgot-password" style="font-size: 13px; color: #0d6efd;">
-        Zaboravili ste lozinku?
-      </a>
-    </div>
-
-    @if(errorMessage != '') {
-      <div style="color:red; margin-top:10px;">
-        {{ errorMessage }}
+<div class="auth-page">
+  <!-- Left side - decorative -->
+  <div class="auth-visual">
+    <div class="auth-visual-blob"></div>
+    <div class="auth-visual-content">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="bi bi-trophy-fill"></i></div>
+        <span>Sportski<span>Termin</span></span>
       </div>
-    }
+      <h2>Dobrodošli nazad!</h2>
+      <p>Rezerviši svoj omiljeni teren za minutu. Brzo, jednostavno, pouzdano.</p>
 
-  </form>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Stotine terena na jednom mestu</span>
+        </div>
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Instant potvrda rezervacije</span>
+        </div>
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Email obaveštenja i podsjetnici</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side - form -->
+  <div class="auth-form-side">
+    <div class="auth-form-card">
+      <div class="auth-form-header">
+        <h1>Prijavi se</h1>
+        <p>Nemaš nalog? <a routerLink="/userRegister">Registruj se</a></p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+        <div class="form-group">
+          <label>Email adresa</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope input-icon"></i>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="vas&#64;email.com"
+              [class.input-error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label>Lozinka</label>
+            <a routerLink="/forgot-password" class="forgot-link">Zaboravili ste lozinku?</a>
+          </div>
+          <div class="input-wrap">
+            <i class="bi bi-lock input-icon"></i>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Vaša lozinka"
+              [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            />
+            <button type="button" class="input-toggle" (click)="showPassword = !showPassword">
+              <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="error-msg" *ngIf="errorMessage">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+
+        <button type="submit" class="btn-auth" [disabled]="loading">
+          <span *ngIf="!loading">Prijavi se</span>
+          <span *ngIf="loading" class="btn-loading">
+            <span class="btn-spinner"></span>
+            Prijavljivanje...
+          </span>
+        </button>
+
+      </form>
+    </div>
+  </div>
 </div>

@@ -1,158 +1,173 @@
-<div class="container py-4">
-  <h2 class="fw-bold mb-4">Pregled Rezervacija i Zarade 📈</h2>
+<div class="owner-page" *ngIf="!loading">
 
-  <div *ngIf="loading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="mt-2 text-muted">Učitavanje podataka...</p>
+  <!-- Header -->
+  <div class="owner-page-header">
+    <div class="owner-page-title">
+      <h1>Rezervacije i Zarada</h1>
+      <p>Pregled poslovanja i upravljanje rezervacijama</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="page-loading" *ngIf="loading">
+    <div class="page-spinner"></div>
+    <p>Učitavanje podataka...</p>
   </div>
 
   <ng-container *ngIf="!loading">
 
-    <!-- STAT KARTICE -->
-    <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
-        <div class="card bg-success text-white shadow-sm border-0 rounded-4 p-3 h-100">
-          <small class="text-uppercase opacity-75">Ukupna Zarada</small>
-          <h3 class="fw-bold mb-0">{{ stats.totalEarnings | number }} RSD</h3>
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card stat-green">
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Ukupna zarada</span>
+          <span class="stat-value">{{ stats.totalEarnings | number }} RSD</span>
         </div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="card bg-primary text-white shadow-sm border-0 rounded-4 p-3 h-100">
-          <small class="text-uppercase opacity-75">Aktivne Rezervacije</small>
-          <h3 class="fw-bold mb-0">{{ stats.confirmedCount }}</h3>
+      <div class="stat-card stat-navy">
+        <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Aktivne rezervacije</span>
+          <span class="stat-value">{{ stats.confirmedCount }}</span>
         </div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="card bg-secondary text-white shadow-sm border-0 rounded-4 p-3 h-100">
-          <small class="text-uppercase opacity-75">Završene</small>
-          <h3 class="fw-bold mb-0">{{ stats.completedCount }}</h3>
+      <div class="stat-card stat-gray">
+        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Završene</span>
+          <span class="stat-value">{{ stats.completedCount }}</span>
         </div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="card bg-danger text-white shadow-sm border-0 rounded-4 p-3 h-100">
-          <small class="text-uppercase opacity-75">Otkazane</small>
-          <h3 class="fw-bold mb-0">{{ stats.cancelledCount }}</h3>
+      <div class="stat-card stat-red">
+        <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Otkazane</span>
+          <span class="stat-value">{{ stats.cancelledCount }}</span>
         </div>
       </div>
     </div>
 
-    <!-- GRAFICI RED -->
-    <div class="row g-3 mb-4">
+    <!-- CHARTS ROW -->
+    <div class="charts-row">
 
-      <!-- Zarada po mjesecu -->
-      <div class="col-md-7">
-        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-          <h6 class="fw-bold mb-3">Zarada po mjesecu (poslednjih 6)</h6>
-          <div class="d-flex align-items-end gap-2" style="height: 120px;">
-            <div *ngFor="let m of earningsByMonth"
-                 class="flex-fill d-flex flex-column align-items-center gap-1">
-              <small class="text-muted" style="font-size: 10px;">
-                {{ m.earnings > 0 ? (m.earnings | number) : '' }}
-              </small>
-              <div class="bg-primary rounded-top w-100"
-                   [style.height.%]="m.earnings > 0 ? (m.earnings / getMaxMonthEarnings() * 100) : 3"
-                   [style.opacity]="m.earnings > 0 ? 1 : 0.2">
-              </div>
-              <small class="text-muted" style="font-size: 11px;">{{ m.label }}</small>
-            </div>
+      <!-- Bar chart - earnings by month -->
+      <div class="chart-card chart-wide">
+        <h4 class="chart-title">Zarada po mjesecu <span>(poslednjih 6)</span></h4>
+        <div class="bar-chart">
+          <div class="bar-wrap" *ngFor="let m of earningsByMonth">
+            <span class="bar-value">{{ m.earnings > 0 ? (m.earnings | number) : '' }}</span>
+            <div class="bar-fill"
+                 [style.height.%]="m.earnings > 0 ? (m.earnings / getMaxMonthEarnings() * 100) : 3"
+                 [class.bar-empty]="m.earnings === 0"></div>
+            <span class="bar-label">{{ m.label }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Najpopularniji termini -->
-      <div class="col-md-5">
-        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-          <h6 class="fw-bold mb-3">🕐 Najpopularniji termini</h6>
-          <div *ngIf="popularHours.length === 0" class="text-muted small">Nema podataka.</div>
-          <div *ngFor="let h of popularHours" class="mb-2">
-            <div class="d-flex justify-content-between small mb-1">
-              <span class="fw-bold">{{ h.hour }}h</span>
-              <span class="text-muted">{{ h.count }} rezervacija</span>
+      <!-- Popular hours -->
+      <div class="chart-card">
+        <h4 class="chart-title">Najpopularniji termini</h4>
+        <div class="no-data" *ngIf="popularHours.length === 0">Nema podataka.</div>
+        <div class="progress-list">
+          <div class="progress-item" *ngFor="let h of popularHours">
+            <div class="progress-item-header">
+              <span class="progress-label">{{ h.hour }}h</span>
+              <span class="progress-count">{{ h.count }} rez.</span>
             </div>
-            <div class="progress" style="height: 6px;">
-              <div class="progress-bar bg-warning"
-                   [style.width.%]="(h.count / popularHours[0].count) * 100">
-              </div>
+            <div class="progress-track">
+              <div class="progress-fill progress-gold"
+                   [style.width.%]="(h.count / popularHours[0].count) * 100"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Zarada po terenu -->
-    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" *ngIf="earningsByVenue.length > 0">
-      <h6 class="fw-bold mb-3">🏟️ Zarada po terenu</h6>
-      <div *ngFor="let v of earningsByVenue" class="mb-3">
-        <div class="d-flex justify-content-between small mb-1">
-          <span class="fw-bold">{{ v.name }}</span>
-          <span class="text-success fw-bold">{{ v.earnings | number }} RSD
-            <span class="text-muted fw-normal">({{ v.count }} rez.)</span>
-          </span>
-        </div>
-        <div class="progress" style="height: 8px;">
-          <div class="progress-bar bg-success"
-               [style.width.%]="(v.earnings / getMaxVenueEarnings()) * 100">
+    <!-- Earnings by venue -->
+    <div class="chart-card chart-full" *ngIf="earningsByVenue.length > 0">
+      <h4 class="chart-title">Zarada po terenu</h4>
+      <div class="progress-list">
+        <div class="progress-item" *ngFor="let v of earningsByVenue">
+          <div class="progress-item-header">
+            <span class="progress-label">{{ v.name }}</span>
+            <span class="progress-count">
+              <strong style="color:#16a34a">{{ v.earnings | number }} RSD</strong>
+              <span style="color:var(--text-muted)"> · {{ v.count }} rez.</span>
+            </span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill progress-green"
+                 [style.width.%]="(v.earnings / getMaxVenueEarnings()) * 100"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TABELA REZERVACIJA -->
-    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="bg-light">
+    <!-- BOOKINGS TABLE -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <h4 class="chart-title" style="margin:0">Sve rezervacije</h4>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
             <tr>
-              <th class="ps-4">Teren</th>
+              <th>Teren</th>
               <th>Klijent</th>
-              <th>Datum i Vreme</th>
+              <th>Datum i vreme</th>
               <th>Iznos</th>
               <th>Status</th>
               <th>Kontakt</th>
-              <th class="pe-4 text-center">Akcije</th>
+              <th class="text-center">Akcije</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let b of bookings">
-              <td class="ps-4 fw-bold">{{ b.venue_name }}</td>
+              <td class="td-bold">{{ b.venue_name }}</td>
               <td>{{ b.client_name }}</td>
               <td>
-                <div class="small fw-bold">{{ b.start_time | date:'dd.MM.yyyy' }}</div>
-                <div class="text-muted small">{{ b.start_time | date:'HH:mm' }} - {{ b.end_time | date:'HH:mm' }}</div>
+                <div class="td-date">{{ b.start_time | date:'dd.MM.yyyy' }}</div>
+                <div class="td-time">{{ b.start_time | date:'HH:mm' }} – {{ b.end_time | date:'HH:mm' }}</div>
               </td>
-              <td class="text-success fw-bold">{{ b.price_paid }} RSD</td>
+              <td class="td-price">{{ b.price_paid }} RSD</td>
               <td>
-                <span class="badge" [ngClass]="{
-                  'bg-success': b.status === 'confirmed',
-                  'bg-danger': b.status === 'cancelled_by_owner',
-                  'bg-warning text-dark': b.status === 'cancelled_by_client',
-                  'bg-secondary': b.status === 'completed'
-                }">
+                <span class="table-status-badge"
+                      [class.badge-confirmed]="b.status === 'confirmed'"
+                      [class.badge-completed]="b.status === 'completed'"
+                      [class.badge-cancelled-owner]="b.status === 'cancelled_by_owner'"
+                      [class.badge-cancelled-client]="b.status === 'cancelled_by_client'">
                   {{ b.status === 'confirmed' ? 'Potvrđeno' :
-                     b.status === 'cancelled_by_owner' ? 'Otkazao Vlasnik' :
-                     b.status === 'cancelled_by_client' ? 'Otkazao Klijent' :
-                     b.status === 'completed' ? 'Završeno' : b.status }}
+                     b.status === 'completed' ? 'Završeno' :
+                     b.status === 'cancelled_by_owner' ? 'Otkazao vlasnik' :
+                     b.status === 'cancelled_by_client' ? 'Otkazao klijent' : b.status }}
                 </span>
               </td>
               <td>
-                <a [href]="'tel:' + b.client_phone" class="btn btn-sm btn-outline-primary me-1" title="Pozovi">📞</a>
-                <a [href]="'mailto:' + b.client_email" class="btn btn-sm btn-outline-secondary" title="Email">📧</a>
+                <div class="contact-btns">
+                  <a [href]="'tel:' + b.client_phone" class="contact-btn" title="Pozovi">
+                    <i class="bi bi-telephone"></i>
+                  </a>
+                  <a [href]="'mailto:' + b.client_email" class="contact-btn" title="Email">
+                    <i class="bi bi-envelope"></i>
+                  </a>
+                </div>
               </td>
-              <td class="pe-4 text-center">
-                <div class="d-flex justify-content-center gap-2">
-                  <button [routerLink]="['/bookings', b.id]" class="btn btn-sm btn-dark rounded-pill px-3">
-                    🎫 Detalji
+              <td class="text-center">
+                <div class="table-actions">
+                  <button [routerLink]="['/bookings', b.id]" class="ovc-btn ovc-btn-view">
+                    <i class="bi bi-ticket"></i> Detalji
                   </button>
                   <button *ngIf="b.status === 'confirmed'"
                           (click)="cancelBooking(b.id)"
-                          class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                    🚫 Otkaži
+                          class="ovc-btn ovc-btn-delete">
+                    <i class="bi bi-x-circle"></i> Otkaži
                   </button>
                 </div>
               </td>
             </tr>
             <tr *ngIf="bookings.length === 0">
-              <td colspan="7" class="text-center text-muted py-4">Nema rezervacija.</td>
+              <td colspan="7" class="table-empty">Nema rezervacija.</td>
             </tr>
           </tbody>
         </table>

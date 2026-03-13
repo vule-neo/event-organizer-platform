@@ -1,26 +1,147 @@
-<div class="register-form">
-  <h2>Registracija</h2>
-  <form [formGroup]="registerForm" (ngSubmit)="register()">
-    <input type="text" formControlName="first_name" placeholder="Ime" />
-    <input type="text" formControlName="last_name" placeholder="Prezime" />
-    <input type="email" formControlName="email" placeholder="Email" />
-    <input type="tel" formControlName="phone" placeholder="Telefon" />
-    <input type="password" formControlName="password" placeholder="Lozinka" />
+<div class="auth-page">
+  <!-- Left visual -->
+  <div class="auth-visual">
+    <div class="auth-visual-blob"></div>
+    <div class="auth-visual-content">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="bi bi-trophy-fill"></i></div>
+        <span>Sportski<span>Termin</span></span>
+      </div>
+      <h2>Pridruži se zajednici!</h2>
+      <p>Hiljade sportista već rezervišu terene na našoj platformi. Budi i ti deo toga.</p>
 
-    <div class="role-selection">
-      <p>Registrujem se kao:</p>
-      <label class="radio-label">
-        <input type="radio" value="customer" formControlName="role"> 
-        <span>Igrač</span>
-      </label>
-      <label class="radio-label">
-        <input type="radio" value="owner" formControlName="role"> 
-        <span>Vlasnik terena</span>
-      </label>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Besplatna registracija</span>
+        </div>
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Rezerviši za par klikova</span>
+        </div>
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Upravljaj svojim terenima</span>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <button type="submit" [disabled]="registerForm.invalid">Registruj se</button>
-  </form>
-  
-  <p *ngIf="message">{{ message }}</p>
+  <!-- Right form -->
+  <div class="auth-form-side">
+    <div class="auth-form-card">
+      <div class="auth-form-header">
+        <h1>Kreiraj nalog</h1>
+        <p>Već imaš nalog? <a routerLink="/login">Prijavi se</a></p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="register()" class="auth-form">
+
+        <!-- Ime i Prezime -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ime</label>
+            <div class="input-wrap">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" formControlName="first_name" placeholder="Vaše ime"
+                [class.input-error]="registerForm.get('first_name')?.invalid && registerForm.get('first_name')?.touched" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Prezime</label>
+            <div class="input-wrap">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" formControlName="last_name" placeholder="Vaše prezime"
+                [class.input-error]="registerForm.get('last_name')?.invalid && registerForm.get('last_name')?.touched" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email adresa</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" formControlName="email" placeholder="vas&#64;email.com"
+              [class.input-error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" />
+          </div>
+        </div>
+
+        <!-- Telefon -->
+        <div class="form-group">
+          <label>Telefon</label>
+          <div class="input-wrap">
+            <i class="bi bi-telephone input-icon"></i>
+            <input type="tel" formControlName="phone" placeholder="+381 6x xxx xxxx" />
+          </div>
+        </div>
+
+        <!-- Lozinka -->
+        <div class="form-group">
+          <label>Lozinka</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock input-icon"></i>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Minimum 6 karaktera"
+              [class.input-error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+            />
+            <button type="button" class="input-toggle" (click)="showPassword = !showPassword">
+              <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="form-group">
+          <label>Registrujem se kao</label>
+          <div class="role-cards">
+            <label class="role-card" [class.role-selected]="registerForm.get('role')?.value === 'customer'">
+              <input type="radio" value="customer" formControlName="role" hidden />
+              <div class="role-icon">
+                <i class="bi bi-person-running"></i>
+              </div>
+              <div class="role-info">
+                <span class="role-title">Igrač</span>
+                <span class="role-desc">Rezervišem terene</span>
+              </div>
+              <i class="bi bi-check-circle-fill role-check"></i>
+            </label>
+
+            <label class="role-card" [class.role-selected]="registerForm.get('role')?.value === 'owner'">
+              <input type="radio" value="owner" formControlName="role" hidden />
+              <div class="role-icon">
+                <i class="bi bi-building"></i>
+              </div>
+              <div class="role-info">
+                <span class="role-title">Vlasnik terena</span>
+                <span class="role-desc">Iznajmljujem terene</span>
+              </div>
+              <i class="bi bi-check-circle-fill role-check"></i>
+            </label>
+          </div>
+        </div>
+
+        <!-- Error / Success -->
+        <div class="error-msg" *ngIf="message && isError">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ message }}
+        </div>
+        <div class="success-msg" *ngIf="message && !isError">
+          <i class="bi bi-check-circle"></i>
+          {{ message }}
+        </div>
+
+        <button type="submit" class="btn-auth" [disabled]="registerForm.invalid || loading">
+          <span *ngIf="!loading">Kreiraj nalog</span>
+          <span *ngIf="loading" class="btn-loading">
+            <span class="btn-spinner"></span>
+            Registracija...
+          </span>
+        </button>
+
+      </form>
+    </div>
+  </div>
 </div>

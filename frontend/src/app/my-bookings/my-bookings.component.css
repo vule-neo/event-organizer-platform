@@ -1,0 +1,557 @@
+/* Dijeli owner-page, owner-venues-grid, ovc-* stilove iz owner-venues.component.css */
+/* Ovdje su samo booking-specific stilovi */
+
+/* ============================================
+   OWNER PAGES — shared + owner-venues
+   ============================================ */
+
+.owner-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ---- PAGE HEADER ---- */
+.owner-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.owner-page-title h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+}
+
+.owner-page-title p {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.btn-add-venue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-add-venue:hover {
+  background: var(--gold);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+/* ---- ERROR ---- */
+.owner-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* ---- EMPTY STATE ---- */
+.owner-empty {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-secondary);
+}
+
+.owner-empty-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--text-muted);
+  margin: 0 auto 20px;
+}
+
+.owner-empty h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.owner-empty p {
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+/* ---- VENUES GRID ---- */
+.owner-venues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* ---- VENUE CARD ---- */
+.owner-venue-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-venue-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: rgba(30,58,95,0.12);
+}
+
+.card-inactive {
+  opacity: 0.65;
+}
+
+/* Card image */
+.ovc-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.ovc-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.owner-venue-card:hover .ovc-image img {
+  transform: scale(1.04);
+}
+
+.ovc-status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.badge-active {
+  background: rgba(22,163,74,0.85);
+  color: #fff;
+}
+
+.badge-inactive {
+  background: rgba(107,114,128,0.85);
+  color: #fff;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+.ovc-rating-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  backdrop-filter: blur(8px);
+}
+
+.ovc-rating-badge i {
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.ovc-rating-badge span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Card body */
+.ovc-body {
+  padding: 20px;
+  flex: 1;
+}
+
+.ovc-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ovc-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.ovc-location i {
+  color: #dc3545;
+  flex-shrink: 0;
+}
+
+.ovc-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.ovc-price-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.ovc-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* Tags */
+.ovc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ovc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(30,58,95,0.06);
+  border: 1px solid rgba(30,58,95,0.1);
+  border-radius: 50px;
+  font-size: 11px;
+  color: var(--navy);
+  font-weight: 500;
+}
+
+.ovc-tag-more {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+/* Card actions */
+.ovc-actions {
+  display: flex;
+  gap: 6px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+  flex-wrap: wrap;
+}
+
+.ovc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.ovc-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ovc-btn-view {
+  border-color: rgba(30,58,95,0.2);
+  color: var(--navy);
+}
+
+.ovc-btn-view:hover {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
+.ovc-btn-edit {
+  border-color: rgba(30,58,95,0.15);
+  color: var(--text-secondary);
+}
+
+.ovc-btn-edit:hover {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.ovc-btn-activate {
+  border-color: rgba(22,163,74,0.3);
+  color: #16a34a;
+}
+
+.ovc-btn-activate:hover {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+}
+
+.ovc-btn-deactivate {
+  border-color: rgba(234,179,8,0.3);
+  color: #a16207;
+}
+
+.ovc-btn-deactivate:hover {
+  background: #ca8a04;
+  color: #fff;
+  border-color: #ca8a04;
+}
+
+.ovc-btn-delete {
+  border-color: rgba(220,53,69,0.2);
+  color: #dc3545;
+  margin-left: auto;
+}
+
+.ovc-btn-delete:hover {
+  background: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .owner-page {
+    padding: 24px 16px 60px;
+  }
+
+  .owner-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-add-venue {
+    justify-content: center;
+  }
+
+  .owner-venues-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.booking-card-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-card-item:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: rgba(30,58,95,0.12);
+}
+
+/* Status pill on image */
+.booking-status-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.status-confirmed {
+  background: rgba(22,163,74,0.85);
+  color: #fff;
+}
+
+.status-completed {
+  background: rgba(30,58,95,0.85);
+  color: #fff;
+}
+
+.status-cancelled {
+  background: rgba(107,114,128,0.75);
+  color: #fff;
+}
+
+.status-cancelled-late {
+  background: rgba(220,53,69,0.8);
+  color: #fff;
+}
+
+/* Booking info grid */
+.booking-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.booking-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.booking-info-row:last-child {
+  border-bottom: none;
+}
+
+.booking-info-row span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.booking-info-row span i {
+  color: var(--navy);
+  font-size: 13px;
+}
+
+.booking-info-row strong {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.booking-price-paid {
+  color: #16a34a !important;
+}
+
+/* Card footer */
+.booking-card-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.w-full {
+  width: 100%;
+  justify-content: center;
+}
+
+.ovc-btn-review {
+  background: rgba(232,184,109,0.1);
+  border-color: rgba(232,184,109,0.4);
+  color: var(--gold-dark);
+  font-size: 13px;
+  padding: 10px;
+}
+
+.ovc-btn-review:hover {
+  background: var(--gold);
+  color: var(--text);
+  border-color: var(--gold);
+}
+
+.ovc-btn-delete.w-full {
+  font-size: 13px;
+  padding: 10px;
+}
+
+.booking-no-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 8px;
+}
+
+.booking-reviewed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #16a34a;
+  font-weight: 600;
+  padding: 8px;
+}
+
+.booking-cancelled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px;
+}

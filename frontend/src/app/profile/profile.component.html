@@ -1,55 +1,112 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body p-4">
-          <div class="text-center mb-4">
-            <div class="d-inline-block p-3 rounded-circle bg-primary bg-opacity-10 mb-3">
-              <i class="bi bi-person-badge fs-1 text-primary"></i>
-            </div>
-            <h3 class="fw-bold">Moj Profil</h3>
-            <p class="text-muted small">Vaši podaci su automatski učitani</p>
-          </div>
+<div class="auth-page profile-page">
 
-          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label class="form-label small fw-bold text-uppercase text-muted">Email (Nalog)</label>
-              <input type="email" formControlName="email" class="form-control bg-light border-0" readonly>
-            </div>
+  <!-- Left visual -->
+  <div class="auth-visual">
+    <div class="auth-visual-blob"></div>
+    <div class="auth-visual-content">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="bi bi-trophy-fill"></i></div>
+        <span>Sportski<span>Termin</span></span>
+      </div>
+      <h2>Vaš profil</h2>
+      <p>Ažurirajte vaše podatke kako bi vlasnici terena mogli da vas kontaktiraju.</p>
 
-            <div class="row mb-3">
-              <div class="col">
-                <label class="form-label small fw-bold text-uppercase text-muted">Ime</label>
-                <input type="text" formControlName="first_name" class="form-control border-2" 
-                       placeholder="Učitavanje..."
-                       [class.is-invalid]="profileForm.get('first_name')?.invalid && profileForm.get('first_name')?.touched">
-              </div>
-              <div class="col">
-                <label class="form-label small fw-bold text-uppercase text-muted">Prezime</label>
-                <input type="text" formControlName="last_name" class="form-control border-2"
-                       placeholder="Učitavanje..."
-                       [class.is-invalid]="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched">
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="form-label small fw-bold text-uppercase text-muted">Telefon</label>
-              <input type="text" formControlName="phone" class="form-control border-2" placeholder="+381 6..."
-                     [class.is-invalid]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
-              <div class="form-text small italic">Ovaj broj će koristiti vlasnici terena da vas kontaktiraju.</div>
-            </div>
-
-            <div *ngIf="message" [class]="'alert small border-0 py-2 ' + (isError ? 'alert-danger' : 'alert-success')">
-              <i class="bi" [ngClass]="isError ? 'bi-exclamation-triangle' : 'bi-check-circle'"></i> {{ message }}
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm" [disabled]="loading || profileForm.invalid">
-              <span *ngIf="!loading">AŽURIRAJ PODATKE</span>
-              <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
-            </button>
-          </form>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Tačni podaci = brža rezervacija</span>
+        </div>
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Telefon za kontakt vlasnika</span>
+        </div>
+        <div class="auth-feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Email notifikacije na vašu adresu</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Right form -->
+  <div class="auth-form-side">
+    <div class="auth-form-card">
+
+      <!-- Avatar -->
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">
+          {{ profileForm.get('first_name')?.value?.charAt(0) || '?' }}{{ profileForm.get('last_name')?.value?.charAt(0) || '' }}
+        </div>
+        <div>
+          <div class="profile-avatar-name">
+            {{ profileForm.get('first_name')?.value }} {{ profileForm.get('last_name')?.value }}
+          </div>
+          <div class="profile-avatar-email">{{ profileForm.get('email')?.value }}</div>
+        </div>
+      </div>
+
+      <div class="auth-form-header" style="margin-top: 24px;">
+        <h1>Uredi profil</h1>
+        <p>Vaši podaci su automatski učitani</p>
+      </div>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+        <!-- Email (readonly) -->
+        <div class="form-group">
+          <label>Email (nalog)</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" formControlName="email" readonly class="input-readonly" />
+          </div>
+        </div>
+
+        <!-- Ime + Prezime -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ime</label>
+            <div class="input-wrap">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" formControlName="first_name" placeholder="Vaše ime"
+                [class.input-error]="profileForm.get('first_name')?.invalid && profileForm.get('first_name')?.touched" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Prezime</label>
+            <div class="input-wrap">
+              <i class="bi bi-person input-icon"></i>
+              <input type="text" formControlName="last_name" placeholder="Vaše prezime"
+                [class.input-error]="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Telefon -->
+        <div class="form-group">
+          <label>Telefon</label>
+          <div class="input-wrap">
+            <i class="bi bi-telephone input-icon"></i>
+            <input type="text" formControlName="phone" placeholder="+381 6x xxx xxxx" />
+          </div>
+          <span class="form-hint">Ovaj broj će koristiti vlasnici terena da vas kontaktiraju.</span>
+        </div>
+
+        <!-- Message -->
+        <div class="error-msg" *ngIf="message && isError">
+          <i class="bi bi-exclamation-circle"></i> {{ message }}
+        </div>
+        <div class="success-msg" *ngIf="message && !isError">
+          <i class="bi bi-check-circle"></i> {{ message }}
+        </div>
+
+        <button type="submit" class="btn-auth" [disabled]="loading || profileForm.invalid">
+          <span *ngIf="!loading">Ažuriraj podatke</span>
+          <span *ngIf="loading" class="btn-loading">
+            <span class="btn-spinner"></span> Čuvanje...
+          </span>
+        </button>
+
+      </form>
     </div>
   </div>
 </div>

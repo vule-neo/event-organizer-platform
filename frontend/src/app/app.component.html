@@ -1,37 +1,78 @@
-<nav class="navbar">
+<nav class="navbar" [class.scrolled]="isScrolled">
   <div class="nav-container">
-    <a routerLink="/explore" class="logo">
-      <span class="icon">⚽</span> Sportski Termin
+
+    <!-- Logo -->
+    <a routerLink="/explore" class="nav-logo">
+      <div class="logo-icon">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <span class="logo-text">Sportski<span class="logo-accent">Termin</span></span>
     </a>
 
-    <div class="nav-links">
-      <a routerLink="/explore" routerLinkActive="active">Istraži terene</a>
+    <!-- Desktop Links -->
+    <div class="nav-links" [class.open]="mobileMenuOpen">
+
+      <a routerLink="/explore" routerLinkActive="active" class="nav-link">
+        <i class="bi bi-search"></i> Istraži terene
+      </a>
 
       <ng-container *ngIf="!authService.isLoggedIn()">
-        <a routerLink="/login" class="btn-login">Prijavi se</a>
-        <a routerLink="/userRegister" class="btn-register">Registracija</a>
+        <div class="nav-divider"></div>
+        <a routerLink="/login" class="btn-nav-outline">Prijavi se</a>
+        <a routerLink="/userRegister" class="btn-nav-primary">Registracija</a>
       </ng-container>
 
       <ng-container *ngIf="authService.isLoggedIn()">
-        
+
         <ng-container *ngIf="authService.hasRole('owner')">
-          <a routerLink="/venues/ownerVenues" routerLinkActive="active">Moji Tereni</a>
-          <a routerLink="/venues/reports" routerLinkActive="active">Rezervacije kod mene</a>
-          <a routerLink="/venues/new" class="btn-create" routerLinkActive="active">+ Novi teren</a>
+          <a routerLink="/venues/ownerVenues" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-building"></i> Moji Tereni
+          </a>
+          <a routerLink="/venues/reports" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-calendar-check"></i> Rezervacije
+          </a>
+          <a routerLink="/venues/new" class="btn-nav-primary" routerLinkActive="active">
+            <i class="bi bi-plus-lg"></i> Novi teren
+          </a>
         </ng-container>
 
         <ng-container *ngIf="authService.hasRole('customer')">
-          <a routerLink="/my-bookings" routerLinkActive="active">Moje rezervacije</a>
+          <a routerLink="/my-bookings" routerLinkActive="active" class="nav-link">
+            <i class="bi bi-calendar2-heart"></i> Moje rezervacije
+          </a>
         </ng-container>
 
-        <div class="user-menu">
-          <a routerLink="/profile" class="user-profile-link" routerLinkActive="active">
-            <i class="bi bi-person-circle"></i> {{ authService.getUserName() }}
+        <div class="nav-divider"></div>
+
+        <div class="user-dropdown">
+          <a routerLink="/profile" class="user-pill" routerLinkActive="active">
+            <div class="user-avatar">
+              {{ getUserInitial() }}
+            </div>
+            <span>{{ authService.getUserName() }}</span>
+            <i class="bi bi-chevron-down"></i>
           </a>
-          <button class="btn-logout" (click)="logout()">Odjavi se</button>
+          <div class="dropdown-menu">
+            <a routerLink="/profile" class="dropdown-item">
+              <i class="bi bi-person"></i> Profil
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item text-danger" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i> Odjavi se
+            </button>
+          </div>
         </div>
+
       </ng-container>
     </div>
+
+    <!-- Mobile Hamburger -->
+    <button class="hamburger" (click)="toggleMobile()" [class.active]="mobileMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
   </div>
 </nav>
 

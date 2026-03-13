@@ -8,13 +8,14 @@ import { AuthService } from '../services/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css'
 })
 export class LoginComponent {
-
   loginForm: FormGroup;
   errorMessage = '';
   loading = false;
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -28,14 +29,12 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    this.loading = true;
-    this.errorMessage = '';
     if (this.loginForm.invalid) {
-      this.errorMessage = 'Molimo popunite sva polja ispravno.';
-      this.loading = false;
+      this.loginForm.markAllAsTouched();
       return;
     }
-
+    this.loading = true;
+    this.errorMessage = '';
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email, password).subscribe({
@@ -44,9 +43,8 @@ export class LoginComponent {
         localStorage.setItem('user', JSON.stringify(response.user));
         this.router.navigate(['']);
       },
-      error: (err) => {
-        console.error(err);
-        this.errorMessage = 'Invalid email or password';
+      error: () => {
+        this.errorMessage = 'Pogrešan email ili lozinka.';
         this.loading = false;
       }
     });

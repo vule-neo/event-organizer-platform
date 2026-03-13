@@ -1,59 +1,105 @@
-<div class="container py-5" *ngIf="booking">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-        <div class="bg-success p-4 text-white text-center">
-          <h3 class="mb-0 fw-bold">Potvrda Rezervacije</h3>
-          <small class="opacity-75">ID: #{{ booking.id.substring(0,8) }}</small>
+<div class="owner-page" *ngIf="booking">
+  <div class="booking-detail-wrap">
+
+    <!-- Ticket card -->
+    <div class="ticket-card">
+
+      <!-- Header -->
+      <div class="ticket-header">
+        <div class="ticket-header-left">
+          <div class="ticket-logo">
+            <i class="bi bi-trophy-fill"></i>
+            <span>Sportski<em>Termin</em></span>
+          </div>
+          <div class="ticket-confirmed"
+               [class.ticket-status-confirmed]="booking.status === 'confirmed'"
+               [class.ticket-status-completed]="booking.status === 'completed'"
+               [class.ticket-status-cancelled]="booking.status.includes('cancelled')">
+            <i class="bi"
+               [class.bi-check-circle-fill]="booking.status === 'confirmed'"
+               [class.bi-trophy-fill]="booking.status === 'completed'"
+               [class.bi-x-circle-fill]="booking.status.includes('cancelled')"></i>
+            {{ booking.status === 'confirmed' ? 'Potvrđena rezervacija' :
+               booking.status === 'completed' ? 'Završena rezervacija' :
+               booking.status === 'cancelled_by_client' ? 'Otkazao klijent' :
+               booking.status === 'cancelled_by_owner' ? 'Otkazao vlasnik' :
+               booking.status === 'cancelled_late' ? 'Kasno otkazano' : booking.status }}</div>
         </div>
-        
-        <div class="card-body p-4">
-          <div class="text-center mb-4">
-            <h2 class="fw-bold text-dark">{{ booking.venue_name }}</h2>
-            <p class="text-muted">📍 {{ booking.address }}, {{ booking.city }}</p>
+        <div class="ticket-id">#{{ booking.id.substring(0,8).toUpperCase() }}</div>
+      </div>
+
+      <!-- Venue name -->
+      <div class="ticket-venue">
+        <h1>{{ booking.venue_name }}</h1>
+        <div class="ticket-location">
+          <i class="bi bi-geo-alt-fill"></i>
+          {{ booking.address }}, {{ booking.city }}
+        </div>
+      </div>
+
+      <!-- Dashed divider -->
+      <div class="ticket-divider">
+        <div class="ticket-notch ticket-notch-left"></div>
+        <div class="ticket-dashes"></div>
+        <div class="ticket-notch ticket-notch-right"></div>
+      </div>
+
+      <!-- Info grid -->
+      <div class="ticket-info-grid">
+        <div class="ticket-info-item">
+          <span class="ticket-info-label"><i class="bi bi-calendar3"></i> Datum</span>
+          <span class="ticket-info-value">{{ booking.start_time | date:'dd.MM.yyyy' }}</span>
+        </div>
+        <div class="ticket-info-item">
+          <span class="ticket-info-label"><i class="bi bi-clock"></i> Vreme</span>
+          <span class="ticket-info-value">{{ booking.start_time | date:'HH:mm' }} – {{ booking.end_time | date:'HH:mm' }}</span>
+        </div>
+      </div>
+
+      <!-- Dashed divider 2 -->
+      <div class="ticket-divider">
+        <div class="ticket-notch ticket-notch-left"></div>
+        <div class="ticket-dashes"></div>
+        <div class="ticket-notch ticket-notch-right"></div>
+      </div>
+
+      <!-- Client -->
+      <div class="ticket-client">
+        <span class="ticket-info-label"><i class="bi bi-person"></i> Klijent</span>
+        <div class="ticket-client-row">
+          <div class="ticket-avatar">
+            {{ booking.first_name[0] }}{{ booking.last_name[0] }}
           </div>
-
-          <div class="row g-3">
-            <div class="col-6">
-              <label class="small text-muted text-uppercase">Datum</label>
-              <p class="fw-bold fs-5">{{ booking.start_time | date:'dd.MM.yyyy' }}</p>
-            </div>
-            <div class="col-6 text-end">
-              <label class="small text-muted text-uppercase">Vreme</label>
-              <p class="fw-bold fs-5">{{ booking.start_time | date:'HH:mm' }} - {{ booking.end_time | date:'HH:mm' }}</p>
-            </div>
-          </div>
-
-          <hr class="my-4" style="border-style: dashed;">
-
-          <div class="mb-4">
-            <label class="small text-muted text-uppercase d-block mb-2">Klijent</label>
-            <div class="d-flex align-items-center bg-light p-3 rounded-3">
-              <div class="avatar me-3 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                {{ booking.first_name[0] }}{{ booking.last_name[0] }}
-              </div>
-              <div>
-                <h6 class="mb-0 fw-bold">{{ booking.first_name }} {{ booking.last_name }}</h6>
-                <small class="text-muted">{{ booking.phone }}</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center bg-success bg-opacity-10 p-3 rounded-3 mb-4">
-            <span class="fw-bold">Ukupno plaćeno:</span>
-            <span class="h4 mb-0 fw-bold text-success">{{ booking.price_paid }} RSD</span>
-          </div>
-
-          <div class="d-grid gap-2">
-            <button class="btn btn-primary btn-lg rounded-3" (click)="printTicket()">
-              🖨️ Odštampaj potvrdu
-            </button>
-            <button class="btn btn-outline-secondary" routerLink="/my-bookings">
-              Nazad na listu
-            </button>
+          <div>
+            <div class="ticket-client-name">{{ booking.first_name }} {{ booking.last_name }}</div>
+            <div class="ticket-client-phone">{{ booking.phone }}</div>
           </div>
         </div>
       </div>
+
+      <!-- Dashed divider 3 -->
+      <div class="ticket-divider">
+        <div class="ticket-notch ticket-notch-left"></div>
+        <div class="ticket-dashes"></div>
+        <div class="ticket-notch ticket-notch-right"></div>
+      </div>
+
+      <!-- Price -->
+      <div class="ticket-price-row">
+        <span class="ticket-price-label">Ukupno plaćeno</span>
+        <span class="ticket-price">{{ booking.price_paid }} RSD</span>
+      </div>
+
+      <!-- Actions -->
+      <div class="ticket-actions">
+        <button class="ticket-btn-primary" (click)="printTicket()">
+          <i class="bi bi-printer"></i> Odštampaj potvrdu
+        </button>
+        <button class="ticket-btn-secondary" routerLink="/my-bookings">
+          <i class="bi bi-arrow-left"></i> Nazad na listu
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

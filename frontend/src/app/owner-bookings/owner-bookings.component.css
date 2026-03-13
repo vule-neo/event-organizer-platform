@@ -1,4 +1,36 @@
-/* Koristi .owner-page iz owner-venues.component.css ili styles.css */
+/* ---- PAGE CONTAINER ---- */
+.owner-page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+.owner-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.owner-page-title h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+}
+
+.owner-page-title p {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .owner-page {
+    padding: 24px 16px 60px;
+  }
+}
 
 /* ---- STAT CARDS ---- */
 .stats-grid {
@@ -6,6 +38,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 24px;
+
 }
 
 .stat-card {
@@ -61,6 +94,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
+
 }
 
 .chart-card {
@@ -76,6 +110,7 @@
 
 .chart-full {
   margin-bottom: 16px;
+
 }
 
 .chart-title {
@@ -305,8 +340,9 @@
 
 /* ---- RESPONSIVE ---- */
 @media (max-width: 1024px) {
-  .stats-grid   { grid-template-columns: repeat(2, 1fr); }
-  .charts-row   { grid-template-columns: 1fr; }
+  .stats-grid   { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
+  .charts-row   { grid-template-columns: 1fr; max-width: 100%; }
+  .chart-full   { max-width: 100%; }
 }
 
 @media (max-width: 600px) {

@@ -230,6 +230,31 @@ exports.deleteVenue = async (venueId) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+
+    // Check if venue has any bookings
+    const bookingCheck = await client.query(
+      'SELECT COUNT(*) FROM bookings WHERE venue_id = $1', [venueId]
+    );
+    const hasBookings = parseInt(bookingCheck.rows[0].count) > 0;
+
+    if (hasBookings) {
+      // Soft delete — deactivate venue, cancel any pending/confirmed future bookings
+      await client.query(
+        `UPDATE venues SET is_active = false WHERE id = $1`, [venueId]
+      );
+      await client.query(
+        `UPDATE bookings 
+         SET status = 'cancelled_by_owner' 
+         WHERE venue_id = $1 
+           AND status = 'confirmed'
+           AND start_time > NOW()`,
+        [venueId]
+      );
+      await client.query('COMMIT');
+      return { success: true, softDeleted: true };
+    }
+
+    // No bookings — safe to fully delete
     const imagesResult = await client.query(
       'SELECT url FROM venue_images WHERE venue_id = $1', [venueId]
     );
@@ -243,7 +268,7 @@ exports.deleteVenue = async (venueId) => {
       const filePath = path.join(process.cwd(), img.url);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     });
-    return { success: true };
+    return { success: true, softDeleted: false };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;

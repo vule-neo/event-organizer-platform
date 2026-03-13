@@ -48,19 +48,26 @@ export class OwnerVenuesComponent implements OnInit {
   }
 
   onDelete(venueId: string) {
-    if (confirm('Da li ste sigurni da želite da obrišete ovaj teren i sve njegove slike?')) {
-      this.venueService.deleteVenue(venueId).subscribe({
-        next: () => {
-          // Ukloni obrisani teren iz niza u memoriji da se UI odmah osveži
+    if (!confirm('Da li ste sigurni da želite da obrišete ovaj teren?')) return;
+
+    this.venueService.deleteVenue(venueId).subscribe({
+      next: (result: any) => {
+        if (result.softDeleted) {
+          // Venue had bookings — deactivated instead of deleted
+          alert('Teren ima postojeće rezervacije i ne može biti trajno obrisan. Teren je deaktiviran i neće biti vidljiv korisnicima. Sve buduće rezervacije su otkazane.');
+          // Update local list — mark as inactive instead of removing
+          const venue = this.venues.find(v => v.id === venueId);
+          if (venue) venue.is_active = false;
+        } else {
+          // Fully deleted
           this.venues = this.venues.filter(v => v.id !== venueId);
-          alert('Teren je uspešno obrisan.');
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Greška pri brisanju terena.');
         }
-      });
-    }
+      },
+      error: (err: any) => {
+        console.error(err);
+        alert('Greška pri brisanju terena: ' + (err?.error?.message || 'Pokušaj ponovo.'));
+      }
+    });
   }
 
   onEdit(venueId: string) {

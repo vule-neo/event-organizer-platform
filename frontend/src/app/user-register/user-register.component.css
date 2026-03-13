@@ -255,6 +255,13 @@
   font-size: 14px;
 }
 
+.error-msg-small {
+  color: #dc3545;
+  font-size: 11px;
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
 /* ---- SUBMIT BUTTON ---- */
 .btn-auth {
   width: 100%;

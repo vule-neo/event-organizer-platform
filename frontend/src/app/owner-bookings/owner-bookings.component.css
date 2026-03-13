@@ -48,12 +48,25 @@
   padding: 20px 24px;
   border-radius: var(--radius);
   color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
 }
 
 .stat-green  { background: linear-gradient(135deg, #16a34a, #15803d); }
+.stat-green:hover { box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3); }
+
 .stat-navy   { background: linear-gradient(135deg, var(--navy), #162d4a); }
+.stat-navy:hover { box-shadow: 0 10px 25px rgba(30, 58, 95, 0.3); }
+
 .stat-gray   { background: linear-gradient(135deg, #6b7280, #4b5563); }
+.stat-gray:hover { box-shadow: 0 10px 25px rgba(107, 114, 128, 0.3); }
+
 .stat-red    { background: linear-gradient(135deg, #dc3545, #b91c1c); }
+.stat-red:hover { box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3); }
 
 .stat-icon {
   width: 48px;
@@ -102,6 +115,12 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: var(--shadow);
 }
 
 .chart-wide {
@@ -144,6 +163,12 @@
   gap: 4px;
   height: 100%;
   justify-content: flex-end;
+  cursor: pointer;
+}
+
+.bar-wrap:hover .bar-fill {
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+  box-shadow: 0 -4px 12px rgba(232, 184, 109, 0.3);
 }
 
 .bar-value {
@@ -186,6 +211,16 @@
   gap: 14px;
 }
 
+.progress-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.progress-item:hover {
+  background: rgba(30, 58, 95, 0.03);
+}
+
 .progress-item-header {
   display: flex;
   justify-content: space-between;
@@ -214,7 +249,7 @@
 .progress-fill {
   height: 100%;
   border-radius: 50px;
-  transition: width 0.5s ease;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .progress-gold   { background: var(--gold); }
@@ -227,6 +262,12 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease;
+}
+
+.table-card:hover {
+  box-shadow: var(--shadow);
 }
 
 .table-card-header {
@@ -267,12 +308,20 @@
   vertical-align: middle;
 }
 
-.data-table tbody tr:last-child td {
-  border-bottom: none;
+.data-table tbody tr {
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: #ffffff;
+  transform: scale(1.01);
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+  position: relative;
 }
 
 .data-table tbody tr:hover td {
-  background: rgba(30,58,95,0.02);
+  border-bottom-color: transparent;
 }
 
 .td-bold { font-weight: 600; }

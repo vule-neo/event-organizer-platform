@@ -25,6 +25,13 @@ export class VenueDetailComponent implements OnInit {
   selectedSlot: any = null;
   occupiedSlots: string[] = [];
 
+  // Custom Calendar State
+  currentMonth: number = new Date().getMonth();
+  currentYear: number = new Date().getFullYear();
+  calendarDays: any[] = [];
+  monthNames = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
+  shortDayNames = ['Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub', 'Ned'];
+
   // Reviews
   reviews: any[] = [];
   canReview = false;
@@ -49,6 +56,7 @@ export class VenueDetailComponent implements OnInit {
     if (id) {
       this.loadVenue(id);
     }
+    this.generateCalendar();
   }
 
   loadVenue(id: string) {
@@ -142,6 +150,102 @@ export class VenueDetailComponent implements OnInit {
     this.activeImageUrl = 'http://localhost:5000' + url;
   }
 
+  // --- CUSTOM CALENDAR LOGIC ---
+  generateCalendar() {
+    this.calendarDays = [];
+    
+    // First day of logical month
+    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+    const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+    
+    // JS getDay(): 0 = Sun, 1 = Mon ... 6 = Sat
+    // We want Mon = 1, Sun = 7 logic for visual layout
+    let startingDayOfWeek = firstDay.getDay();
+    if (startingDayOfWeek === 0) startingDayOfWeek = 7;
+    
+    // Prev month days to fill the gap
+    const prevMonthDays = startingDayOfWeek - 1;
+    const prevMonthLastDay = new Date(this.currentYear, this.currentMonth, 0).getDate();
+    
+    for (let i = prevMonthDays - 1; i >= 0; i--) {
+      const dayNum = prevMonthLastDay - i;
+      const d = new Date(this.currentYear, this.currentMonth - 1, dayNum);
+      this.calendarDays.push(this.createCalendarDayObj(d, false));
+    }
+    
+    // Current month days
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      const d = new Date(this.currentYear, this.currentMonth, i);
+      this.calendarDays.push(this.createCalendarDayObj(d, true));
+    }
+    
+    // Next month days to complete 42 cells (6 rows)
+    const totalCells = 42;
+    const currentCells = this.calendarDays.length;
+    for (let i = 1; i <= totalCells - currentCells; i++) {
+      const d = new Date(this.currentYear, this.currentMonth + 1, i);
+      this.calendarDays.push(this.createCalendarDayObj(d, false));
+    }
+  }
+
+  private createCalendarDayObj(dateObj: Date, isCurrentMonth: boolean) {
+    // Format YYYY-MM-DD local time adjusted
+    const zOffset = dateObj.getTimezoneOffset() * 60000;
+    const localISOTime = (new Date(dateObj.getTime() - zOffset)).toISOString().split('T')[0];
+    
+    const todayStr = this.today;
+    const isPast = localISOTime < todayStr;
+    const isToday = localISOTime === todayStr;
+    
+    return {
+      date: dateObj,
+      dateString: localISOTime,
+      dayNumber: dateObj.getDate(),
+      isCurrentMonth: isCurrentMonth,
+      isPast: isPast,
+      isToday: isToday
+    };
+  }
+
+  prevMonth() {
+    // Ne damo previse u proslost ako je to pre current month u stvarnosti (opciono)
+    const now = new Date();
+    if (this.currentYear < now.getFullYear() || (this.currentYear === now.getFullYear() && this.currentMonth <= now.getMonth())) {
+      // Allow it or block it. Let's allow but maybe the user won't be able to click past days anyway.
+    }
+    
+    this.currentMonth--;
+    if (this.currentMonth < 0) {
+      this.currentMonth = 11;
+      this.currentYear--;
+    }
+    this.generateCalendar();
+  }
+
+  nextMonth() {
+    this.currentMonth++;
+    if (this.currentMonth > 11) {
+      this.currentMonth = 0;
+      this.currentYear++;
+    }
+    this.generateCalendar();
+  }
+
+  selectCalendarDate(day: any) {
+    if (day.isPast) return;
+    this.selectedDate = day.dateString;
+    this.selectedSlot = null; // reset slot na promenu dana
+    this.loadOccupiedSlots();
+    
+    // Ako smo kliknuli na datum iz drugog meseca, fokusiraj taj mesec
+    if (!day.isCurrentMonth) {
+      this.currentMonth = day.date.getMonth();
+      this.currentYear = day.date.getFullYear();
+      this.generateCalendar();
+    }
+  }
+
+  // Obsolete but keep logic if needed by HTML elsewhere
   onDateChange() {
     this.selectedSlot = null;
     this.loadOccupiedSlots();

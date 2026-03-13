@@ -22,96 +22,79 @@
 
       <!-- Search Bar -->
       <!-- Search Bar - POTPUNO NOV SA FITIRANIM ŠIRINAMA -->
-<div class="search-card" data-aos="fade-up" data-aos-delay="150">
+      <div class="search-card" data-aos="fade-up" data-aos-delay="150">
 
-  <!-- Text search - fleksibilan -->
-  <div class="search-field" style="flex: 2 1 200px;">
-    <i class="bi bi-search search-icon"></i>
-    <input
-      type="text"
-      [(ngModel)]="searchTerm"
-      (input)="onSearchInput()"
-      placeholder="Pretraži terene..."
-      style="width: 100%;"
-    />
-    <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
-      <i class="bi bi-x"></i>
-    </button>
-  </div>
-
-  <div class="search-divider"></div>
-
-  <!-- City dropdown - FIKSNA ŠIRINA -->
-  <div class="search-field" style="flex: 0 0 140px; min-width: 140px;">
-    <i class="bi bi-geo-alt search-icon"></i>
-    
-    <div class="search-dropdown-wrap">
-      <div class="custom-select" (click)="toggleCityDropdown($event)">
-        <span [class.placeholder]="!selectedCity">
-          {{ selectedCity || 'Svi gradovi' }}
-        </span>
-        <i class="bi bi-chevron-down dropdown-arrow" [class.open]="cityOpen"></i>
-      </div>
-      
-      <div class="dropdown-panel" [class.show]="cityOpen">
-        <div 
-          class="dropdown-option" 
-          [class.active]="!selectedCity"
-          (click)="selectCity('', $event)">
-          <i class="bi bi-globe2"></i>
-          Svi gradovi
+        <!-- Text search - fleksibilan -->
+        <div class="search-field" style="flex: 2 1 200px;">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" [(ngModel)]="searchTerm" (input)="onSearchInput()" placeholder="Pretraži terene..."
+            style="width: 100%;" />
+          <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+            <i class="bi bi-x"></i>
+          </button>
         </div>
-        <div 
-          *ngFor="let city of cities" 
-          class="dropdown-option" 
-          [class.active]="selectedCity === city"
-          (click)="selectCity(city, $event)">
-          <i class="bi bi-geo-alt"></i>
-          {{ city }}
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="search-divider"></div>
+        <div class="search-divider"></div>
 
-  <!-- Sport dropdown - FIKSNA ŠIRINA (manja) -->
-  <div class="search-field" style="flex: 0 0 120px; min-width: 120px;">
-    <i class="bi bi-dribbble search-icon"></i>
-    
-    <div class="search-dropdown-wrap">
-      <div class="custom-select" (click)="toggleSportDropdown($event)">
-        <span [class.placeholder]="!selectedSport">
-          {{ getSportName(selectedSport) || 'Sport' }}
-        </span>
-        <i class="bi bi-chevron-down dropdown-arrow" [class.open]="sportOpen"></i>
-      </div>
-      
-      <div class="dropdown-panel" [class.show]="sportOpen" style="left: -40px;">
-        <div 
-          class="dropdown-option" 
-          [class.active]="!selectedSport"
-          (click)="selectSport('', $event)">
-          <i class="bi bi-trophy"></i>
-          Svi sportovi
-        </div>
-        <div 
-          *ngFor="let sport of sports" 
-          class="dropdown-option" 
-          [class.active]="selectedSport === sport.id"
-          (click)="selectSport(sport.id, $event)">
-          <i class="bi" [ngClass]="sport.icon_name || 'bi-dribbble'"></i>
-          {{ sport.name }}
-        </div>
-      </div>
-    </div>
-  </div>
+        <!-- City dropdown - FIKSNA ŠIRINA -->
+        <div class="search-field" style="flex: 0 0 140px; min-width: 140px;">
+          <i class="bi bi-geo-alt search-icon"></i>
 
-  <button class="search-btn" (click)="applyFilters()">
-    <i class="bi bi-search"></i>
-    <span>Pretraži</span>
-  </button>
-</div>
+          <div class="search-dropdown-wrap">
+            <div class="custom-select" (click)="toggleCityDropdown($event)">
+              <span [class.placeholder]="!selectedCity">
+                {{ selectedCity || 'Svi gradovi' }}
+              </span>
+              <i class="bi bi-chevron-down dropdown-arrow" [class.open]="cityOpen"></i>
+            </div>
+
+            <div class="dropdown-panel" [class.show]="cityOpen">
+              <div class="dropdown-option" [class.active]="!selectedCity" (click)="selectCity('', $event)">
+                <i class="bi bi-globe2"></i>
+                Svi gradovi
+              </div>
+              <div *ngFor="let city of cities" class="dropdown-option" [class.active]="selectedCity === city"
+                (click)="selectCity(city, $event)">
+                <i class="bi bi-geo-alt"></i>
+                {{ city }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="search-divider"></div>
+
+        <!-- Sport dropdown - FIKSNA ŠIRINA (manja) -->
+        <div class="search-field" style="flex: 0 0 120px; min-width: 120px;">
+          <i class="bi bi-dribbble search-icon"></i>
+
+          <div class="search-dropdown-wrap">
+            <div class="custom-select" (click)="toggleSportDropdown($event)">
+              <span [class.placeholder]="!selectedSport">
+                {{ getSportName(selectedSport) || 'Sport' }}
+              </span>
+              <i class="bi bi-chevron-down dropdown-arrow" [class.open]="sportOpen"></i>
+            </div>
+
+            <div class="dropdown-panel" [class.show]="sportOpen" style="left: -40px;">
+              <div class="dropdown-option" [class.active]="!selectedSport" (click)="selectSport('', $event)">
+                <i class="bi bi-trophy"></i>
+                Svi sportovi
+              </div>
+              <div *ngFor="let sport of sports" class="dropdown-option" [class.active]="selectedSport === sport.id"
+                (click)="selectSport(sport.id, $event)">
+                <i class="bi" [ngClass]="sport.icon_name || 'bi-dribbble'"></i>
+                {{ sport.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="search-btn" (click)="applyFilters()">
+          <i class="bi bi-search"></i>
+          <span>Pretraži</span>
+        </button>
+      </div>
       <!-- Active filter chips -->
       <div class="active-filters" *ngIf="isFiltering">
         <span class="filter-chip" *ngIf="searchTerm">
@@ -154,7 +137,7 @@
       <div class="floating-card main-card">
         <div class="floating-card-img">
           <img src="assets/hero-sport.jpg" alt="Sportski teren"
-               onerror="this.src='https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600&auto=format&fit=crop&q=80'">
+            onerror="this.src='https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600&auto=format&fit=crop&q=80'">
           <div class="card-badge-sport">Fudbal</div>
           <div class="card-badge-price">2500 RSD/h</div>
         </div>
@@ -189,34 +172,83 @@
   <div class="section-container">
     <div class="section-header" data-aos="fade-up">
       <h2>Kako <span class="text-navy">funkcioniše?</span></h2>
-      <p>Tri jednostavna koraka do tvog sledećeg meča.</p>
+      <p>Tri jednostavna koraka do uspeha na našoj platformi.</p>
+
+      <!-- Sleek Toggle Control -->
+      <div class="hiw-toggle-container">
+        <div class="hiw-toggle">
+          <button class="toggle-btn" [class.active]="activeHowItWorksTab === 'players'"
+            (click)="setHowItWorksTab('players', true)">
+            <i class="bi bi-person-fill"></i> Za igrače
+          </button>
+          <button class="toggle-btn" [class.active]="activeHowItWorksTab === 'owners'"
+            (click)="setHowItWorksTab('owners', true)">
+            <i class="bi bi-briefcase-fill"></i> Za vlasnike
+          </button>
+          <div class="toggle-slider" [class.owners]="activeHowItWorksTab === 'owners'"></div>
+        </div>
+      </div>
     </div>
-    <div class="steps-grid">
-      <div class="step-card" data-aos="fade-up" data-aos-delay="0">
-        <span class="step-number">01</span>
-        <div class="step-icon"><i class="bi bi-search"></i></div>
-        <h3>Pronađi teren</h3>
-        <p>Pretraži terene po lokaciji, sportu i dostupnosti. Uporedi cene i recenzije.</p>
+
+    <div class="hiw-content-wrapper">
+      <!-- PLAYERS STEPS -->
+      <div class="steps-grid" [class.active]="activeHowItWorksTab === 'players'">
+        <div class="step-card" data-aos="fade-up" data-aos-delay="0">
+          <span class="step-number">01</span>
+          <div class="step-icon"><i class="bi bi-search"></i></div>
+          <h3>Pronađi teren</h3>
+          <p>Pretraži terene po lokaciji, sportu i dostupnosti. Uporedi cene i recenzije.</p>
+        </div>
+        <div class="step-connector" data-aos="fade-up" data-aos-delay="100">
+          <div class="connector-line"></div>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+        <div class="step-card" data-aos="fade-up" data-aos-delay="150">
+          <span class="step-number">02</span>
+          <div class="step-icon"><i class="bi bi-calendar3"></i></div>
+          <h3>Izaberi termin</h3>
+          <p>Odaberi datum i vreme koje ti odgovara. Vidi dostupnost u realnom vremenu.</p>
+        </div>
+        <div class="step-connector" data-aos="fade-up" data-aos-delay="200">
+          <div class="connector-line"></div>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+        <div class="step-card" data-aos="fade-up" data-aos-delay="250">
+          <span class="step-number">03</span>
+          <div class="step-icon"><i class="bi bi-check-circle"></i></div>
+          <h3>Potvrdi rezervaciju</h3>
+          <p>Rezerviši u par klikova i dobij potvrdu odmah na email ili telefon.</p>
+        </div>
       </div>
-      <div class="step-connector" data-aos="fade-up" data-aos-delay="100">
-        <div class="connector-line"></div>
-        <i class="bi bi-arrow-right"></i>
-      </div>
-      <div class="step-card" data-aos="fade-up" data-aos-delay="150">
-        <span class="step-number">02</span>
-        <div class="step-icon"><i class="bi bi-calendar3"></i></div>
-        <h3>Izaberi termin</h3>
-        <p>Odaberi datum i vreme koje ti odgovara. Vidi dostupnost u realnom vremenu.</p>
-      </div>
-      <div class="step-connector" data-aos="fade-up" data-aos-delay="200">
-        <div class="connector-line"></div>
-        <i class="bi bi-arrow-right"></i>
-      </div>
-      <div class="step-card" data-aos="fade-up" data-aos-delay="250">
-        <span class="step-number">03</span>
-        <div class="step-icon"><i class="bi bi-check-circle"></i></div>
-        <h3>Potvrdi rezervaciju</h3>
-        <p>Rezerviši u par klikova i dobij potvrdu odmah na email.</p>
+
+      <!-- OWNERS STEPS -->
+      <div class="steps-grid" [class.active]="activeHowItWorksTab === 'owners'">
+        <div class="step-card" data-aos="fade-up" data-aos-delay="0">
+          <span class="step-number">01</span>
+          <div class="step-icon"><i class="bi bi-building"></i></div>
+          <h3>Registruj objekat</h3>
+          <p>Kreiraj profil svog sportskog centra i ostavi osnovne podatke za brz početak.</p>
+        </div>
+        <div class="step-connector" data-aos="fade-up" data-aos-delay="100">
+          <div class="connector-line"></div>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+        <div class="step-card" data-aos="fade-up" data-aos-delay="150">
+          <span class="step-number">02</span>
+          <div class="step-icon"><i class="bi bi-plus-square"></i></div>
+          <h3>Dodaj terene i cene</h3>
+          <p>Unesi raspoložive termine, slike i formiraj cenovnik onako kako tebi odgovara.</p>
+        </div>
+        <div class="step-connector" data-aos="fade-up" data-aos-delay="200">
+          <div class="connector-line"></div>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+        <div class="step-card" data-aos="fade-up" data-aos-delay="250">
+          <span class="step-number">03</span>
+          <div class="step-icon"><i class="bi bi-cash-coin"></i></div>
+          <h3>Započni naplatu</h3>
+          <p>Prati rezervacije u realnom vremenu i podigni poslovanje na viši nivo.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -257,15 +289,11 @@
 
     <!-- Cards Grid -->
     <div class="venues-grid" *ngIf="!loading && filteredVenues.length > 0" [class.filtering]="isFiltering">
-      <div
-        class="venue-card"
-        *ngFor="let venue of filteredVenues; let i = index"
-        [style.animation-delay]="(i * 50) + 'ms'"
-        [routerLink]="['/venues/details', venue.id]"
-      >
+      <div class="venue-card" *ngFor="let venue of filteredVenues; let i = index"
+        [style.animation-delay]="(i * 50) + 'ms'" [routerLink]="['/venues/details', venue.id]">
         <div class="venue-card-img">
           <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'"
-               [alt]="venue.name" loading="lazy" />
+            [alt]="venue.name" loading="lazy" />
           <div class="img-overlay"></div>
           <div class="venue-badge-sport">{{ getSportName(venue.sport_id) }}</div>
           <div class="venue-badge-price">{{ venue.price_per_slot }} RSD</div>
@@ -277,7 +305,8 @@
           <h3 class="venue-name">{{ venue.name }}</h3>
           <div class="venue-stars" *ngIf="venue.avg_rating">
             <ng-container *ngFor="let star of [1,2,3,4,5]">
-              <i class="bi" [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
+              <i class="bi"
+                [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
             </ng-container>
             <span>({{ venue.review_count }})</span>
           </div>
@@ -323,53 +352,70 @@
   </div>
 </section>
 
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="footer-logo">
-          <div class="logo-icon-sm"><i class="bi bi-trophy-fill"></i></div>
-          <span>Sportski<span>Termin</span></span>
-        </div>
-        <p>Premium platforma za rezervaciju sportskih terena. Pronađi, rezerviši i igraj — sve na jednom mestu.</p>
-        <div class="footer-socials">
-          <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-          <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-          <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <h4>Platforma</h4>
-        <ul>
-          <li><a routerLink="/explore">Istraži terene</a></li>
-          <li><a routerLink="/userRegister">Registracija</a></li>
-          <li><a routerLink="/login">Prijava</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Podrška</h4>
-        <ul>
-          <li><a routerLink="/help">Pomoć</a></li>
-          <li><a routerLink="/faq">FAQ</a></li>
-          <li><a routerLink="/contact">Kontakt</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Kontakt</h4>
-        <ul class="footer-contact">
-          <li><i class="bi bi-envelope"></i> info&#64;sportskitermin.rs</li>
-          <li><i class="bi bi-telephone"></i> +381 11 123 4567</li>
-          <li><i class="bi bi-geo-alt"></i> Beograd, Srbija</li>
-        </ul>
-      </div>
+<!-- ===== FEATURES SECTION ===== -->
+<section class="features-section" *ngIf="!isFiltering">
+  <div class="section-container">
+    <div class="section-header" data-aos="fade-up">
+      <h2>Zašto izabrati <span class="text-gold">SportskiTermin?</span></h2>
+      <p>Pružamo ti najbolje iskustvo rezervacije, bez skrivenih troškova i komplikacija.</p>
     </div>
-    <div class="footer-bottom">
-      <p>© 2026 SportskiTermin. Sva prava zadržana.</p>
-      <div class="footer-legal">
-        <a href="#">Uslovi korišćenja</a>
-        <a href="#">Politika privatnosti</a>
+
+    <div class="features-grid">
+      <!-- Feature 1 -->
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="feature-icon">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <h3>Brza rezervacija</h3>
+        <p>Zaboravi na pozive i čekanje. Rezerviši termin u samo par klikova, 24/7.</p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="feature-icon">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <h3>Pouzdanost 100%</h3>
+        <p>Svi tereni su provereni. Sigurna potvrda rezervacije stiže istog trenutka.</p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="feature-icon">
+          <i class="bi bi-star"></i>
+        </div>
+        <h3>Iskrene recenzije</h3>
+        <p>Pročitaj iskustva drugih sportista pre nego što doneseš odluku o terenu.</p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="feature-icon">
+          <i class="bi bi-phone"></i>
+        </div>
+        <h3>Uvek pri ruci</h3>
+        <p>Prilagođeno tvom mobilnom telefonu za laku pretragu gde god da se nalaziš.</p>
       </div>
     </div>
   </div>
-</footer>
+</section>
+
+<!-- ===== CTA SECTION (UNAUTHENTICATED) ===== -->
+<ng-container *ngIf="!authService.isLoggedIn()">
+  <section class="cta-section" data-aos="zoom-in">
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <h2>Spreman za igru?</h2>
+      <p>Pridruži se hiljadama sportista koji već uživaju u brzoj i lakoj rezervaciji terena.</p>
+      <div class="cta-buttons">
+        <a routerLink="/userRegister" class="btn-cta-primary">
+          <i class="bi bi-person-plus"></i> Kreiraj nalog besplatno
+        </a>
+        <a routerLink="/login" class="btn-cta-secondary">
+          Već imaš nalog? Prijavi se
+        </a>
+      </div>
+    </div>
+  </section>
+</ng-container>
+

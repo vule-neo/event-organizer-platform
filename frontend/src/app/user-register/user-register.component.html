@@ -72,7 +72,17 @@
           <label>Telefon</label>
           <div class="input-wrap">
             <i class="bi bi-telephone input-icon"></i>
-            <input type="tel" formControlName="phone" placeholder="+381 6x xxx xxxx" />
+            <input type="tel" formControlName="phone" placeholder="+381 6x xxx xxxx"
+                   [class.input-error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched" />
+          </div>
+          <div class="error-msg-small" *ngIf="registerForm.get('phone')?.errors?.['pattern'] && registerForm.get('phone')?.touched">
+            * Unesite ispravan format broja (npr. +381 6X...).
+          </div>
+          <div class="error-msg-small" *ngIf="registerForm.get('phone')?.errors?.['minlength'] && registerForm.get('phone')?.touched">
+            * Broj telefona mora imati najmanje 9 karaktera.
+          </div>
+          <div class="error-msg-small" *ngIf="registerForm.get('phone')?.errors?.['maxlength'] && registerForm.get('phone')?.touched">
+            * Broj telefona ne može biti duži od 15 karaktera.
           </div>
         </div>
 

@@ -27,7 +27,7 @@ export class UserRegisterComponent {
       first_name: ['', Validators.required],
       last_name:  ['', Validators.required],
       email:      ['', [Validators.required, Validators.email]],
-      phone:      [''],
+      phone:      ['', [Validators.pattern('^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$'), Validators.minLength(9), Validators.maxLength(15)]],
       password:   ['', [Validators.required, Validators.minLength(6)]],
       role:       ['customer', Validators.required]
     });

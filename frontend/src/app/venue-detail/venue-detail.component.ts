@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VenueService } from '../services/venue.service';
 import { BookingService } from '../services/booking.service';
@@ -48,7 +48,8 @@ export class VenueDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private venueService: VenueService,
     private bookingService: BookingService,
-    public authService: AuthService
+    public authService: AuthService,
+    private router: Router // <-- DODAJ OVO
   ) { }
 
   ngOnInit(): void {
@@ -293,14 +294,30 @@ export class VenueDetailComponent implements OnInit {
 
   confirmBooking() {
     if (!this.selectedSlot || !this.venue) return;
+    
     const bookingData = {
       venue_id: this.venue.id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
       end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
       price_paid: this.venue.price_per_slot
     };
+    
     this.bookingService.createBooking(bookingData).subscribe({
-      next: () => { alert('Uspešno rezervisano!'); this.loadOccupiedSlots(); },
+      next: (response: any) => {
+        // Dohvati ID kreirane rezervacije (zavisi od tvog API response-a)
+        const bookingId = response.id || response.booking?.id;
+        
+        if (bookingId) {
+          // Redirect na detail stranicu sa porukom
+          this.router.navigate(['/bookings', bookingId], { 
+            queryParams: { success: 'true' } 
+          });
+        } else {
+          // Fallback ako nema ID-a
+          alert('Uspešno rezervisano!');
+          this.loadOccupiedSlots();
+        }
+      },
       error: (err) => alert(err.error.message || 'Greška')
     });
   }
@@ -313,8 +330,10 @@ export class VenueDetailComponent implements OnInit {
 
   confirmRecurringBooking() {
     if (!this.selectedSlot || !this.venue) return;
+    
     this.recurringLoading = true;
     this.recurringResult = null;
+    
     const data = {
       venue_id: this.venue.id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
@@ -322,9 +341,24 @@ export class VenueDetailComponent implements OnInit {
       price_paid: this.venue.price_per_slot,
       weeks: this.recurringWeeks
     };
+    
     this.bookingService.createRecurringBooking(data).subscribe({
-      next: (res: any) => { this.recurringResult = res; this.recurringLoading = false; this.loadOccupiedSlots(); },
-      error: (err) => { alert(err.error?.message || 'Greška'); this.recurringLoading = false; }
+      next: (res: any) => {
+        this.recurringResult = res;
+        this.recurringLoading = false;
+        this.loadOccupiedSlots();
+        
+        // Ako ima uspješnih rezervacija, pitaj korisnika da li želi da vidi prvu
+        if (res.created > 0 && res.bookingIds && res.bookingIds.length > 0) {
+          if (confirm(`Rezervisano ${res.created} termina. Želite li da vidite detalje prve rezervacije?`)) {
+            this.router.navigate(['/bookings', res.bookingIds[0]]);
+          }
+        }
+      },
+      error: (err) => { 
+        alert(err.error?.message || 'Greška'); 
+        this.recurringLoading = false; 
+      }
     });
   }
 

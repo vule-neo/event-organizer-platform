@@ -1,3 +1,19 @@
+<!-- SUCCESS MESSAGE SA FADE OUT ANIMACIJOM -->
+<div class="success-message" 
+     *ngIf="showSuccessMessage"
+     [class.fade-out]="successMessageFading">
+  <div class="success-content">
+    <i class="bi bi-check-circle-fill"></i>
+    <div class="success-text">
+      <strong>Rezervacija uspešno kreirana!</strong>
+      <span>Potvrda je poslata na vaš email.</span>
+    </div>
+    <button class="success-close" (click)="closeSuccessMessage()">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+</div>
+<!-- Ostatak tvog HTML-a za booking detail -->
 <div class="owner-page" *ngIf="booking">
   <div class="booking-detail-wrap">
 

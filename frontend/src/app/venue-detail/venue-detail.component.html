@@ -204,8 +204,22 @@
       </div>
     </div>
 
-    <!-- ===== RIGHT COLUMN — BOOKING PANEL ===== -->
+
     <div class="booking-panel">
+          <!-- ===== RIGHT COLUMN — BOOKING PANEL ===== -->
+     <!-- Dodaj odmah iznad <div class="booking-panel"> -->
+<div class="booking-spotlight" *ngIf="!selectedSlot">
+  <div class="spotlight-icon">
+    <i class="bi bi-calendar-check-fill"></i>
+  </div>
+  <div class="spotlight-text">
+    <strong>Rezerviši termin</strong>
+    <span>Odaberi datum i klikni na termin</span>
+  </div>
+  <div class="spotlight-arrow">
+    <i class="bi bi-arrow-right-short"></i>
+  </div>
+</div>
       <div class="booking-card">
 
         <!-- Card header -->

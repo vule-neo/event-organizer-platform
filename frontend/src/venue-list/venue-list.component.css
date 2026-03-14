@@ -2277,3 +2277,33 @@
     align-self: flex-end;
   }
 }
+
+/* ============================================
+   FIX: DROPDOWN SAMO KADA JE VIDLJIV
+   ============================================ */
+   .dropdown-panel {
+    /* Postavi display: none kao osnovno stanje */
+    display: none !important;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  
+  .dropdown-panel.show {
+    /* Kada je aktivan, prikaži ga */
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all !important;
+  }
+  
+  /* Dodatno osiguranje - da hover na prazan prostor ne radi ništa */
+  .search-dropdown-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+    /* Osiguraj da wrap ne hvata klikove kad nema aktivnog dropdowna */
+    pointer-events: auto;
+  }

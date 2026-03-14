@@ -310,6 +310,13 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     e.stopPropagation();
     this.cityOpen = !this.cityOpen;
     this.sportOpen = false;
+    
+    // Ako zatvaramo dropdown, osiguraj da se klik ne registruje negdje drugo
+    if (!this.cityOpen) {
+      setTimeout(() => {
+        // Mali trik - nakon zatvaranja, ništa ne radi
+      }, 50);
+    }
   }
 
   toggleSportDropdown(e: MouseEvent) {

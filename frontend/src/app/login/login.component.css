@@ -321,3 +321,100 @@
     padding-top: 60px;
   }
 }
+
+/* ============================================
+   REGISTER CTA — KARTICA IZNAD FORME
+   ============================================ */
+   .register-cta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(145deg, #f8f4ff, #fff);
+    border-radius: 20px;
+    border: 1px solid rgba(232, 184, 109, 0.3);
+    box-shadow: 0 10px 30px -10px rgba(30, 58, 95, 0.2);
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    animation: slideInUp 0.5s ease;
+  }
+  
+  .register-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px -10px rgba(30, 58, 95, 0.3);
+    border-color: rgba(232, 184, 109, 0.6);
+  }
+  
+  .register-cta-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--gold) 0%, #f3c891 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 5px 15px rgba(232, 184, 109, 0.3);
+  }
+  
+  .register-cta-text {
+    flex: 1;
+  }
+  
+  .register-cta-text strong {
+    display: block;
+    font-size: 15px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  
+  .register-cta-text span {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    display: block;
+  }
+  
+  .register-cta-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .register-cta-btn:hover {
+    background: var(--gold);
+    color: var(--navy);
+    transform: translateX(2px);
+  }
+  
+  .register-cta-btn i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+  }
+  
+  .register-cta-btn:hover i {
+    transform: translateX(4px);
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

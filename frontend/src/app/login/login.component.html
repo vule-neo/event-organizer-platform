@@ -32,7 +32,19 @@
     <div class="auth-form-card">
       <div class="auth-form-header">
         <h1>Prijavi se</h1>
-        <p>Nemaš nalog? <a routerLink="/userRegister">Registruj se</a></p>
+        <div class="register-cta">
+          <div class="register-cta-icon">
+            <i class="bi bi-gift-fill"></i>
+          </div>
+          <div class="register-cta-text">
+            <strong>Prvi put si ovde?</strong>
+            <span>Rezerviši termin za manje od 2 minuta ⚡</span>
+          </div>
+          <a routerLink="/userRegister" class="register-cta-btn">
+            Registruj se
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">

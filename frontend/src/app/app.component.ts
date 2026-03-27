@@ -14,9 +14,9 @@ export class AppComponent implements OnInit {
   isScrolled = false;
   mobileMenuOpen = false;
 
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(public authService: AuthService, private router: Router) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   @HostListener('window:scroll')
   onScroll() {

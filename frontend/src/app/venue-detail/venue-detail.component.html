@@ -12,6 +12,8 @@
 
 <!-- MAIN -->
 <div class="venue-detail-page" *ngIf="!loading && venue">
+  <!-- Scroll progress bar -->
+  <div class="scroll-progress-bar" [style.width.%]="scrollProgress"></div>
 
   <!-- Breadcrumb -->
   <nav class="breadcrumb">
@@ -22,227 +24,141 @@
     <span>{{ venue.name }}</span>
   </nav>
 
-  <div class="detail-layout">
+  <!-- ===== STICKY FLOATING CTA ===== -->
+  <button class="sticky-reserve-btn" *ngIf="showStickyButton" (click)="scrollToBooking()">
+    <i class="bi bi-calendar-check-fill"></i>
+    <span>REZERVIŠI TERMIN</span>
+    <span class="sticky-reserve-price">{{ venue.price_per_slot }} RSD</span>
+  </button>
 
-    <!-- ===== LEFT COLUMN ===== -->
-    <div class="detail-left">
+  <!-- ===== VENUE INFO (full-width, single column) ===== -->
+  <div class="detail-content">
 
-      <!-- Main image -->
-      <div class="main-image-wrap">
-        <img [src]="activeImageUrl || 'assets/no-image.jpg'" [alt]="venue.name" />
+    <!-- Main image -->
+    <div class="main-image-wrap">
+      <img [src]="activeImageUrl || 'assets/no-image.jpg'" [alt]="venue.name" />
+    </div>
+
+    <!-- Thumbnails -->
+    <div class="thumbnails" *ngIf="venue.images?.length > 1">
+      <div *ngFor="let img of venue.images" class="thumb-item"
+        [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url" (click)="setActiveImage(img.url)">
+        <img [src]="'http://localhost:5000' + img.url" [alt]="venue.name" />
       </div>
+    </div>
 
-      <!-- Thumbnails -->
-      <div class="thumbnails" *ngIf="venue.images?.length > 1">
-        <div *ngFor="let img of venue.images" class="thumb-item"
-          [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url" (click)="setActiveImage(img.url)">
-          <img [src]="'http://localhost:5000' + img.url" [alt]="venue.name" />
-        </div>
-      </div>
+    <!-- Header -->
+    <div class="venue-header">
+      <h1>{{ venue.name }}</h1>
 
-      <!-- Header -->
-      <div class="venue-header">
-        <h1>{{ venue.name }}</h1>
-
-        <!-- SHARE DUGME — jedina promjena -->
-        <div class="share-wrap">
-          <button class="btn-share" (click)="toggleShareMenu($event)" title="Podijeli teren">
-            <i class="bi bi-share-fill"></i>
-            <span>Dijeli</span>
+      <!-- SHARE -->
+      <div class="share-wrap">
+        <button class="btn-share" (click)="toggleShareMenu($event)" title="Podijeli teren">
+          <i class="bi bi-share-fill"></i>
+          <span>Dijeli</span>
+        </button>
+        <div class="share-menu" [class.show]="shareMenuOpen" (click)="$event.stopPropagation()">
+          <button class="share-option" (click)="shareVia('copy')">
+            <i class="bi bi-link-45deg"></i> Kopiraj link
           </button>
-          <div class="share-menu" [class.show]="shareMenuOpen" (click)="$event.stopPropagation()">
-            <button class="share-option" (click)="shareVia('copy')">
-              <i class="bi bi-link-45deg"></i> Kopiraj link
-            </button>
-            <button class="share-option" (click)="shareVia('whatsapp')">
-              <i class="bi bi-whatsapp"></i> WhatsApp
-            </button>
-            <button class="share-option" (click)="shareVia('viber')">
-              <i class="bi bi-phone-vibrate-fill"></i> Viber
-            </button>
-            <button class="share-option" (click)="shareVia('instagram')">
-              <i class="bi bi-instagram"></i> Instagram Story
-            </button>
-            <div class="share-copied" *ngIf="linkCopied">
-              <i class="bi bi-check-circle-fill"></i> Link kopiran!
-            </div>
+          <button class="share-option" (click)="shareVia('whatsapp')">
+            <i class="bi bi-whatsapp"></i> WhatsApp
+          </button>
+          <button class="share-option" (click)="shareVia('viber')">
+            <i class="bi bi-phone-vibrate-fill"></i> Viber
+          </button>
+          <button class="share-option" (click)="shareVia('instagram')">
+            <i class="bi bi-instagram"></i> Instagram Story
+          </button>
+          <div class="share-copied" *ngIf="linkCopied">
+            <i class="bi bi-check-circle-fill"></i> Link kopiran!
           </div>
         </div>
+      </div>
 
-        <div class="venue-meta">
-          <!-- Rating -->
-          <div class="venue-rating-row" *ngIf="venue.avg_rating">
-            <div class="stars">
-              <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
-            </div>
-            <span class="rating-value">{{ venue.avg_rating }}</span>
-            <span class="rating-count">({{ venue.review_count }} recenzija)</span>
+      <div class="venue-meta">
+        <!-- Rating -->
+        <div class="venue-rating-row" *ngIf="venue.avg_rating">
+          <div class="stars">
+            <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+              [ngClass]="venue.avg_rating >= star ? 'bi-star-fill' : (venue.avg_rating >= star - 0.5 ? 'bi-star-half' : 'bi-star')"></i>
           </div>
-          <div class="venue-new-pill" *ngIf="!venue.avg_rating">
-            <i class="bi bi-stars"></i> Novo na platformi
-          </div>
-
-          <!-- Location -->
-          <div class="venue-location">
-            <i class="bi bi-geo-alt-fill"></i>
-            {{ venue.street }}, {{ venue.city }}
-          </div>
+          <span class="rating-value">{{ venue.avg_rating }}</span>
+          <span class="rating-count">({{ venue.review_count }} recenzija)</span>
+        </div>
+        <div class="venue-new-pill" *ngIf="!venue.avg_rating">
+          <i class="bi bi-stars"></i> Novo na platformi
         </div>
 
-        <!-- Price -->
-        <div class="venue-price">
+        <!-- Location -->
+        <div class="venue-location">
+          <i class="bi bi-geo-alt-fill"></i>
+          {{ venue.street }}, {{ venue.city }}
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="venue-price">
+        {{ venue.price_per_slot }} RSD <span>/ termin</span>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Description -->
+    <div class="detail-section">
+      <h3>O terenu</h3>
+      <p class="description-text">
+        {{ venue.description || 'Vlasnik nije uneo opis za ovaj teren.' }}
+      </p>
+    </div>
+
+    <!-- Tags -->
+    <div class="detail-section" *ngIf="venue.tags?.length > 0">
+      <h3>Pogodnosti</h3>
+      <div class="tags-wrap">
+        <span class="tag-pill" *ngFor="let tag of venue.tags">
+          <i class="bi {{ tag.icon }}"></i>
+          {{ tag.name }}
+        </span>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Working hours -->
+    <div class="detail-section">
+      <h3>Radno vreme</h3>
+      <div class="hours-grid">
+        <div class="hours-row" *ngFor="let day of venue.working_hours">
+          <span class="day-name">{{ dayNames[day.day_of_week] }}</span>
+          <span class="hours-time" *ngIf="day.is_open">
+            <i class="bi bi-clock"></i>
+            {{ day.open_time.substring(0,5) }} – {{ day.close_time.substring(0,5) }}
+          </span>
+          <span class="hours-closed" *ngIf="!day.is_open">
+            <i class="bi bi-x-circle"></i> Zatvoreno
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== BOOKING SECTION (full-width, above reviews) ===== -->
+    <div class="booking-section-full" id="booking-section">
+      <div class="booking-section-header">
+        <h3><i class="bi bi-calendar-check"></i> Rezervacija termina</h3>
+        <div class="booking-price-badge">
           {{ venue.price_per_slot }} RSD <span>/ termin</span>
         </div>
       </div>
 
-      <div class="section-divider"></div>
-
-      <!-- Description -->
-      <div class="detail-section">
-        <h3>O terenu</h3>
-        <p class="description-text">
-          {{ venue.description || 'Vlasnik nije uneo opis za ovaj teren.' }}
-        </p>
-      </div>
-
-      <!-- Tags -->
-      <div class="detail-section" *ngIf="venue.tags?.length > 0">
-        <h3>Pogodnosti</h3>
-        <div class="tags-wrap">
-          <span class="tag-pill" *ngFor="let tag of venue.tags">
-            <i class="bi {{ tag.icon }}"></i>
-            {{ tag.name }}
-          </span>
-        </div>
-      </div>
-
-      <div class="section-divider"></div>
-
-      <!-- Working hours -->
-      <div class="detail-section">
-        <h3>Radno vreme</h3>
-        <div class="hours-grid">
-          <div class="hours-row" *ngFor="let day of venue.working_hours">
-            <span class="day-name">{{ dayNames[day.day_of_week] }}</span>
-            <span class="hours-time" *ngIf="day.is_open">
-              <i class="bi bi-clock"></i>
-              {{ day.open_time.substring(0,5) }} – {{ day.close_time.substring(0,5) }}
-            </span>
-            <span class="hours-closed" *ngIf="!day.is_open">
-              <i class="bi bi-x-circle"></i> Zatvoreno
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-divider"></div>
-
-      <!-- ===== REVIEWS ===== -->
-      <div class="reviews-section">
-        <div class="reviews-header">
-          <h3>Recenzije</h3>
-          <span class="review-count-badge" *ngIf="reviews.length > 0">{{ reviews.length }}</span>
-        </div>
-
-        <!-- Review form -->
-        <div class="review-form-card" *ngIf="canReview && !reviewSuccess">
-          <h5>Ostavite recenziju</h5>
-
-          <div class="star-selector">
-            <button type="button" class="star-btn" *ngFor="let star of [1,2,3,4,5]"
-              [class.lit]="star <= (hoverRating || reviewRating)" (mouseenter)="hoverRating = star"
-              (mouseleave)="hoverRating = 0" (click)="reviewRating = star">
-              <i class="bi bi-star-fill"></i>
-            </button>
-          </div>
-
-          <textarea class="review-textarea" rows="3" [(ngModel)]="reviewComment"
-            placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
-
-          <div class="review-error" *ngIf="reviewError">
-            <i class="bi bi-exclamation-circle"></i> {{ reviewError }}
-          </div>
-
-          <button class="btn-submit-review" (click)="submitReview()" [disabled]="reviewSubmitting">
-            {{ reviewSubmitting ? 'Slanje...' : 'Objavi recenziju' }}
-          </button>
-        </div>
-
-        <!-- Success -->
-        <div class="review-success" *ngIf="reviewSuccess">
-          <i class="bi bi-check-circle-fill"></i>
-          Recenzija uspješno objavljena!
-        </div>
-
-        <!-- No reviews -->
-        <div class="no-reviews" *ngIf="reviews.length === 0">
-          <i class="bi bi-chat-square-text"></i>
-          Još nema recenzija za ovaj teren.
-        </div>
-
-        <!-- Review list -->
-        <div class="review-card" *ngFor="let review of reviews">
-          <div class="review-card-header">
-            <div class="reviewer-info">
-              <div class="reviewer-avatar">
-                {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
-              </div>
-              <div>
-                <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
-                <div class="review-stars">
-                  <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                    [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
-                </div>
-              </div>
-            </div>
-            <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy' }}</span>
-          </div>
-          <p class="review-comment">{{ review.comment }}</p>
-        </div>
-
-      </div>
-    </div>
-
-
-    <div class="booking-panel">
-          <!-- ===== RIGHT COLUMN — BOOKING PANEL ===== -->
-     <!-- Dodaj odmah iznad <div class="booking-panel"> -->
-<div class="booking-spotlight" *ngIf="!selectedSlot">
-  <div class="spotlight-icon">
-    <i class="bi bi-calendar-check-fill"></i>
-  </div>
-  <div class="spotlight-text">
-    <strong>Rezerviši termin</strong>
-    <span>Odaberi datum i klikni na termin</span>
-  </div>
-  <div class="spotlight-arrow">
-    <i class="bi bi-arrow-right-short"></i>
-  </div>
-</div>
-      <div class="booking-card">
-
-        <!-- Card header -->
-        <div class="booking-card-header">
-          <div class="booking-price">
-            {{ venue.price_per_slot }} RSD <span>/ termin</span>
-          </div>
-          <div class="booking-rating-row" *ngIf="venue.avg_rating">
-            <div class="stars">
-              <i class="bi bi-star-fill" *ngFor="let s of [1,2,3,4,5]"
-                [style.opacity]="s <= venue.avg_rating ? '1' : '0.3'"></i>
-            </div>
-            <span>{{ venue.avg_rating }} · {{ venue.review_count }} ocena</span>
-          </div>
-        </div>
-
-        <!-- Card body -->
-        <div class="booking-card-body">
-
-          <!-- Custom Calendar -->
+      <div class="booking-section-body">
+        <!-- Custom Calendar -->
+        <div class="booking-col-calendar">
           <span class="booking-label">Izaberi datum</span>
           <div class="custom-calendar-container">
-            <!-- Header (Mesec i Godina) -->
             <div class="calendar-header">
               <button class="cal-nav-btn" (click)="prevMonth()" title="Prethodni mesec">
                 <i class="bi bi-chevron-left"></i>
@@ -255,23 +171,27 @@
               </button>
             </div>
 
-            <!-- Dani u nedelji -->
             <div class="calendar-weekdays">
               <span *ngFor="let wk of shortDayNames">{{ wk }}</span>
             </div>
 
-            <!-- Grid sa datumima -->
             <div class="calendar-grid">
               <button *ngFor="let day of calendarDays" class="cal-day-btn"
                 [class.cal-day-other-month]="!day.isCurrentMonth" [class.cal-day-past]="day.isPast"
                 [class.cal-day-today]="day.isToday && selectedDate !== day.dateString"
-                [class.cal-day-selected]="selectedDate === day.dateString" [disabled]="day.isPast"
+                [class.cal-day-selected]="selectedDate === day.dateString" [class.cal-day-closed]="day.isClosed"
+                [class.cal-day-full]="day.isFull" [class.cal-day-free]="day.isFree"
+                [disabled]="day.isPast || day.isClosed || day.isFull"
+                [title]="day.isClosed ? 'Zatvoreno' : (day.isFull ? 'Nema slobodnih' : '')"
                 (click)="selectCalendarDate(day)">
                 <span>{{ day.dayNumber }}</span>
               </button>
             </div>
           </div>
+        </div>
 
+        <!-- Slots + Actions -->
+        <div class="booking-col-slots">
           <!-- Slots -->
           <div class="slots-wrap" *ngIf="availableSlots.length > 0">
             <span class="booking-label">Dostupni termini</span>
@@ -300,12 +220,12 @@
           <div class="guest-cta" *ngIf="!authService.isLoggedIn()">
             <div class="guest-cta-icon"><i class="bi bi-lock-fill"></i></div>
             <p class="guest-cta-text">Prijavite se da biste rezervisali termin</p>
-            <a routerLink="/login" class="btn-guest-login">
+            <button (click)="openAuthModal('login')" class="btn-guest-login">
               <i class="bi bi-box-arrow-in-right"></i> Prijavi se
-            </a>
-            <a routerLink="/userRegister" class="btn-guest-register">
+            </button>
+            <button (click)="openAuthModal('register')" class="btn-guest-register">
               <i class="bi bi-person-plus"></i> Kreiraj nalog
-            </a>
+            </button>
           </div>
 
           <!-- Book button (single) -->
@@ -356,7 +276,6 @@
             <i class="bi bi-info-circle"></i>
             Koristite Alate za vlasnika za upravljanje terminima.
           </div>
-
         </div>
       </div>
 
@@ -368,7 +287,146 @@
           <i class="bi bi-slash-circle"></i> Blokiraj termin
         </button>
       </div>
+    </div>
 
+    <div class="section-divider"></div>
+
+    <!-- ===== REVIEWS (always last) ===== -->
+    <div class="reviews-section">
+      <div class="reviews-header">
+        <h3>Recenzije</h3>
+        <span class="review-count-badge" *ngIf="reviews.length > 0">{{ reviews.length }}</span>
+      </div>
+
+      <!-- Review form -->
+      <div class="review-form-card" *ngIf="canReview && !reviewSuccess">
+        <h5>Ostavite recenziju</h5>
+
+        <div class="star-selector">
+          <button type="button" class="star-btn" *ngFor="let star of [1,2,3,4,5]"
+            [class.lit]="star <= (hoverRating || reviewRating)" (mouseenter)="hoverRating = star"
+            (mouseleave)="hoverRating = 0" (click)="reviewRating = star">
+            <i class="bi bi-star-fill"></i>
+          </button>
+        </div>
+
+        <textarea class="review-textarea" rows="3" [(ngModel)]="reviewComment"
+          placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
+
+        <div class="review-error" *ngIf="reviewError">
+          <i class="bi bi-exclamation-circle"></i> {{ reviewError }}
+        </div>
+
+        <button class="btn-submit-review" (click)="submitReview()" [disabled]="reviewSubmitting">
+          {{ reviewSubmitting ? 'Slanje...' : 'Objavi recenziju' }}
+        </button>
+      </div>
+
+      <!-- Success -->
+      <div class="review-success" *ngIf="reviewSuccess">
+        <i class="bi bi-check-circle-fill"></i>
+        Recenzija uspješno objavljena!
+      </div>
+
+      <!-- No reviews -->
+      <div class="no-reviews" *ngIf="reviews.length === 0">
+        <i class="bi bi-chat-square-text"></i>
+        Još nema recenzija za ovaj teren.
+      </div>
+
+      <!-- Review list -->
+      <div class="review-card" *ngFor="let review of reviews">
+        <div class="review-card-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">
+              {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
+            </div>
+            <div>
+              <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
+              <div class="review-stars">
+                <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                  [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
+              </div>
+            </div>
+          </div>
+          <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy' }}</span>
+        </div>
+        <p class="review-comment">{{ review.comment }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INLINE AUTH MODAL -->
+<div class="auth-modal-overlay" *ngIf="showAuthModal" (click)="closeAuthModal()">
+  <div class="auth-modal-content" (click)="$event.stopPropagation()">
+    <button class="btn-close-modal" (click)="closeAuthModal()"><i class="bi bi-x-lg"></i></button>
+
+    <div class="auth-modal-header">
+      <div class="auth-modal-logo">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <h4>Sportski<span>Termin</span></h4>
+    </div>
+
+    <div class="auth-modal-tabs">
+      <button class="auth-tab" [class.active]="authModalTab === 'login'"
+        (click)="authModalTab = 'login'">Prijava</button>
+      <button class="auth-tab" [class.active]="authModalTab === 'register'"
+        (click)="authModalTab = 'register'">Registracija</button>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-modal-body" *ngIf="authModalTab === 'login'">
+      <form (ngSubmit)="submitInlineLogin()">
+        <div class="auth-form-group">
+          <label><i class="bi bi-envelope"></i> Email</label>
+          <input type="email" name="email" [(ngModel)]="authData.email" required placeholder="vaseime@email.com">
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-lock"></i> Lozinka</label>
+          <input type="password" name="password" [(ngModel)]="authData.password" required placeholder="••••••••">
+        </div>
+        <p class="auth-error" *ngIf="authError"><i class="bi bi-exclamation-circle"></i> {{ authError }}</p>
+        <button type="submit" class="btn-auth-submit" [disabled]="authLoading">
+          <span *ngIf="!authLoading"><i class="bi bi-box-arrow-in-right"></i> Prijavi se</span>
+          <span *ngIf="authLoading"><i class="bi bi-arrow-repeat spin-icon"></i> Sačekajte...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Register Form -->
+    <div class="auth-modal-body" *ngIf="authModalTab === 'register'">
+      <form (ngSubmit)="submitInlineRegister()">
+        <div class="auth-form-row">
+          <div class="auth-form-group">
+            <label><i class="bi bi-person"></i> Ime</label>
+            <input type="text" name="firstName" [(ngModel)]="authData.firstName" required placeholder="Ime">
+          </div>
+          <div class="auth-form-group">
+            <label><i class="bi bi-person"></i> Prezime</label>
+            <input type="text" name="lastName" [(ngModel)]="authData.lastName" required placeholder="Prezime">
+          </div>
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-envelope"></i> Email</label>
+          <input type="email" name="regEmail" [(ngModel)]="authData.email" required placeholder="vaseime@email.com">
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-telephone"></i> Telefon</label>
+          <input type="text" name="phone" [(ngModel)]="authData.phone" required placeholder="+381 ...">
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-lock"></i> Lozinka</label>
+          <input type="password" name="regPassword" [(ngModel)]="authData.password" required placeholder="••••••••">
+        </div>
+        <p class="auth-error" *ngIf="authError"><i class="bi bi-exclamation-circle"></i> {{ authError }}</p>
+        <button type="submit" class="btn-auth-submit" [disabled]="authLoading">
+          <span *ngIf="!authLoading"><i class="bi bi-person-plus"></i> Brza Registracija</span>
+          <span *ngIf="authLoading"><i class="bi bi-arrow-repeat spin-icon"></i> Sačekajte...</span>
+        </button>
+      </form>
     </div>
   </div>
 </div>

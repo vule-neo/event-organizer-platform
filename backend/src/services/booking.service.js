@@ -10,16 +10,28 @@ const formatDateTime = (dt) => {
   });
 };
 
-exports.getOccupiedSlots = async (venueId, date) => {
-    const result = await pool.query(
-        `SELECT start_time, end_time FROM bookings 
-         WHERE venue_id = $1 AND status = 'confirmed' AND start_time::date = $2
-         UNION
-         SELECT start_time, end_time FROM blocked_slots 
-         WHERE venue_id = $1 AND start_time::date = $2`,
-        [venueId, date]
-    );
-    return result.rows;
+exports.getOccupiedSlots = async (venueId, dateOrMonth) => {
+    if (dateOrMonth && dateOrMonth.length === 7) {
+        const result = await pool.query(
+            `SELECT start_time, end_time FROM bookings 
+             WHERE venue_id = $1 AND status = 'confirmed' AND TO_CHAR(start_time, 'YYYY-MM') = $2
+             UNION
+             SELECT start_time, end_time FROM blocked_slots 
+             WHERE venue_id = $1 AND TO_CHAR(start_time, 'YYYY-MM') = $2`,
+            [venueId, dateOrMonth]
+        );
+        return result.rows;
+    } else {
+        const result = await pool.query(
+            `SELECT start_time, end_time FROM bookings 
+             WHERE venue_id = $1 AND status = 'confirmed' AND start_time::date = $2
+             UNION
+             SELECT start_time, end_time FROM blocked_slots 
+             WHERE venue_id = $1 AND start_time::date = $2`,
+            [venueId, dateOrMonth]
+        );
+        return result.rows;
+    }
 };
 
 exports.createBooking = async ({ venue_id, client_id, start_time, end_time, price_paid }) => {

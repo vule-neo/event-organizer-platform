@@ -295,35 +295,70 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  // Zatvori dropdowne klikom van njih
+  // Zatvori dropdownove kada se klikne van (već postoji, ali poboljšaj)
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
-    // Zatvori samo ako klik nije unutar search-card (da chip buttoni rade)
-    if (!target.closest('.search-card') && !target.closest('.active-filters')) {
+
+    // Proveri da li je kliknut filter chip ili dugme za reset
+    if (target.closest('.filter-chip') || target.closest('.filter-reset-link')) {
+      return; // Ne zatvaraj dropdown ako se klikne na filter
+    }
+
+    // Zatvori dropdownove ako klik nije unutar search polja
+    if (!target.closest('.search-field') && !target.closest('.dropdown-panel')) {
       this.cityOpen = false;
       this.sportOpen = false;
     }
   }
 
+  // Dodaj ove metode za bolje mobile iskustvo
+
   toggleCityDropdown(e: MouseEvent) {
     e.stopPropagation();
+
+    // Zatvori sport dropdown ako je otvoren
+    if (this.sportOpen) {
+      this.sportOpen = false;
+    }
+
+    // Toggle city dropdown
     this.cityOpen = !this.cityOpen;
-    this.sportOpen = false;
-    
-    // Ako zatvaramo dropdown, osiguraj da se klik ne registruje negdje drugo
-    if (!this.cityOpen) {
+
+    // Na mobile-u, skroluj do dropdowna da bude vidljiv
+    if (this.cityOpen && window.innerWidth <= 768) {
       setTimeout(() => {
-        // Mali trik - nakon zatvaranja, ništa ne radi
+        const dropdown = document.querySelector('.search-field:has(.dropdown-panel.show)');
+        if (dropdown) {
+          dropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }, 50);
     }
   }
 
   toggleSportDropdown(e: MouseEvent) {
     e.stopPropagation();
+
+    // Zatvori city dropdown ako je otvoren
+    if (this.cityOpen) {
+      this.cityOpen = false;
+    }
+
+    // Toggle sport dropdown
     this.sportOpen = !this.sportOpen;
-    this.cityOpen = false;
+
+    // Na mobile-u, skroluj do dropdowna da bude vidljiv
+    if (this.sportOpen && window.innerWidth <= 768) {
+      setTimeout(() => {
+        const dropdown = document.querySelector('.search-field:has(.dropdown-panel.show)');
+        if (dropdown) {
+          dropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 50);
+    }
   }
+
+
 
   selectCity(city: string, e?: MouseEvent) {
     e?.stopPropagation();
@@ -384,6 +419,37 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (this.mapReady) this.placeMarkers(this.filteredVenues);
+  }
+
+
+  // Metoda za detalje (postojeća, ali ćemo je prilagoditi)
+  viewDetails(venueId: string, event: MouseEvent) {
+    event.stopPropagation(); // Spreči da se klik propagira na card
+    this.router.navigate(['/venues/details', venueId]);
+  }
+
+  // Metoda za brzu rezervaciju - vodi na detail i skroluje do booking sekcije
+  bookNow(venueId: string, event: MouseEvent) {
+    event.stopPropagation();
+
+    // Koristi skipLocationChange da ne triggeruje scroll restoration
+    this.router.navigate(['/venues/details', venueId], {
+      queryParams: { scrollTo: 'booking' },
+      skipLocationChange: false, // Ostavi false, ali dodajemo state
+      state: { skipScrollRestoration: true } // Dodajemo custom state
+    });
+  }
+
+  // Metoda za brzu rezervaciju iz Available Today sekcije
+  bookNowFromAvailable(venueId: string, event: MouseEvent) {
+    event.stopPropagation(); // Spreči da se klik propagira na card
+
+    // Koristi scroll servis da preskoči automatski scroll na vrh
+    // Ako imaš ScrollService, inače samo navigiraj
+    this.router.navigate(['/venues/details', venueId], {
+      queryParams: { scrollTo: 'booking' },
+      state: { skipScroll: true, fromAvailable: true }
+    });
   }
 
   scrollToSearch() {

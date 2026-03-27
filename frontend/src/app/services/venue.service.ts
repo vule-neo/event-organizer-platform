@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';  // <-- DODAJ OVO
 
 export interface Venue {
   id: string;
@@ -16,10 +17,11 @@ export interface Venue {
 
 @Injectable({ providedIn: 'root' })
 export class VenueService {
-  private apiUrl = 'http://localhost:5000/api/venues';
-  private sportsUrl = 'http://localhost:5000/api/venues/sports';
-  private tagsUrl = 'http://localhost:5000/api/venues/tags';
-  private baseUrl = 'http://localhost:5000/api';
+  // SVE URL-OVE izvedi iz environment.apiUrl
+  private apiUrl = `${environment.apiUrl}/venues`;
+  private sportsUrl = `${environment.apiUrl}/venues/sports`;
+  private tagsUrl = `${environment.apiUrl}/venues/tags`;
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -32,6 +34,8 @@ export class VenueService {
   }
 
   getAllVenues(): Observable<Venue[]> {
+    const url = `${this.apiUrl}/all`;
+    console.log('🔍 API URL:', url);  // <-- DODAJ OVO
     return this.http.get<Venue[]>(`${this.apiUrl}/all`);
   }
 

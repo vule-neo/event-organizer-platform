@@ -19,6 +19,9 @@ export class VenueDetailComponent implements OnInit {
   errorMessage = '';
   activeImageUrl: string = '';
 
+  showStickyButton: boolean = false;
+  private scrollListener: any;
+
   today: string = new Date().toISOString().split('T')[0];
   selectedDate: string = this.today;
   availableSlots: any[] = [];
@@ -42,6 +45,21 @@ export class VenueDetailComponent implements OnInit {
   reviewError = '';
   hoverRating = 0;
 
+  scrollProgress: number = 0;
+
+  // Inline Auth Modal
+  showAuthModal = false;
+  authModalTab: 'login' | 'register' = 'login';
+  authData = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: ''
+  };
+  authLoading = false;
+  authError = '';
+
   dayNames = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 
   constructor(
@@ -55,7 +73,46 @@ export class VenueDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) this.loadVenue(id);
-    this.generateCalendar();
+
+    this.setupScrollListener();
+
+    this.route.queryParams.subscribe(params => {
+      if (params['scrollTo'] === 'booking') {
+        // Mali delay da se učita sadržaj
+        setTimeout(() => {
+          this.scrollToBooking();
+        }, 500);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    // Očisti scroll listener kada se komponenta uništi
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener);
+    }
+  }
+
+  private setupScrollListener() {
+    this.scrollListener = () => {
+      const bookingSection = document.getElementById('booking-section');
+      if (bookingSection) {
+        const rect = bookingSection.getBoundingClientRect();
+        const isBookingVisible = rect.top <= window.innerHeight && rect.bottom >= 0;
+        const scrollY = window.scrollY || window.pageYOffset;
+        this.showStickyButton = !isBookingVisible || scrollY > 300;
+      } else {
+        this.showStickyButton = window.scrollY > 300;
+      }
+
+      // DODAJ OVO ZA PROGRESS BAR:
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      this.scrollProgress = (winScroll / height) * 100;
+    };
+
+    window.addEventListener('scroll', this.scrollListener);
+    setTimeout(() => this.scrollListener(), 100);
   }
 
   loadVenue(id: string) {
@@ -67,6 +124,7 @@ export class VenueDetailComponent implements OnInit {
           this.activeImageUrl = 'http://localhost:5000' + data.images[0].url;
         }
         this.loadOccupiedSlots();
+        this.generateCalendar();
         this.loadReviews();
         this.checkCanReview();
         this.loading = false;
@@ -142,6 +200,7 @@ export class VenueDetailComponent implements OnInit {
     for (let i = 1; i <= totalCells - this.calendarDays.length; i++) {
       this.calendarDays.push(this.createCalendarDayObj(new Date(this.currentYear, this.currentMonth + 1, i), false));
     }
+    this.loadMonthlyOccupiedSlots();
   }
 
   private createCalendarDayObj(dateObj: Date, isCurrentMonth: boolean) {
@@ -247,6 +306,109 @@ export class VenueDetailComponent implements OnInit {
     this.availableSlots = slots;
   }
 
+  monthlyOccupiedSlots: any[] = [];
+
+  loadMonthlyOccupiedSlots() {
+    if (!this.venue) return;
+    const monthStr = `${this.currentYear}-${(this.currentMonth + 1).toString().padStart(2, '0')}`;
+    this.bookingService.getOccupiedSlots(this.venue.id, monthStr).subscribe({
+      next: (occupied: any[]) => {
+        this.monthlyOccupiedSlots = occupied;
+        this.updateCalendarDaysStatus();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  updateCalendarDaysStatus() {
+    const occupiedMapped = this.monthlyOccupiedSlots.map(o => {
+      const d = new Date(o.start_time);
+      const zOffset = d.getTimezoneOffset() * 60000;
+      const localDateStr = (new Date(d.getTime() - zOffset)).toISOString().split('T')[0];
+      const timeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+      return { dateString: localDateStr, time: timeStr };
+    });
+
+    this.calendarDays.forEach(day => {
+      day.isClosed = false;
+      day.isFull = false;
+      day.isFree = false;
+
+      if (day.isPast || day.isCurrentMonth === false) return;
+
+      const dateObj = new Date(day.dateString + 'T12:00:00');
+      const dayOfWeek = dateObj.getDay();
+      if (!this.venue.working_hours) return;
+      const workingDay = this.venue.working_hours.find((h: any) => h.day_of_week === dayOfWeek);
+
+      if (!workingDay || !workingDay.is_open) {
+        day.isClosed = true;
+        return;
+      }
+
+      const nextDayDate = new Date(dateObj);
+      nextDayDate.setDate(nextDayDate.getDate() + 1);
+      const nextDayString = nextDayDate.toISOString().split('T')[0];
+
+      const occupiedTimesForThisDay = occupiedMapped
+        .filter(o => o.dateString === day.dateString || o.dateString === nextDayString)
+        .map(o => o.time);
+
+      const slots = this.getSlotsForDate(day.dateString, occupiedTimesForThisDay);
+
+      if (slots.length === 0) {
+        day.isClosed = true;
+      } else {
+        const hasFree = slots.some(s => !s.isOccupied);
+        if (hasFree) {
+          day.isFree = true;
+        } else {
+          day.isFull = true;
+        }
+      }
+    });
+  }
+
+  private getSlotsForDate(dateString: string, occupiedTimes: string[]): any[] {
+    const dateObj = new Date(dateString + 'T12:00:00');
+    const dayOfWeek = dateObj.getDay();
+    const workingDay = this.venue.working_hours.find((h: any) => h.day_of_week === dayOfWeek);
+
+    if (!workingDay || !workingDay.is_open) return [];
+
+    const slots = [];
+    const openMins = this.parseTime(workingDay.open_time);
+    let closeMins = this.parseTime(workingDay.close_time);
+    const duration = this.venue.slot_duration_mins;
+    const isOvernight = closeMins <= openMins;
+    if (isOvernight) closeMins += 24 * 60;
+
+    const isToday = dateString === this.today;
+    let nowMins = 0;
+    if (isToday) {
+      nowMins = (new Date().getUTCHours() * 60 + new Date().getUTCMinutes() + this.getBelgradeOffsetMins()) % (24 * 60);
+    }
+
+    let currentTime = openMins;
+    while (currentTime + duration <= closeMins) {
+      const displayStart = currentTime % (24 * 60);
+      const startStr = this.formatTime(displayStart);
+
+      const slotStartForComparison = isOvernight && currentTime >= 24 * 60 ? displayStart + 24 * 60 : displayStart;
+      if (isToday && slotStartForComparison <= nowMins) {
+        currentTime += duration;
+        continue;
+      }
+
+      slots.push({
+        start: startStr,
+        isOccupied: occupiedTimes.includes(startStr)
+      });
+      currentTime += duration;
+    }
+    return slots;
+  }
+
   private parseTime(t: string): number {
     if (!t) return 0;
     const [h, m] = t.split(':').map(Number);
@@ -294,23 +456,23 @@ export class VenueDetailComponent implements OnInit {
 
   confirmBooking() {
     if (!this.selectedSlot || !this.venue) return;
-    
+
     const bookingData = {
       venue_id: this.venue.id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
       end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
       price_paid: this.venue.price_per_slot
     };
-    
+
     this.bookingService.createBooking(bookingData).subscribe({
       next: (response: any) => {
         // Dohvati ID kreirane rezervacije (zavisi od tvog API response-a)
         const bookingId = response.id || response.booking?.id;
-        
+
         if (bookingId) {
           // Redirect na detail stranicu sa porukom
-          this.router.navigate(['/bookings', bookingId], { 
-            queryParams: { success: 'true' } 
+          this.router.navigate(['/bookings', bookingId], {
+            queryParams: { success: 'true' }
           });
         } else {
           // Fallback ako nema ID-a
@@ -330,10 +492,10 @@ export class VenueDetailComponent implements OnInit {
 
   confirmRecurringBooking() {
     if (!this.selectedSlot || !this.venue) return;
-    
+
     this.recurringLoading = true;
     this.recurringResult = null;
-    
+
     const data = {
       venue_id: this.venue.id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
@@ -341,13 +503,13 @@ export class VenueDetailComponent implements OnInit {
       price_paid: this.venue.price_per_slot,
       weeks: this.recurringWeeks
     };
-    
+
     this.bookingService.createRecurringBooking(data).subscribe({
       next: (res: any) => {
         this.recurringResult = res;
         this.recurringLoading = false;
         this.loadOccupiedSlots();
-        
+
         // Ako ima uspješnih rezervacija, pitaj korisnika da li želi da vidi prvu
         if (res.created > 0 && res.bookingIds && res.bookingIds.length > 0) {
           if (confirm(`Rezervisano ${res.created} termina. Želite li da vidite detalje prve rezervacije?`)) {
@@ -355,9 +517,9 @@ export class VenueDetailComponent implements OnInit {
           }
         }
       },
-      error: (err) => { 
-        alert(err.error?.message || 'Greška'); 
-        this.recurringLoading = false; 
+      error: (err) => {
+        alert(err.error?.message || 'Greška');
+        this.recurringLoading = false;
       }
     });
   }
@@ -419,5 +581,96 @@ export class VenueDetailComponent implements OnInit {
         });
         break;
     }
+  }
+
+  scrollToBooking() {
+    const el = document.getElementById('booking-section');
+    if (el) {
+      // Dobij poziciju elementa
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset od vrha
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+
+      // Opciono: dodaj vizuelni efekat da istakneš sekciju
+      el.style.transition = 'box-shadow 0.3s ease';
+      el.style.boxShadow = '0 0 0 3px var(--gold), 0 0 0 6px rgba(232, 184, 109, 0.3)';
+      setTimeout(() => {
+        el.style.boxShadow = '';
+      }, 1000);
+
+      // Zatvori share menu ako je otvoren
+      this.shareMenuOpen = false;
+    }
+  }
+
+  // ---- INLINE AUTH MODAL ----
+  openAuthModal(tab: 'login' | 'register') {
+    this.authModalTab = tab;
+    this.showAuthModal = true;
+    this.authError = '';
+    this.authData = { firstName: '', lastName: '', email: '', phone: '', password: '' };
+  }
+
+  closeAuthModal() {
+    this.showAuthModal = false;
+  }
+
+  submitInlineLogin() {
+    if (!this.authData.email || !this.authData.password) {
+      this.authError = 'Sva polja su obavezna'; return;
+    }
+    this.authLoading = true; this.authError = '';
+    this.authService.login(this.authData.email, this.authData.password).subscribe({
+      next: (res) => {
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+        this.authLoading = false;
+        this.closeAuthModal();
+      },
+      error: (err) => {
+        this.authError = err.error?.message || 'Greška pri prijavi';
+        this.authLoading = false;
+      }
+    });
+  }
+
+  submitInlineRegister() {
+    if (!this.authData.firstName || !this.authData.lastName || !this.authData.email || !this.authData.password || !this.authData.phone) {
+      this.authError = 'Sva polja su obavezna'; return;
+    }
+    this.authLoading = true; this.authError = '';
+    const payload = {
+      first_name: this.authData.firstName,
+      last_name: this.authData.lastName,
+      email: this.authData.email,
+      password: this.authData.password,
+      phone: this.authData.phone,
+      role: 'customer'
+    };
+    this.authService.register(payload).subscribe({
+      next: () => {
+        this.authService.login(this.authData.email, this.authData.password).subscribe({
+          next: (res) => {
+            localStorage.setItem('token', res.token);
+            localStorage.setItem('user', JSON.stringify(res.user));
+            this.authLoading = false;
+            this.closeAuthModal();
+          },
+          error: () => {
+            this.authLoading = false;
+            this.authModalTab = 'login';
+            this.authError = 'Uspješna registracija! Prijavite se.';
+          }
+        });
+      },
+      error: (err) => {
+        this.authError = err.error?.message || 'Greška pri registraciji';
+        this.authLoading = false;
+      }
+    });
   }
 }

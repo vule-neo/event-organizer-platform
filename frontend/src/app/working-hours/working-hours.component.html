@@ -25,7 +25,15 @@
         <label>Otvaranje</label>
         <div class="wh-time-input-wrap">
           <i class="bi bi-sunrise wh-time-icon"></i>
-          <input type="time" [(ngModel)]="day.open_time" (click)="$event.stopPropagation()" />
+          <div class="wh-selects-container">
+            <select [(ngModel)]="day.open_hour" (click)="$event.stopPropagation()" (change)="updateTimeFromSelect(day)" class="wh-select">
+              <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+            </select>
+            <span class="wh-colon">:</span>
+            <select [(ngModel)]="day.open_minute" (click)="$event.stopPropagation()" (change)="updateTimeFromSelect(day)" class="wh-select">
+              <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -37,7 +45,15 @@
         <label>Zatvaranje</label>
         <div class="wh-time-input-wrap">
           <i class="bi bi-sunset wh-time-icon"></i>
-          <input type="time" [(ngModel)]="day.close_time" (click)="$event.stopPropagation()" />
+          <div class="wh-selects-container">
+            <select [(ngModel)]="day.close_hour" (click)="$event.stopPropagation()" (change)="updateTimeFromSelect(day)" class="wh-select">
+              <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+            </select>
+            <span class="wh-colon">:</span>
+            <select [(ngModel)]="day.close_minute" (click)="$event.stopPropagation()" (change)="updateTimeFromSelect(day)" class="wh-select">
+              <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+            </select>
+          </div>
         </div>
       </div>
 

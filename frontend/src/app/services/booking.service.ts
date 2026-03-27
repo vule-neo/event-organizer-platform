@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';  // <-- DODAJ OVO
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
-  private apiUrl = 'http://localhost:5000/api/bookings';
+  private apiUrl = `${environment.apiUrl}/bookings`;  // <-- ISPRAVLJENO
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getOccupiedSlots(venueId: string, date: string) {
     return this.http.get<any[]>(`${this.apiUrl}/occupied?venueId=${venueId}&date=${date}`);
@@ -45,5 +46,4 @@ export class BookingService {
   createRecurringBooking(data: any) {
     return this.http.post(`${this.apiUrl}/create-recurring`, data);
   }
-
 }

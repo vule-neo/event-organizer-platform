@@ -319,6 +319,10 @@
 }
 
 @media (max-width: 768px) {
+  .nav-container {
+    padding: 0 16px;
+  }
+
   .hamburger {
     display: flex;
   }

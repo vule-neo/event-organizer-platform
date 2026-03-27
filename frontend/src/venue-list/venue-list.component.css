@@ -5,7 +5,9 @@
 /* ---- HERO ---- */
 .hero {
   position: relative;
-  padding: 80px 24px 100px;
+  padding: 60px 24px 40px;
+  /* Bilo je 80px 24px 100px - smanjeno */
+  margin-bottom: 0;
   overflow: visible;
   background: var(--bg);
 }
@@ -736,12 +738,16 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background: var(--gold);
-  color: var(--text);
-  padding: 4px 12px;
+  background: linear-gradient(135deg, var(--gold), #f5c563);
+  color: var(--navy);
+  padding: 6px 16px;
   border-radius: 50px;
-  font-size: 11px;
-  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(232, 184, 109, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
 }
 
 .venue-rating-badge {
@@ -881,25 +887,112 @@
   color: var(--text-secondary);
 }
 
+/* Card buttons container */
+.card-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Existing detail button - malo prilagođen */
 .btn-card-detail {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: var(--navy);
-  color: #fff;
+  background: var(--bg-secondary);
+  color: var(--text);
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
-  border: none;
+  border: 1px solid var(--border);
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
 
 .btn-card-detail:hover {
-  background: var(--gold);
-  color: var(--text);
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+  transform: translateY(-2px);
+}
+
+/* NEW BOOK BUTTON - istaknut dizajn */
+.btn-card-book {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--navy) 0%, #1e4668 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-card-book::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s;
+}
+
+.btn-card-book:active::before {
+  width: 150px;
+  height: 150px;
+}
+
+.btn-card-book:hover {
+  background: linear-gradient(135deg, var(--gold) 0%, #e8b86d 100%);
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(232, 184, 109, 0.4);
+}
+
+.btn-card-book i {
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.btn-card-book:hover i {
+  transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-card-detail,
+  .btn-card-book {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .venue-card-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .venue-duration {
+    margin-bottom: 4px;
+  }
 }
 
 /* Empty State */
@@ -1960,7 +2053,10 @@
 
 .avail-section {
   background: var(--bg);
-  padding: 72px 0 80px;
+  padding: 40px 0 60px;
+  /* Bilo je 72px 0 80px - smanjeno */
+  margin-top: -20px;
+  /* Dodaj negativan margin da povučeš gore */
 }
 
 /* Header */
@@ -2281,29 +2377,444 @@
 /* ============================================
    FIX: DROPDOWN SAMO KADA JE VIDLJIV
    ============================================ */
-   .dropdown-panel {
-    /* Postavi display: none kao osnovno stanje */
-    display: none !important;
-    opacity: 0;
-    transform: translateY(-6px) scale(0.98);
-    pointer-events: none;
-    transition: opacity 0.18s ease, transform 0.18s ease;
+.dropdown-panel {
+  /* Postavi display: none kao osnovno stanje */
+  display: none !important;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.dropdown-panel.show {
+  /* Kada je aktivan, prikaži ga */
+  display: block !important;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all !important;
+}
+
+/* Dodatno osiguranje - da hover na prazan prostor ne radi ništa */
+.search-dropdown-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+  /* Osiguraj da wrap ne hvata klikove kad nema aktivnog dropdowna */
+  pointer-events: auto;
+}
+
+/* ============================================
+   RESPONSIVENESS (MOBILE FRIENDLY)
+   ============================================ */
+@media (max-width: 1024px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
   }
-  
-  .dropdown-panel.show {
-    /* Kada je aktivan, prikaži ga */
-    display: block !important;
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: all !important;
+
+  .hero-content {
+    align-items: center;
   }
-  
-  /* Dodatno osiguranje - da hover na prazan prostor ne radi ništa */
-  .search-dropdown-wrap {
+
+  .hero-subtitle {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .hero-stats {
+    justify-content: center;
+  }
+
+  .hero-visual {
+    display: none;
+  }
+
+  .search-card {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+    border-radius: var(--radius);
+  }
+
+  .search-field {
+    width: 100%;
+  }
+
+  .search-divider {
+    height: 1px;
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .search-btn {
+    justify-content: center;
+    margin: 8px;
+    border-radius: 8px;
+  }
+
+  .venues-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .steps-grid {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .step-connector {
+    display: none;
+  }
+
+  .hero {
+    padding: 40px 16px 60px;
+  }
+
+  .venues-section {
+    padding: 40px 16px;
+  }
+
+  .how-it-works {
+    padding: 40px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .venues-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-header h2 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .search-card {
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .search-field {
+    width: 100%;
+    min-width: unset !important;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+  }
+
+  .dropdown-panel {
+    z-index: 9999 !important;
+  }
+
+  .hero {
+    padding-top: 20px;
+  }
+}
+
+/* Available Today Card - novi stilovi */
+.avail-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  gap: 12px;
+}
+
+.avail-card-price-info {
+  flex: 1;
+  cursor: pointer;
+}
+
+.avail-card-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.avail-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.avail-card-rating i {
+  color: var(--gold);
+  font-size: 10px;
+}
+
+.avail-card-new {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold-dark);
+  background: rgba(232, 184, 109, 0.12);
+  padding: 2px 8px;
+  border-radius: 50px;
+  display: inline-block;
+}
+
+/* BOOK BUTTON za Available Today */
+.avail-book-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--navy) 0%, #1e4668 100%);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.2);
+}
+
+.avail-book-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.avail-book-btn:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+.avail-book-btn:hover {
+  background: linear-gradient(135deg, var(--gold) 0%, #e8b86d 100%);
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(232, 184, 109, 0.4);
+}
+
+.avail-book-btn i {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.avail-book-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Responsive za Available Today */
+@media (max-width: 640px) {
+  .avail-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .avail-book-btn {
+    justify-content: center;
+    padding: 8px 12px;
+    width: 100%;
+  }
+
+  .avail-card-price-info {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .avail-card-price {
+    display: inline-block;
+    margin-right: 8px;
+  }
+
+  .avail-card-rating,
+  .avail-card-new {
+    display: inline-block;
+  }
+}
+
+/* ============================================
+   MOBILE FIXES - DROPDOWN I VELIČINE
+   ============================================ */
+
+/* Osnovni reset za mobile */
+@media (max-width: 768px) {
+
+  /* Hero sekcija - smanji padding */
+  .hero {
+    padding: 30px 16px 20px !important;
+  }
+
+  /* SEARCH CARD - potpuno prilagođen za mobile */
+  .search-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 12px !important;
+    gap: 8px !important;
+    background: var(--card);
+    border-radius: 16px !important;
     position: relative;
-    flex: 1;
-    min-width: 0;
-    overflow: visible;
-    /* Osiguraj da wrap ne hvata klikove kad nema aktivnog dropdowna */
-    pointer-events: auto;
+    z-index: 100;
   }
+
+  /* Sva polja - puna širina, bez fiksne širine */
+  .search-field {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 12px 16px !important;
+    background: var(--bg-secondary);
+    border-radius: 12px !important;
+    border: 1px solid var(--border);
+  }
+
+  /* Ukloni dividere na mobile */
+  .search-divider {
+    display: none !important;
+  }
+
+  /* Dropdown wrapper - puna širina */
+  .search-dropdown-wrap {
+    width: 100% !important;
+    position: relative;
+  }
+
+  /* Custom select - puna širina */
+  .custom-select {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .custom-select span {
+    font-size: 14px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* DROPDOWN PANEL - VISOK Z-INDEX ZA MOBILE */
+  .dropdown-panel {
+    position: fixed !important;
+    top: auto !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: auto !important;
+    max-height: 60vh !important;
+    width: calc(100% - 32px) !important;
+    min-width: 0 !important;
+    z-index: 99999 !important;
+    background: white !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+    margin-top: 8px;
+  }
+
+  /* Kada je dropdown otvoren - pozicioniraj ga ispod polja */
+  .search-field:has(.dropdown-panel.show) {
+    position: relative;
+    z-index: 10000;
+  }
+
+  .dropdown-panel.show {
+    display: block !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+  }
+
+  /* Opcije u dropdownu - veći tap target */
+  .dropdown-option {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+  }
+
+  .dropdown-option i {
+    font-size: 18px !important;
+  }
+
+  /* Search button - puna širina */
+  .search-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 14px 20px !important;
+    margin-top: 4px !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+  }
+
+  /* Active filter chips - prilagodi */
+  .active-filters {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .filter-chip {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* Tekst u inputu - veći za lakše tapiranje */
+  .search-field input {
+    font-size: 16px !important;
+    padding: 4px 0 !important;
+  }
+
+  /* Placeholder stil */
+  .search-field input::placeholder {
+    font-size: 14px;
+  }
+}
+
+/* Dodatni mobile fix za tap target */
+@media (max-width: 768px) {
+
+  /* Povećaj tap target za sve interaktivne elemente */
+  .custom-select,
+  .dropdown-option,
+  .search-btn,
+  .filter-chip button {
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  /* Spreči zoom na input poljima */
+  .search-field input {
+    font-size: 16px !important;
+  }
+
+  /* Poboljšaj scroll unutar dropdowna */
+  .dropdown-panel {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Dodaj padding za bolji touch */
+  .dropdown-option {
+    padding: 12px 16px !important;
+  }
+
+  /* Zatvori dropdown kada se skroluje (opciono) */
+  body.dropdown-open {
+    overflow: hidden;
+  }
+}

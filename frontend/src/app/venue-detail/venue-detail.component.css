@@ -1,9 +1,9 @@
 /* ============================================
-   VENUE DETAIL
+   VENUE DETAIL — Single Column Layout
    ============================================ */
 
 .venue-detail-page {
-  max-width: 1280px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 40px 24px 80px;
 }
@@ -38,12 +38,71 @@
   font-weight: 500;
 }
 
-/* ---- LAYOUT ---- */
-.detail-layout {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 40px;
-  align-items: start;
+/* ---- STICKY FLOATING CTA ---- */
+.sticky-reserve-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 60px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(30, 58, 95, 0.35), 0 2px 8px rgba(30, 58, 95, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  animation: ctaPulse 3s ease-in-out infinite;
+}
+
+.sticky-reserve-btn:hover {
+  background: var(--gold);
+  color: var(--navy);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(232, 184, 109, 0.4);
+  animation: none;
+}
+
+.sticky-reserve-btn i {
+  font-size: 18px;
+}
+
+.sticky-reserve-price {
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sticky-reserve-btn:hover .sticky-reserve-price {
+  background: rgba(30, 58, 95, 0.15);
+}
+
+@keyframes ctaPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 8px 30px rgba(30, 58, 95, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 8px 30px rgba(30, 58, 95, 0.35), 0 0 0 8px rgba(30, 58, 95, 0.08);
+  }
+}
+
+/* ---- SINGLE COLUMN CONTENT ---- */
+.detail-content {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---- IMAGES ---- */
@@ -301,291 +360,67 @@
   color: #dc3545;
 }
 
-/* ---- REVIEWS ---- */
-.reviews-section {
-  margin-top: 40px;
+/* ============================================
+   BOOKING SECTION — Full Width
+   ============================================ */
+.booking-section-full {
+  background: var(--card);
+  border: 2px solid var(--navy);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(30, 58, 95, 0.1);
 }
 
-.reviews-header {
+.booking-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 28px;
+  background: var(--navy);
+  color: #fff;
+}
+
+.booking-section-header h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
+  color: #fff;
+  margin: 0;
 }
 
-.reviews-header h3 {
-  font-family: 'Montserrat', sans-serif;
+.booking-section-header h3 i {
   font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.review-count-badge {
-  padding: 3px 10px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 50px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* Review form */
-.review-form-card {
-  background: var(--card);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-sm);
-}
-
-.review-form-card h5 {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--text);
-}
-
-/* Star selector */
-.star-selector {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.star-btn {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: var(--border);
-  cursor: pointer;
-  transition: all 0.15s;
-  padding: 0;
-  line-height: 1;
-}
-
-.star-btn.lit {
   color: var(--gold);
-  transform: scale(1.1);
 }
 
-.star-btn:hover {
-  transform: scale(1.2);
-}
-
-.review-textarea {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-  resize: vertical;
-  outline: none;
-  transition: var(--transition);
-  background: var(--bg);
-  margin-bottom: 12px;
-}
-
-.review-textarea:focus {
-  border-color: var(--navy);
-  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.08);
-}
-
-.review-textarea::placeholder {
-  color: var(--text-muted);
-}
-
-.review-error {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  background: #fff5f5;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-sm);
-  color: #dc3545;
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.review-success {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: var(--radius-sm);
-  color: #16a34a;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.btn-submit-review {
-  padding: 10px 24px;
-  background: var(--navy);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.btn-submit-review:hover:not(:disabled) {
-  background: var(--gold);
-  color: var(--text);
-}
-
-.btn-submit-review:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Review cards */
-.review-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 12px;
-  transition: var(--transition);
-}
-
-.review-card:hover {
-  box-shadow: var(--shadow-sm);
-  border-color: rgba(30, 58, 95, 0.1);
-}
-
-.review-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.reviewer-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.reviewer-avatar {
-  width: 38px;
-  height: 38px;
-  background: var(--navy);
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.booking-price-badge {
   font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.reviewer-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.review-stars {
-  display: flex;
-  gap: 2px;
-  color: var(--gold);
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.review-date {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.review-comment {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.no-reviews {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-secondary);
-  font-size: 15px;
-}
-
-.no-reviews i {
-  font-size: 36px;
-  color: var(--border);
-  display: block;
-  margin-bottom: 12px;
-}
-
-/* ---- BOOKING PANEL (RIGHT COLUMN) ---- */
-.booking-panel {
-  position: sticky;
-  top: 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.booking-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  width: 100%;  /* Osiguraj punu širinu */
-}
-
-.booking-card-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--navy);
-}
-
-.booking-price {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 800;
   color: #fff;
 }
 
-.booking-price span {
+.booking-price-badge span {
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.6);
 }
 
-.booking-rating-row {
+.booking-section-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  padding: 28px;
+}
+
+.booking-col-calendar,
+.booking-col-slots {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.booking-rating-row .stars {
-  font-size: 12px;
-}
-
-.booking-rating-row span {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.booking-card-body {
-  padding: 24px;
+  flex-direction: column;
 }
 
 .booking-label {
@@ -720,6 +555,27 @@
 
 .cal-day-selected::after {
   display: none;
+}
+
+/* Calendar statuses */
+.cal-day-closed {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  background: rgba(100, 116, 139, 0.05);
+  cursor: not-allowed;
+}
+
+.cal-day-full {
+  color: #dc3545;
+  text-decoration: line-through;
+  background: rgba(220, 53, 69, 0.05);
+  cursor: not-allowed;
+}
+
+.cal-day-free {
+  color: #16a34a;
+  font-weight: 600;
+  background: rgba(22, 163, 74, 0.05);
 }
 
 /* Slots */
@@ -959,7 +815,7 @@
 }
 
 .owner-tools {
-  margin-top: 12px;
+  margin-top: 16px;
   padding: 16px;
   background: #fff5f5;
   border: 1px solid #fecaca;
@@ -1007,6 +863,235 @@
   cursor: not-allowed;
 }
 
+/* ---- REVIEWS ---- */
+.reviews-section {
+  margin-top: 0;
+}
+
+.reviews-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.reviews-header h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.review-count-badge {
+  padding: 3px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Review form */
+.review-form-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.review-form-card h5 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+/* Star selector */
+.star-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.star-btn.lit {
+  color: var(--gold);
+  transform: scale(1.1);
+}
+
+.star-btn:hover {
+  transform: scale(1.2);
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: var(--transition);
+  background: var(--bg);
+  margin-bottom: 12px;
+}
+
+.review-textarea:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.08);
+}
+
+.review-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.review-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: #dc3545;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.review-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-sm);
+  color: #16a34a;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.btn-submit-review {
+  padding: 10px 24px;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-submit-review:hover:not(:disabled) {
+  background: var(--gold);
+  color: var(--text);
+}
+
+.btn-submit-review:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Review cards */
+.review-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: var(--transition);
+}
+
+.review-card:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(30, 58, 95, 0.1);
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewer-avatar {
+  width: 38px;
+  height: 38px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.reviewer-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.review-stars {
+  display: flex;
+  gap: 2px;
+  color: var(--gold);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.review-comment {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.no-reviews i {
+  font-size: 36px;
+  color: var(--border);
+  display: block;
+  margin-bottom: 12px;
+}
+
 /* ---- LOADING / ERROR ---- */
 .page-loading {
   display: flex;
@@ -1027,6 +1112,12 @@
   animation: spin 0.8s linear infinite;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .page-error {
   max-width: 400px;
   margin: 80px auto;
@@ -1038,28 +1129,7 @@
   color: #dc3545;
 }
 
-/* ---- RESPONSIVE ---- */
-@media (max-width: 1024px) {
-  .detail-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .booking-panel {
-    position: static;
-  }
-}
-
-@media (max-width: 768px) {
-  .venue-detail-page {
-    padding: 24px 16px 60px;
-  }
-
-  .venue-header h1 {
-    font-size: 24px;
-  }
-}
-
-/* ---- SHARE DUGME (jedino novo) ---- */
+/* ---- SHARE ---- */
 .share-wrap {
   position: relative;
   display: inline-block;
@@ -1195,7 +1265,7 @@
   color: #16a34a;
 }
 
-/* ---- GUEST CTA (nelogovan korisnik) ---- */
+/* ---- GUEST CTA ---- */
 .guest-cta {
   display: flex;
   flex-direction: column;
@@ -1237,11 +1307,12 @@
   padding: 12px;
   background: var(--navy);
   color: #fff;
+  border: none;
   border-radius: var(--radius-sm);
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
   transition: var(--transition);
 }
 
@@ -1265,7 +1336,7 @@
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
   transition: var(--transition);
 }
 
@@ -1275,173 +1346,405 @@
 }
 
 /* ============================================
-   BOOKING SPOTLIGHT — KOMBINOVANO
+   AUTH MODAL — Premium Styled
    ============================================ */
-   .booking-spotlight {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 16px 20px;
-    background: linear-gradient(145deg, #fff8e7, #fff);
-    border-radius: 60px;
-    box-shadow: 0 10px 25px -5px rgba(232, 184, 109, 0.3);
-    border: 1px solid rgba(232, 184, 109, 0.4);
-    animation: spotlightGlow 2.5s ease-in-out infinite;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .booking-spotlight::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(232, 184, 109, 0.2) 0%, transparent 70%);
-    animation: rotate 8s linear infinite;
-    z-index: 0;
-  }
-  
-  .spotlight-icon {
-    width: 48px;
-    height: 48px;
-    background: var(--navy);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold);
-    font-size: 22px;
-    box-shadow: 0 5px 15px rgba(30, 58, 95, 0.3);
-    position: relative;
-    z-index: 1;
-    animation: iconPulse 2s ease-in-out infinite;
-  }
-  
-  .spotlight-text {
-    flex: 1;
-    position: relative;
-    z-index: 1;
-  }
-  
-  .spotlight-text strong {
-    display: block;
-    font-size: 16px;
-    color: var(--navy);
-    margin-bottom: 2px;
-  }
-  
-  .spotlight-text span {
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-  
-  .spotlight-arrow {
-    font-size: 32px;
-    color: var(--gold);
-    animation: arrowBounce 1.5s ease-in-out infinite;
-    position: relative;
-    z-index: 1;
-    margin-right: -4px;
-  }
-  
-  @keyframes spotlightGlow {
-    0% { box-shadow: 0 10px 25px -5px rgba(232, 184, 109, 0.3); }
-    50% { box-shadow: 0 15px 35px -3px rgba(232, 184, 109, 0.6); }
-    100% { box-shadow: 0 10px 25px -5px rgba(232, 184, 109, 0.3); }
-  }
-  
-  @keyframes iconPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-  }
-  
-  @keyframes arrowBounce {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(8px); }
-    100% { transform: translateX(0); }
-  }
-  
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  /* Da ne smeta kad je slot izabran */
-  .booking-spotlight {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  
-  .booking-spotlight.hide {
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
-    display: none;
-  }
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 25, 47, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
 
-  /* ============================================
-   BOOKING PANEL HIGHLIGHT — PULSIRAJUĆI SJAJ
-   ============================================ */
-.booking-card {
+.auth-modal-content {
+  background: var(--card);
+  width: 100%;
+  max-width: 440px;
+  border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(30, 58, 95, 0.08);
+  animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.booking-card::after {
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--bg-secondary);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 16px;
+  transition: var(--transition);
+  z-index: 10;
+}
+
+.btn-close-modal:hover {
+  background: #fecaca;
+  color: #dc3545;
+}
+
+/* Modal Header / Logo */
+.auth-modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 24px 12px;
+}
+
+.auth-modal-logo {
+  width: 48px;
+  height: 48px;
+  background: var(--navy);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 22px;
+}
+
+.auth-modal-header h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0;
+}
+
+.auth-modal-header h4 span {
+  color: var(--gold-dark);
+}
+
+/* Modal Tabs */
+.auth-modal-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+}
+
+.auth-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 14px 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.auth-tab.active {
+  color: var(--navy);
+}
+
+.auth-tab.active::after {
   content: '';
   position: absolute;
+  bottom: -2px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Modal Body */
+.auth-modal-body {
+  padding: 24px;
+}
+
+.auth-form-group {
+  margin-bottom: 16px;
+}
+
+.auth-form-group label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.auth-form-group label i {
+  margin-right: 4px;
+  color: var(--text-muted);
+}
+
+.auth-form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+.auth-form-group input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.08);
+}
+
+.auth-form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.auth-form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.auth-form-row .auth-form-group {
+  flex: 1;
+}
+
+.auth-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: #dc3545;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.auth-error i {
+  flex-shrink: 0;
+}
+
+.btn-auth-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-auth-submit:hover:not(:disabled) {
+  background: var(--gold);
+  color: var(--navy);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn-auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .venue-detail-page {
+    padding: 24px 16px 100px;
+  }
+
+  .venue-header h1 {
+    font-size: 24px;
+  }
+
+  .booking-section-body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .sticky-reserve-btn {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    justify-content: center;
+    border-radius: var(--radius);
+    padding: 14px 20px;
+  }
+
+  .booking-section-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 16px 20px;
+  }
+
+  .auth-modal-content {
+    max-width: 100%;
+  }
+
+  .auth-form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+
+.sticky-reserve-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  /* Povećano sa 14px 28px */
+  background: linear-gradient(135deg, var(--navy) 0%, #1e4668 100%);
+  color: #fff;
+  border: none;
+  border-radius: 60px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  /* Povećano sa 15px */
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4), 0 2px 8px rgba(30, 58, 95, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.8px;
+  /* Povećano za bolju čitljivost */
+  animation: ctaPulse 2s ease-in-out infinite, ctaGlow 2s ease-in-out infinite;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Jači pulse efekat */
+@keyframes ctaPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(30, 58, 95, 0.6);
+  }
+}
+
+/* Dodatni glow efekat */
+@keyframes ctaGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 8px 30px rgba(30, 58, 95, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 8px 40px rgba(232, 184, 109, 0.5);
+    background: linear-gradient(135deg, var(--navy) 0%, #2c5a8c 100%);
+  }
+}
+
+.sticky-reserve-btn:hover {
+  animation: none;
+  transform: translateY(-5px) scale(1.03);
+  background: linear-gradient(135deg, var(--gold) 0%, #e8b86d 100%);
+  color: var(--navy);
+  box-shadow: 0 15px 40px rgba(232, 184, 109, 0.5);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.sticky-reserve-btn i {
+  font-size: 22px;
+  /* Povećano sa 18px */
+  transition: transform 0.3s ease;
+}
+
+.sticky-reserve-btn:hover i {
+  transform: rotate(8deg) scale(1.1);
+}
+
+.sticky-reserve-price {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  /* Povećano sa 13px */
+  font-weight: 800;
+  transition: all 0.3s ease;
+}
+
+.sticky-reserve-btn:hover .sticky-reserve-price {
+  background: rgba(30, 58, 95, 0.2);
+  color: var(--navy);
+}
+
+/* Dodatni efekat treperenja za privlačenje pažnje */
+@keyframes ctaAttention {
+
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  50% {
+    border-color: rgba(232, 184, 109, 0.8);
+    box-shadow: 0 8px 30px rgba(232, 184, 109, 0.6);
+  }
+}
+
+.sticky-reserve-btn {
+  animation: ctaPulse 2s ease-in-out infinite, ctaGlow 2s ease-in-out infinite, ctaAttention 1.5s ease-in-out infinite;
+}
+
+/* Scroll progress bar */
+.scroll-progress-bar {
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 30% 50%, rgba(232, 184, 109, 0.4) 0%, transparent 70%);
-  pointer-events: none;
-  opacity: 0;
-  animation: pulseGlow 3s ease-in-out infinite;
-  border-radius: inherit;
-  z-index: 1;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--navy));
+  z-index: 1001;
+  transition: width 0.1s ease-out;
 }
-
-@keyframes pulseGlow {
-  0% { opacity: 0; }
-  50% { opacity: 0.6; }
-  100% { opacity: 0; }
-}
-
-/* Da sadržaj bude iznad sjaja */
-.booking-card-header,
-.booking-card-body,
-.booking-card-footer {
-  position: relative;
-  z-index: 2;
-}
-
-/* ============================================
-   BOOKING PANEL HIGHLIGHT — PLUTAJUĆI EFEKAT
-   ============================================ */
-   .booking-card {
-    animation: floatPanel 4s ease-in-out infinite;
-    transform-origin: center;
-    will-change: transform;
-  }
-  
-  @keyframes floatPanel {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-    100% { transform: translateY(0px); }
-  }
-  
-  /* Dodaj suptilnu sjenu koja prati pokret */
-  .booking-card {
-    transition: box-shadow 0.3s ease;
-  }
-  
-  .booking-card:hover {
-    animation-play-state: paused;
-    box-shadow: 0 25px 50px -8px rgba(30, 58, 95, 0.25);
-  }
-
-  

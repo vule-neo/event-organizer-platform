@@ -1,15 +1,8 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "cd backend && npm install",
-    "watch": {
-      "paths": [
-        "backend/**"
-      ]
-    }
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd backend && npm start",
-    "healthcheckPath": "/test-db"
+    "startCommand": "cd backend && npm start"
   }
 }

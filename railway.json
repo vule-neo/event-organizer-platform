@@ -2,18 +2,14 @@
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "cd backend && npm install",
-    "nixpacks": {
-      "plan": {
-        "providers": [
-          "nodejs"
-        ],
-        "setup": {
-          "nodejs": "20"
-        }
-      }
+    "watch": {
+      "paths": [
+        "backend/**"
+      ]
     }
   },
   "deploy": {
-    "startCommand": "cd backend && npm start"
+    "startCommand": "cd backend && npm start",
+    "healthcheckPath": "/test-db"
   }
 }

@@ -18,21 +18,30 @@ export class ReviewModalComponent {
   rating = 5;
   comment = '';
   loading = false;
+  errorMessage = '';  // <-- DODAJ OVO!
 
-  constructor(private reviewService: ReviewService) {}
+  constructor(private reviewService: ReviewService) { }
 
   saveReview() {
     if (!this.booking) return;
 
+    // Validacija
+    if (!this.comment.trim()) {
+      this.errorMessage = 'Molimo vas unesite komentar.';
+      return;
+    }
+
     this.loading = true;
+    this.errorMessage = '';  // Resetuj grešku
+
     const reviewData = {
       booking_id: this.booking.id,
-      venue_id: this.booking.venue_id, // <--- PROVERI DA LI JE OVO DEFINISANO
+      venue_id: this.booking.venue_id,
       rating: this.rating,
       comment: this.comment
     };
 
-    console.log('Šaljem review:', reviewData); // DODAJ OVO DA VIDIŠ ŠTA IDE NA BACKEND
+    console.log('Šaljem review:', reviewData);
 
     this.reviewService.submitReview(reviewData).subscribe({
       next: () => {
@@ -40,7 +49,8 @@ export class ReviewModalComponent {
         this.done.emit();
       },
       error: (err) => {
-        console.error(err);
+        console.error('Greška pri slanju recenzije:', err);
+        this.errorMessage = err.error?.message || 'Došlo je do greške. Pokušajte ponovo.';
         this.loading = false;
       }
     });
@@ -48,5 +58,9 @@ export class ReviewModalComponent {
 
   setRating(stars: number) {
     this.rating = stars;
+    // Resetuj errorMessage kada korisnik menja ocenu
+    if (this.errorMessage) {
+      this.errorMessage = '';
+    }
   }
 }

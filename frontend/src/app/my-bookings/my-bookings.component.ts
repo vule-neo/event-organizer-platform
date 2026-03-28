@@ -14,13 +14,20 @@ import { RouterLink } from '@angular/router';
 export class MyBookingsComponent implements OnInit {
   bookings: any[] = [];
   loading = true;
+  selectedBooking: any | null = null;
 
-  constructor(private bookingService: BookingService) {}
+  constructor(private bookingService: BookingService) { }
 
   ngOnInit(): void {
+    this.loadBookings();
+  }
+
+  loadBookings() {
+    this.loading = true;
     this.bookingService.getMyBookings().subscribe({
       next: (data) => {
-        this.bookings = data;
+        // NE SORTIRAJ OVDE! Backend već vraća ispravan redosled
+        this.bookings = data; // Samo dodeli podatke
         this.loading = false;
       },
       error: (err) => {
@@ -30,13 +37,26 @@ export class MyBookingsComponent implements OnInit {
     });
   }
 
-  getStatusClass(status: string) {
-    switch (status) {
-      case 'confirmed': return 'badge bg-success';
-      case 'cancelled_by_client': return 'badge bg-danger';
-      case 'completed': return 'badge bg-primary';
-      default: return 'badge bg-secondary';
-    }
+  getStatusClass(status: string): string {
+    const map: Record<string, string> = {
+      'confirmed': 'status-confirmed',
+      'completed': 'status-completed',
+      'cancelled_by_client': 'status-cancelled',
+      'cancelled_late': 'status-cancelled-late',
+      'cancelled_by_owner': 'status-cancelled'
+    };
+    return map[status] || 'status-default';
+  }
+
+  getStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      'confirmed': 'Potvrđeno',
+      'completed': 'Završeno',
+      'cancelled_by_client': 'Otkazano',
+      'cancelled_late': 'Kasno otkazano',
+      'cancelled_by_owner': 'Otkazao vlasnik'
+    };
+    return map[status] || status;
   }
 
   cancelReservation(id: string) {
@@ -44,8 +64,7 @@ export class MyBookingsComponent implements OnInit {
       this.bookingService.cancelBooking(id).subscribe({
         next: (res: any) => {
           alert(res.message);
-          // Osveži listu nakon otkazivanja
-          this.ngOnInit(); 
+          this.loadBookings(); // Osveži listu nakon otkazivanja
         },
         error: (err) => {
           alert(err.error.message || 'Greška pri otkazivanju');
@@ -61,28 +80,13 @@ export class MyBookingsComponent implements OnInit {
     return diffInHours > 24;
   }
 
-    // U my-bookings.component.ts
-  selectedBooking: any | null = null;
-
   openReviewModal(booking: any) {
     this.selectedBooking = booking;
   }
 
   handleReviewDone() {
     this.selectedBooking = null;
-    // Ovde pozovi servis da ponovo učitaš listu (refresh) 
-    // kako bi status bookinga osvežio ili sklonio dugme za ocenu
+    // OSNOVNO: osveži listu rezervacija
+    this.loadBookings();
   }
-
-  getStatusLabel(status: string): string {
-    const map: any = {
-      'confirmed': 'Potvrđeno',
-      'completed': 'Završeno',
-      'cancelled_by_client': 'Otkazano',
-      'cancelled_late': 'Kasno otkazano',
-      'cancelled_by_owner': 'Otkazao vlasnik'
-    };
-    return map[status] || status;
-  }
-
 }

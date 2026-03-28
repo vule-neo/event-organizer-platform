@@ -3,11 +3,11 @@ const mailer = require('../config/mailer');
 
 // Helper za formatiranje datuma
 const formatDateTime = (dt) => {
-  const d = new Date(dt);
-  return d.toLocaleString('sr-RS', { 
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
+    const d = new Date(dt);
+    return d.toLocaleString('sr-RS', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
 };
 
 exports.getOccupiedSlots = async (venueId, dateOrMonth) => {
@@ -127,7 +127,17 @@ exports.getUserBookings = async (clientId) => {
          FROM bookings b
          JOIN venues v ON b.venue_id = v.id
          WHERE b.client_id = $1
-         ORDER BY b.start_time DESC`,
+         ORDER BY 
+            CASE 
+                -- Prvo buduće rezervacije (confirmed) po najbližem terminu
+                WHEN b.status = 'confirmed' AND b.start_time > NOW() THEN 1
+                -- Zatim prošle rezervacije (completed) po najnovijoj
+                WHEN b.status = 'completed' THEN 2
+                -- Na kraju otkazane
+                ELSE 3
+            END,
+            -- Unutar iste grupe, sortiraj po start_time (najbliži prvo za buduće, najnoviji za prošle)
+            b.start_time ASC`,
         [clientId]
     );
     return result.rows;
@@ -365,11 +375,11 @@ exports.createRecurring = async ({ venue_id, client_id, start_time, end_time, pr
         if (info.rows.length > 0) {
             const { client_email, first_name, venue_name, city, street, owner_email, owner_name } = info.rows[0];
 
-            const terminList = created.map(b => 
+            const terminList = created.map(b =>
                 `<li>${formatDateTime(b.start_time)} — ${formatDateTime(b.end_time)}</li>`
             ).join('');
 
-            const failedList = failed.length > 0 
+            const failedList = failed.length > 0
                 ? `<p style="color:#dc3545;">⚠️ Sljedeći termini nisu mogli biti rezervisani (već zauzeti): <strong>${failed.join(', ')}</strong></p>`
                 : '';
 

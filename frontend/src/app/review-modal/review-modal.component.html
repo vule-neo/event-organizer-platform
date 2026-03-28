@@ -1,44 +1,69 @@
-<div class="review-modal-overlay">
-  <div class="card border-0 shadow-lg review-card rounded-4 overflow-hidden">
-    <div class="card-header bg-warning border-0 p-3 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold text-dark">Oceni: {{ booking?.venue_name }}</h5>
-      <button type="button" class="btn-close" (click)="close.emit()"></button>
+<div class="review-modal-overlay" (click)="close.emit()">
+  <div class="review-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="review-modal-header">
+      <button class="close-modal" (click)="close.emit()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <div class="modal-icon">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <h3>Ocenite teren</h3>
+      <p>Vaše iskustvo je važno za <span class="venue-highlight">{{ booking?.venue_name }}</span></p>
     </div>
 
-    <div class="card-body p-4">
-      <p class="text-muted small text-center mb-4">
-        Vaša recenzija pomaže drugima da odaberu najbolji teren.
-      </p>
+    <!-- Body -->
+    <div class="review-modal-body">
 
-      <div class="text-center mb-4">
-        <div class="stars-container h2">
-          <span *ngFor="let s of [1,2,3,4,5]" 
-                (click)="setRating(s)" 
-                [class.active]="s <= rating"
-                class="star">
-            ★
-          </span>
+      <!-- Rating section -->
+      <div class="rating-section">
+        <span class="rating-label">Tvoja ocena</span>
+        <div class="star-rating">
+          <button *ngFor="let star of [1,2,3,4,5]" class="star-btn" [class.lit]="star <= rating"
+            (click)="setRating(star)">
+            <i class="bi bi-star-fill"></i>
+          </button>
         </div>
-        <span class="badge bg-light text-dark border mt-2">Ocena: {{ rating }}/5</span>
+        <div class="rating-feedback">
+          <span *ngIf="rating === 1" class="feedback-text"> Loše iskustvo</span>
+          <span *ngIf="rating === 2" class="feedback-text"> Ispod proseka</span>
+          <span *ngIf="rating === 3" class="feedback-text"> Zadovoljavajuće</span>
+          <span *ngIf="rating === 4" class="feedback-text"> Vrlo dobro</span>
+          <span *ngIf="rating === 5" class="feedback-text"> Odlično! Preporučujem</span>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label fw-bold small">VAŠ KOMENTAR</label>
-        <textarea [(ngModel)]="comment" 
-                  class="form-control rounded-3" 
-                  rows="3" 
-                  placeholder="Kakvi su utisci o terenu i osoblju?">
-        </textarea>
+      <!-- Comment section -->
+      <div class="review-section">
+        <label class="review-label">
+          <i class="bi bi-chat-text-fill"></i> Tvoj komentar
+        </label>
+        <textarea [(ngModel)]="comment" class="review-textarea" rows="4"
+          placeholder="Napiši svoje iskustvo... Kako je bilo? Šta ti se dopalo? Šta bi moglo bolje?"></textarea>
+        <div class="char-counter" *ngIf="comment?.length">
+          {{ comment.length }} / 500 karaktera
+        </div>
       </div>
 
-      <div class="d-grid gap-2 mt-4">
-        <button (click)="saveReview()" 
-                [disabled]="loading" 
-                class="btn btn-warning btn-lg fw-bold rounded-pill shadow-sm">
-          {{ loading ? 'Slanje...' : 'Objavi Recenziju' }}
-        </button>
-        <button (click)="close.emit()" class="btn btn-link text-muted btn-sm">Odustani</button>
+      <!-- Error message -->
+      <div class="review-error" *ngIf="errorMessage">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ errorMessage }}</span>
       </div>
+
     </div>
+
+    <!-- Footer -->
+    <div class="review-modal-footer">
+      <button class="btn-review-cancel" (click)="close.emit()">
+        <i class="bi bi-x-lg"></i> Odustani
+      </button>
+      <button class="btn-review-submit" [disabled]="loading" (click)="saveReview()">
+        <span *ngIf="!loading"><i class="bi bi-check-lg"></i> Objavi recenziju</span>
+        <span *ngIf="loading"><i class="bi bi-arrow-repeat spin-icon"></i> Slanje...</span>
+      </button>
+    </div>
+
   </div>
 </div>

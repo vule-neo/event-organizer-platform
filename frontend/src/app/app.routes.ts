@@ -19,6 +19,8 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { FaqComponent } from './faq/faq.component';
 import { HelpmeComponent } from './helpme/helpme.component';
 import { ContactComponent } from './contact/contact.component';
+import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
+import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/explore', pathMatch: 'full' },
@@ -28,6 +30,10 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'explore', component: VenueListComponent },
   { path: 'venues/details/:id', component: VenueDetailComponent },
+
+  // Legal pages
+  { path: 'privacy-policy', component: PrivacyPolicyComponent },
+  { path: 'terms-of-use', component: TermsOfUseComponent },
 
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'my-bookings', component: MyBookingsComponent, canActivate: [authGuard] },
@@ -49,7 +55,7 @@ export const routes: Routes = [
       { path: 'venues', component: AdminVenuesComponent }
     ]
   },
-  { path: 'faq',     component: FaqComponent     },
-  { path: 'help',    component: HelpmeComponent    },
+  { path: 'faq', component: FaqComponent },
+  { path: 'help', component: HelpmeComponent },
   { path: 'contact', component: ContactComponent },
 ];

@@ -65,7 +65,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, password } = req.body;
     await authService.resetPassword(token, password);
-    res.json({ message: 'Lozinka uspješno promijenjena.' });
+    res.json({ message: 'Lozinka uspešno promenjena.' });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

@@ -24,7 +24,7 @@
             <th>Sport</th>
             <th>Vlasnik</th>
             <th>Lokacija</th>
-            <th>Cijena</th>
+            <th>Cena</th>
             <th>Status</th>
             <th class="text-center">Akcije</th>
           </tr>
@@ -33,7 +33,7 @@
           <tr *ngFor="let v of venues" [class.row-inactive]="!v.is_active">
             <td>
               <div class="venue-thumb-cell">
-                <img [src]="v.main_image ? 'http://localhost:5000' + v.main_image : 'assets/no-image.png'"
+                <img [src]="v.main_image ? apiBase + v.main_image : 'assets/no-image.png'"
                      class="venue-thumb-img" />
                 <span class="td-bold">{{ v.name }}</span>
               </div>

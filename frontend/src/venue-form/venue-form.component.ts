@@ -5,6 +5,7 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { VenueService } from '../app/services/venue.service';
 import { WorkingHoursComponent } from '../app/working-hours/working-hours.component';
 import { AddressPickerComponent, AddressResult } from '../app/address-picker/address-picker.component';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-venue-form',
@@ -19,6 +20,7 @@ export class VenueFormComponent implements OnInit {
   venueForm!: FormGroup;
   message = '';
   step: number = 1;
+  apiBase = environment.apiBase;
 
   venueId: string | null = null;
   isEditMode: boolean = false;
@@ -173,15 +175,31 @@ export class VenueFormComponent implements OnInit {
   }
 
   private handleFiles(files: FileList) {
+    const totalAllowed = 5;
+    const currentTotal = this.existingImages.length + this.selectedFiles.length;
+    let availableSlots = totalAllowed - currentTotal;
+
+    if (availableSlots <= 0) {
+      this.message = 'Maksimalan broj slika je 5.';
+      return;
+    }
+
     Array.from(files).forEach(file => {
+      if (availableSlots <= 0) return;
+
       // Validate that it's an image
       if (file.type.match(/image\/*/)) {
         this.selectedFiles.push(file);
         const reader = new FileReader();
         reader.onload = (e: any) => this.previewUrls.push(e.target.result);
         reader.readAsDataURL(file);
+        availableSlots--;
       }
     });
+
+    if (Array.from(files).length > availableSlots && availableSlots === 0) {
+       this.message = 'Neke slike nisu dodate jer je dostignut limit od 5 slika.';
+    }
   }
 
   removeImage(index: number) {
@@ -219,7 +237,7 @@ export class VenueFormComponent implements OnInit {
       }
     });
 
-    // Ako je edit mode i lat/lng nisu promijenjeni (null u formi),
+    // Ako je edit mode i lat/lng nisu promenjeni (null u formi),
     // ne šalji ih — backend će zadržati stare vrijednosti
     // ALI moramo osigurati da UPDATE ne pokuša SET lat=undefined
     formData.append('working_hours', JSON.stringify(this.savedWorkingHours));

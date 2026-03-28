@@ -15,7 +15,7 @@
         </div>
         <div class="vf-step-info">
           <span class="vf-step-title">Osnovni podaci</span>
-          <span class="vf-step-desc">Naziv, sport, lokacija, cijena</span>
+          <span class="vf-step-desc">Naziv, sport, lokacija, cena</span>
         </div>
       </div>
 
@@ -27,7 +27,7 @@
           <span *ngIf="step <= 2">2</span>
         </div>
         <div class="vf-step-info">
-          <span class="vf-step-title">Radno vrijeme</span>
+          <span class="vf-step-title">Radno vreme</span>
           <span class="vf-step-desc">Dani i sati rada</span>
         </div>
       </div>
@@ -117,7 +117,7 @@
 
           <div class="vf-row">
             <div class="vf-field">
-              <label>Cijena po terminu (RSD) <span class="req">*</span></label>
+              <label>Cena po terminu (RSD) <span class="req">*</span></label>
               <div class="input-wrap">
                 <i class="bi bi-cash input-icon"></i>
                 <input type="number" formControlName="price_per_slot" placeholder="npr. 1500"
@@ -149,7 +149,7 @@
         <div class="vf-actions">
           <div></div>
           <button type="button" class="vf-btn-next" (click)="nextStep()">
-            Dalje: Radno vrijeme <i class="bi bi-arrow-right"></i>
+            Dalje: Radno vreme <i class="bi bi-arrow-right"></i>
           </button>
         </div>
       </div>
@@ -157,7 +157,7 @@
       <!-- ===== KORAK 2 ===== -->
       <div *ngIf="step === 2" class="vf-step-content">
         <div class="vf-step-header">
-          <h1>Radno vrijeme</h1>
+          <h1>Radno vreme</h1>
           <p>Postavite dane i sate kada je teren dostupan za rezervacije.</p>
         </div>
 
@@ -212,7 +212,7 @@
       <div *ngIf="step === 4" class="vf-step-content">
         <div class="vf-step-header">
           <h1>Slike terena</h1>
-          <p>Dodajte do 20 fotografija. Prva slika biće naslovna.</p>
+          <p>Dodajte do 5 fotografija. Prva slika biće naslovna.</p>
         </div>
 
         <!-- Existing images (edit mode) -->
@@ -220,7 +220,7 @@
           <label class="vf-images-label">Trenutne slike</label>
           <div class="vf-preview-grid">
             <div *ngFor="let img of existingImages; let i = index" class="vf-preview-item">
-              <img [src]="'http://localhost:5000' + img.url" />
+              <img [src]="apiBase + img.image_path" alt="Existing Image" />
               <button type="button" class="vf-remove-btn" (click)="removeExistingImage(img.id, i)">
                 <i class="bi bi-x"></i>
               </button>
@@ -241,7 +241,7 @@
           <div class="vf-upload-inner">
             <div class="vf-upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
             <p class="vf-upload-title">Kliknite ili prevucite slike ovde</p>
-            <p class="vf-upload-hint">JPG, PNG, WEBP — max 20 slika</p>
+            <p class="vf-upload-hint">JPG, PNG, WEBP — max 5 slika</p>
           </div>
         </div>
 

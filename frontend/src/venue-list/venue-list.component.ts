@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, NgZone, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
 import { VenueService } from '../app/services/venue.service';
 import { AuthService } from '../app/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../environments/environment';
 
 declare var google: any;
+const namePattern = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄČĆĘÈÉÊËĖĮÌÍÎÏŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
 
 @Component({
   selector: 'app-venue-list',
@@ -57,12 +59,23 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   String = String;
   private searchTimeout: any;
+  apiBase = environment.apiBase;
+
+  // Inline Auth Modal State
+  showAuthModal = false;
+  authModalTab: 'login' | 'register' = 'login';
+  authData = { firstName: '', lastName: '', email: '', phone: '', password: '' };
+  authLoading = false;
+  authError = '';
+  showPassword = false;
 
   constructor(
     private venueService: VenueService,
     public authService: AuthService,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private meta: Meta,
+    private title: Title
   ) { }
 
   ngOnInit() {
@@ -248,7 +261,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     const rating = venue.avg_rating
       ? `<span class="map-popup-rating"><i class="bi bi-star-fill" style="color:#e8b86d;font-size:11px;"></i> ${Number(venue.avg_rating).toFixed(1)}</span>`
       : `<span class="map-popup-new">Novo</span>`;
-    const imgSrc = venue.main_image ? `http://localhost:5000${venue.main_image}` : 'assets/no-image.jpg';
+    const imgSrc = venue.main_image ? `${this.apiBase}${venue.main_image}` : 'assets/no-image.jpg';
     const content = `
       <div class="map-popup">
         <div class="map-popup-img">
@@ -273,11 +286,21 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.venues = data;
         this.filteredVenues = [...data];
         this.cities = [...new Set(data.map((v: any) => v.city).filter(Boolean))].sort() as string[];
+        this.updateSEOTags();
         this.loading = false;
         if (this.mapReady) this.placeMarkers(this.filteredVenues);
       },
       error: () => { this.errorMessage = 'Neuspešno učitavanje terena.'; this.loading = false; }
     });
+  }
+
+  private updateSEOTags() {
+    this.title.setTitle('Istraži i Rezerviši Sportske Terene | SportskiTermin');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'Pronađi i rezerviši najbolje sportske terene u tvojoj blizini. Fudbal, košarka, tenis i još mnogo toga uz brzu online rezervaciju.'
+    });
+    this.meta.updateTag({ name: 'keywords', content: 'sportski tereni, rezervacija termina, fudbal, košarka, tenis, srbija' });
   }
 
   loadSports() {
@@ -478,10 +501,108 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private stopAutoRotate() {
-    if (this.autoRotateInterval) { clearInterval(this.autoRotateInterval); this.autoRotateInterval = null; }
+    if (this.autoRotateInterval) {
+      clearInterval(this.autoRotateInterval);
+      this.autoRotateInterval = null;
+    }
   }
 
   get noVenueCoords(): boolean {
     return this.filteredVenues.length > 0 && this.filteredVenues.every(v => !v.lat || !v.lng);
+  }
+
+  // ---- CTA ACTIONS ----
+  handlePlayerCTA() {
+    if (this.authService.isLoggedIn()) {
+      this.scrollToSearch();
+    } else {
+      this.openAuthModal('register');
+    }
+  }
+
+  handleOwnerCTA() {
+    if (this.authService.isLoggedIn()) {
+      if (this.authService.hasRole('owner')) {
+        this.router.navigate(['/vlasnik/novi-teren']);
+      }
+    } else {
+      this.openAuthModal('register');
+    }
+  }
+
+  // ---- AUTH MODAL METHODS ----
+  openAuthModal(tab: 'login' | 'register') {
+    this.authModalTab = tab;
+    this.showAuthModal = true;
+    this.authError = '';
+    this.showPassword = false;
+    this.authData = { firstName: '', lastName: '', email: '', phone: '', password: '' };
+  }
+
+  closeAuthModal() {
+    this.showAuthModal = false;
+  }
+
+  submitInlineLogin() {
+    if (!this.authData.email || !this.authData.password) {
+      this.authError = 'Sva polja su obavezna';
+      return;
+    }
+    this.authLoading = true;
+    this.authError = '';
+    this.authService.login(this.authData.email, this.authData.password).subscribe({
+      next: (res) => {
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+        this.authLoading = false;
+        this.closeAuthModal();
+      },
+      error: (err) => {
+        this.authError = err.error?.message || 'Greška pri prijavi';
+        this.authLoading = false;
+      }
+    });
+  }
+
+  submitInlineRegister() {
+    if (!this.authData.firstName || !this.authData.lastName || !this.authData.email || !this.authData.password || !this.authData.phone) {
+      this.authError = 'Sva polja su obavezna';
+      return;
+    }
+    if (!namePattern.test(this.authData.firstName) || !namePattern.test(this.authData.lastName)) {
+      this.authError = 'Ime i prezime ne smeju sadržati brojeve ili simbole';
+      return;
+    }
+    this.authLoading = true;
+    this.authError = '';
+    const payload = {
+      first_name: this.authData.firstName,
+      last_name: this.authData.lastName,
+      email: this.authData.email,
+      password: this.authData.password,
+      phone: this.authData.phone,
+      role: 'customer'
+    };
+    this.authService.register(payload).subscribe({
+      next: () => {
+        this.authService.login(this.authData.email, this.authData.password).subscribe({
+          next: (res) => {
+            localStorage.setItem('token', res.token);
+            localStorage.setItem('user', JSON.stringify(res.user));
+            this.authLoading = false;
+            this.closeAuthModal();
+          },
+          error: () => {
+            this.authLoading = false;
+            this.authModalTab = 'login';
+            this.authError = 'Uspešna registracija! Prijavite se.';
+          }
+        });
+      },
+      error: (err) => {
+        this.authError = err.error?.message || 'Greška pri registraciji';
+        this.authLoading = false;
+      }
+    });
   }
 }

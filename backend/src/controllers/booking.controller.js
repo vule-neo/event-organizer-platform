@@ -105,7 +105,7 @@ exports.createRecurring = async (req, res) => {
         };
         const result = await bookingService.createRecurring(data);
 
-        let message = `Uspješno rezervisano ${result.created} termina.`;
+        let message = `Uspešno rezervisano ${result.created} termina.`;
         if (result.failed.length > 0) {
             message += ` Sljedeći datumi su bili zauzeti: ${result.failed.join(', ')}`;
         }

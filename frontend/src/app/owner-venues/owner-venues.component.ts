@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VenueService } from '../services/venue.service';
 import { Router, RouterModule } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-owner-venues',
@@ -14,6 +15,7 @@ export class OwnerVenuesComponent implements OnInit {
   venues: any[] = [];
   loading: boolean = true;
   errorMessage: string = '';
+  apiBase = environment.apiBase;
 
   constructor(
     private venueService: VenueService,

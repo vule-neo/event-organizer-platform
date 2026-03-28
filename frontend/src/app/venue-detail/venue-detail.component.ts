@@ -2,9 +2,13 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Meta, Title } from '@angular/platform-browser';
 import { VenueService } from '../services/venue.service';
 import { BookingService } from '../services/booking.service';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../environments/environment';
+
+const namePattern = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄČĆĘÈÉÊËĖĮÌÍÎÏŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
 
 @Component({
   selector: 'app-venue-detail',
@@ -18,6 +22,7 @@ export class VenueDetailComponent implements OnInit {
   loading = true;
   errorMessage = '';
   activeImageUrl: string = '';
+  apiBase = environment.apiBase;
 
   showStickyButton: boolean = false;
   private scrollListener: any;
@@ -59,6 +64,7 @@ export class VenueDetailComponent implements OnInit {
   };
   authLoading = false;
   authError = '';
+  showPassword = false;
 
   dayNames = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 
@@ -67,7 +73,9 @@ export class VenueDetailComponent implements OnInit {
     private venueService: VenueService,
     private bookingService: BookingService,
     public authService: AuthService,
-    private router: Router // <-- DODAJ OVO
+    private router: Router,
+    private meta: Meta,
+    private title: Title
   ) { }
 
   ngOnInit(): void {
@@ -121,8 +129,9 @@ export class VenueDetailComponent implements OnInit {
       next: (data) => {
         this.venue = data;
         if (data.images && data.images.length > 0) {
-          this.activeImageUrl = 'http://localhost:5000' + data.images[0].url;
+          this.activeImageUrl = this.apiBase + data.images[0].image_path;
         }
+        this.updateSEOTags();
         this.loadOccupiedSlots();
         this.generateCalendar();
         this.loadReviews();
@@ -131,6 +140,16 @@ export class VenueDetailComponent implements OnInit {
       },
       error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
     });
+  }
+
+  private updateSEOTags() {
+    if (!this.venue) return;
+    const venueTitle = `${this.venue.name} - Rezervacija | SportskiTermin`;
+    const venueDesc = `Rezerviši termin na ${this.venue.name} u gradu ${this.venue.city}. Najbolji sportski tereni na jednom mestu.`;
+    
+    this.title.setTitle(venueTitle);
+    this.meta.updateTag({ name: 'description', content: venueDesc });
+    this.meta.updateTag({ name: 'keywords', content: `sport, teren, rezervacija, ${this.venue.name}, ${this.venue.city}, ${this.venue.sport_id}` });
   }
 
   loadReviews() {
@@ -178,7 +197,7 @@ export class VenueDetailComponent implements OnInit {
     });
   }
 
-  setActiveImage(url: string) { this.activeImageUrl = 'http://localhost:5000' + url; }
+  setActiveImage(url: string) { this.activeImageUrl = this.apiBase + url; }
 
   // --- CALENDAR ---
   generateCalendar() {
@@ -265,7 +284,7 @@ export class VenueDetailComponent implements OnInit {
     const isOvernight = closeMins <= openMins;
     if (isOvernight) closeMins += 24 * 60;
 
-    // Ako je odabrani datum danas, računaj trenutno vrijeme u Beogradu
+    // Ako je odabrani datum danas, računaj trenutno vreme u Beogradu
     const isToday = this.selectedDate === this.today;
     let nowMins = 0;
     if (isToday) {
@@ -510,7 +529,7 @@ export class VenueDetailComponent implements OnInit {
         this.recurringLoading = false;
         this.loadOccupiedSlots();
 
-        // Ako ima uspješnih rezervacija, pitaj korisnika da li želi da vidi prvu
+        // Ako ima uspešnih rezervacija, pitaj korisnika da li želi da vidi prvu
         if (res.created > 0 && res.bookingIds && res.bookingIds.length > 0) {
           if (confirm(`Rezervisano ${res.created} termina. Želite li da vidite detalje prve rezervacije?`)) {
             this.router.navigate(['/bookings', res.bookingIds[0]]);
@@ -612,6 +631,7 @@ export class VenueDetailComponent implements OnInit {
     this.authModalTab = tab;
     this.showAuthModal = true;
     this.authError = '';
+    this.showPassword = false;
     this.authData = { firstName: '', lastName: '', email: '', phone: '', password: '' };
   }
 
@@ -642,6 +662,9 @@ export class VenueDetailComponent implements OnInit {
     if (!this.authData.firstName || !this.authData.lastName || !this.authData.email || !this.authData.password || !this.authData.phone) {
       this.authError = 'Sva polja su obavezna'; return;
     }
+    if (!namePattern.test(this.authData.firstName) || !namePattern.test(this.authData.lastName)) {
+      this.authError = 'Ime i prezime ne smeju sadržati brojeve ili simbole'; return;
+    }
     this.authLoading = true; this.authError = '';
     const payload = {
       first_name: this.authData.firstName,
@@ -663,7 +686,7 @@ export class VenueDetailComponent implements OnInit {
           error: () => {
             this.authLoading = false;
             this.authModalTab = 'login';
-            this.authError = 'Uspješna registracija! Prijavite se.';
+            this.authError = 'Uspešna registracija! Prijavite se.';
           }
         });
       },

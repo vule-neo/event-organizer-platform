@@ -58,7 +58,7 @@ const sendReminders = async () => {
                             <p style="margin:4px 0;"><strong>📍 Lokacija:</strong> ${booking.street}, ${booking.city}</p>
                             <p style="margin:4px 0;"><strong>🕐 Početak:</strong> ${formatDateTime(booking.start_time)}</p>
                             <p style="margin:4px 0;"><strong>🕐 Kraj:</strong> ${formatDateTime(booking.end_time)}</p>
-                            <p style="margin:4px 0;"><strong>💰 Cijena:</strong> ${booking.price_paid} RSD</p>
+                            <p style="margin:4px 0;"><strong>💰 Cena:</strong> ${booking.price_paid} RSD</p>
                         </div>
                         <p style="color:#dc3545; font-size:13px;">⚠️ Otkazivanje je moguće najkasnije 24h prije termina.</p>
                     </div>

@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
-
-router.post('/register', authController.register);
-router.post('/login', authController.login);
-
+const { registerValidation, loginValidation, updateProfileValidation } = require('../middleware/validation.middleware');
 const authMiddleware = require('../middleware/auth.middleware');
 
+router.post('/register', registerValidation, authController.register);
+router.post('/login', loginValidation, authController.login);
+
 // ... tvoje postojeće rute za login i register ...
-router.put('/profile-update', authMiddleware, authController.updateProfile);
+router.put('/profile-update', authMiddleware, updateProfileValidation, authController.updateProfile);
 
 
 router.get('/profile', authMiddleware, authController.getProfile);

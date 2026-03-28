@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 
+const namePattern = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄČĆĘÈÉÊËĖĮÌÍÎÏŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -18,8 +20,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.profileForm = this.fb.group({
-      first_name: ['', Validators.required],
-      last_name: ['', Validators.required],
+      first_name: ['', [Validators.required, Validators.pattern(namePattern)]],
+      last_name: ['', [Validators.required, Validators.pattern(namePattern)]],
       phone: ['', [Validators.required, Validators.pattern('^[0-9+ ]*$')]],
       email: [{ value: '', disabled: true }]
     });

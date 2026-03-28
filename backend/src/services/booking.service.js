@@ -79,13 +79,13 @@ exports.createBooking = async ({ venue_id, client_id, start_time, end_time, pric
                 <div style="font-family:Arial,sans-serif; max-width:500px; margin:auto; padding:32px; border:1px solid #e0e0e0; border-radius:12px;">
                     <h2 style="color:#198754;">Rezervacija potvrđena!</h2>
                     <p>Zdravo <strong>${first_name}</strong>,</p>
-                    <p>Vaša rezervacija je uspješno kreirana.</p>
+                    <p>Vaša rezervacija je uspešno kreirana.</p>
                     <div style="background:#f8f9fa; border-radius:8px; padding:16px; margin:16px 0;">
                         <p style="margin:4px 0;"><strong>🏟️ Teren:</strong> ${venue_name}</p>
                         <p style="margin:4px 0;"><strong>📍 Lokacija:</strong> ${street}, ${city}</p>
                         <p style="margin:4px 0;"><strong>🕐 Početak:</strong> ${formatDateTime(start_time)}</p>
                         <p style="margin:4px 0;"><strong>🕐 Kraj:</strong> ${formatDateTime(end_time)}</p>
-                        <p style="margin:4px 0;"><strong>💰 Cijena:</strong> ${price_paid} RSD</p>
+                        <p style="margin:4px 0;"><strong>💰 Cena:</strong> ${price_paid} RSD</p>
                     </div>
                     <p style="color:#666; font-size:13px;">Otkazivanje je moguće najkasnije 24h prije termina.</p>
                 </div>
@@ -187,7 +187,7 @@ exports.cancelBooking = async (bookingId, clientId) => {
             <div style="font-family:Arial,sans-serif; max-width:500px; margin:auto; padding:32px; border:1px solid #e0e0e0; border-radius:12px;">
                 <h2 style="color:#dc3545;">Rezervacija otkazana</h2>
                 <p>Zdravo <strong>${first_name}</strong>,</p>
-                <p>Vaša rezervacija je uspješno otkazana.</p>
+                <p>Vaša rezervacija je uspešno otkazana.</p>
                 <div style="background:#f8f9fa; border-radius:8px; padding:16px; margin:16px 0;">
                     <p style="margin:4px 0;"><strong>🏟️ Teren:</strong> ${venue_name}</p>
                     <p style="margin:4px 0;"><strong>📍 Lokacija:</strong> ${street}, ${city}</p>
@@ -391,10 +391,10 @@ exports.createRecurring = async ({ venue_id, client_id, start_time, end_time, pr
                     <div style="font-family:Arial,sans-serif; max-width:500px; margin:auto; padding:32px; border:1px solid #e0e0e0; border-radius:12px;">
                         <h2 style="color:#198754;">Rezervacije potvrđene!</h2>
                         <p>Zdravo <strong>${first_name}</strong>,</p>
-                        <p>Uspješno ste rezervisali <strong>${created.length}</strong> termina na terenu <strong>${venue_name}</strong>.</p>
+                        <p>Uspešno ste rezervisali <strong>${created.length}</strong> termina na terenu <strong>${venue_name}</strong>.</p>
                         <div style="background:#f8f9fa; border-radius:8px; padding:16px; margin:16px 0;">
                             <p style="margin:4px 0;"><strong>📍 Lokacija:</strong> ${street}, ${city}</p>
-                            <p style="margin:4px 0;"><strong>💰 Cijena po terminu:</strong> ${price_paid} RSD</p>
+                            <p style="margin:4px 0;"><strong>💰 Cena po terminu:</strong> ${price_paid} RSD</p>
                             <p style="margin:8px 0 4px;"><strong>📅 Rezervisani termini:</strong></p>
                             <ul style="margin:0; padding-left:20px;">${terminList}</ul>
                         </div>

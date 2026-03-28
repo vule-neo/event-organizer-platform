@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BookingService } from '../services/booking.service';
 import { ReviewModalComponent } from '../review-modal/review-modal.component';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-my-bookings',
@@ -15,6 +16,7 @@ export class MyBookingsComponent implements OnInit {
   bookings: any[] = [];
   loading = true;
   selectedBooking: any | null = null;
+  apiBase = environment.apiBase;
 
   constructor(private bookingService: BookingService) { }
 

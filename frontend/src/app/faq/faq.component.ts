@@ -27,7 +27,7 @@ export class FaqComponent {
       {
         id: 'r2',
         q: 'Mogu li rezervisati više termina odjednom?',
-        a: 'Trenutno je moguće rezervisati jedan termin po transakciji. Za ponavljajuće termine (npr. svake sedmice), kontaktiraj vlasnika terena direktno — većina vlasnika nudi dogovor za stalne korisnike.'
+        a: 'Trenutno je moguće rezervisati jedan termin po transakciji. Za ponavljajuće termine (npr. svake nedelje), kontaktiraj vlasnika terena direktno — većina vlasnika nudi dogovor za stalne korisnike.'
       },
       {
         id: 'r3',
@@ -113,7 +113,7 @@ export class FaqComponent {
       {
         id: 'n4',
         q: 'Mogu li obrisati nalog?',
-        a: 'Da. Zahtev za brisanje naloga pošalji na info&#64;sportskitermin.rs. Nalog sa svim podacima biće obrisan u roku od 7 radnih dana.'
+        a: 'Da. Zahtev za brisanje naloga pošalji na vasiljevicvujadin1&#64;gmail.com. Nalog sa svim podacima biće obrisan u roku od 7 radnih dana.'
       }
     ],
     ocenjivanje: [
@@ -125,7 +125,7 @@ export class FaqComponent {
       {
         id: 'oc2',
         q: 'Mogu li promeniti ili obrisati svoju recenziju?',
-        a: 'Trenutno nije moguće menjati objavljenu recenziju. Ako smatraš da je recenzija pogrešna, kontaktiraj nas na info&#64;sportskitermin.rs.'
+        a: 'Trenutno nije moguće menjati objavljenu recenziju. Ako smatraš da je recenzija pogrešna, kontaktiraj nas na vasiljevicvujadin1&#64;gmail.com.'
       },
       {
         id: 'oc3',

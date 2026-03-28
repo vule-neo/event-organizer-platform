@@ -4,6 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 
+const namePattern = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄČĆĘÈÉÊËĖĮÌÍÎÏŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
+
 @Component({
   selector: 'app-user-register',
   standalone: true,
@@ -24,8 +26,8 @@ export class UserRegisterComponent {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
-      first_name: ['', Validators.required],
-      last_name:  ['', Validators.required],
+      first_name: ['', [Validators.required, Validators.pattern(namePattern)]],
+      last_name:  ['', [Validators.required, Validators.pattern(namePattern)]],
       email:      ['', [Validators.required, Validators.email]],
       phone:      ['', [Validators.pattern('^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$'), Validators.minLength(9), Validators.maxLength(15)]],
       password:   ['', [Validators.required, Validators.minLength(6)]],
@@ -44,7 +46,7 @@ export class UserRegisterComponent {
     this.authService.register(this.registerForm.value).subscribe({
       next: (res: any) => {
         this.isError = false;
-        this.message = 'Nalog uspješno kreiran! Preusmjeravamo vas...';
+        this.message = 'Nalog uspešno kreiran! Preusmeravamo vas...';
         this.loading = false;
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));

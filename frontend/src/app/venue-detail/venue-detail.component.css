@@ -1543,6 +1543,31 @@
   color: var(--text-muted);
 }
 
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+.auth-input-toggle:hover {
+  color: var(--navy);
+}
+
 .auth-form-row {
   display: flex;
   gap: 12px;

@@ -1,14 +1,27 @@
 const express = require('express');
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const path = require('path');
 const pool = require('./config/db');
 const cronService = require('./services/cron.service'); // Tvoj cron posao
 
 const app = express();
 
-// Middleware
+// Security Middleware
+app.use(helmet());
+
+// Rate Limiting (Prevent brute force / DDOS)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after 15 minutes"
+});
+app.use("/api/", limiter);
+
+// CORS configuration
 app.use(cors({
-  origin: "http://localhost:4200",
+  origin: process.env.FRONTEND_URL || "http://localhost:4200",
   credentials: true
 }));
 app.use(express.json());

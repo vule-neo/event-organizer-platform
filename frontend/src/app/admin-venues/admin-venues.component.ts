@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../services/admin.service';
 import { RouterModule } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-admin-venues',
@@ -12,8 +13,9 @@ import { RouterModule } from '@angular/router';
 export class AdminVenuesComponent implements OnInit {
   venues: any[] = [];
   loading = true;
+  apiBase = environment.apiBase;
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService) { }
 
   ngOnInit() {
     this.adminService.getAllVenues().subscribe({

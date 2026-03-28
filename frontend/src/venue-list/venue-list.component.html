@@ -7,17 +7,17 @@
     <div class="hero-content" data-aos="fade-up">
       <div class="hero-badge">
         <i class="bi bi-trophy-fill"></i>
-        <span>Broj 1 platforma za rezervacije</span>
+        <span>Broj 1 platforma za rezervacije u Srbiji</span>
       </div>
 
       <h1 class="hero-title">
         Rezerviši teren<br>
-        <span class="hero-title-accent">za minut.</span>
+        <span class="hero-title-accent">u tri klika.</span>
       </h1>
 
       <p class="hero-subtitle">
-        Pronađi i rezerviši najbolje sportske terene u tvom gradu.
-        Brzo, jednostavno i pouzdano.
+        Zakaži termin online za manje od 30 sekundi.<br>
+        Bez zivkanja. Bez cimanja.
       </p>
 
       <!-- Search Bar -->
@@ -178,8 +178,8 @@
           <span class="avail-pulse"></span>
           Slobodno danas
         </div>
-        <h2>Rezerviši <span class="text-navy">odmah</span></h2>
-        <p>Tereni sa slobodnim terminima danas — klikni i rezerviši za par minuta.</p>
+        <h2>Uhvati slobodan termin danas</h2>
+        <p>Klikni, rezerviši i igraj — bez čekanja.</p>
       </div>
       <div class="avail-controls">
         <button class="avail-arrow" (click)="carouselScroll('left')" aria-label="Prethodni">
@@ -208,8 +208,8 @@
         (mousemove)="onCarouselDragMove($event)" (mouseup)="onCarouselMouseUp()" (mouseleave)="onCarouselMouseLeave()">
         <div class="avail-card" *ngFor="let venue of availableToday">
           <div class="avail-card-img" (click)="navigateToVenue(venue.id)">
-            <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'"
-              [alt]="venue.name" draggable="false" />
+            <img [src]="venue.main_image ? apiBase + venue.main_image : 'assets/no-image.jpg'" [alt]="venue.name"
+              draggable="false" />
             <div class="avail-card-overlay"></div>
             <span class="avail-sport-badge">{{ getSportName(venue.sport_id) }}</span>
             <span class="avail-slots-badge">
@@ -275,7 +275,7 @@
           <span class="step-number">01</span>
           <div class="step-icon"><i class="bi bi-search"></i></div>
           <h3>Pronađi teren</h3>
-          <p>Pretraži terene po lokaciji, sportu i dostupnosti. Uporedi cene i recenzije.</p>
+          <p>Izaberi grad, sport i odmah vidi slobodne termine.</p>
         </div>
         <div class="step-connector" data-aos="fade-up" data-aos-delay="100">
           <div class="connector-line"></div>
@@ -284,8 +284,8 @@
         <div class="step-card" data-aos="fade-up" data-aos-delay="150">
           <span class="step-number">02</span>
           <div class="step-icon"><i class="bi bi-calendar3"></i></div>
-          <h3>Registruj se i izaberi termin</h3>
-          <p>Kreiraj nalog kao igrac. Odaberi datum i vreme koje ti odgovara. Vidi dostupnost u realnom vremenu.</p>
+          <h3>Izaberi termin</h3>
+          <p>Odaberi datum i vreme koje ti odgovara — sve u realnom vremenu.</p>
         </div>
         <div class="step-connector" data-aos="fade-up" data-aos-delay="200">
           <div class="connector-line"></div>
@@ -294,8 +294,8 @@
         <div class="step-card" data-aos="fade-up" data-aos-delay="250">
           <span class="step-number">03</span>
           <div class="step-icon"><i class="bi bi-check-circle"></i></div>
-          <h3>Potvrdi rezervaciju</h3>
-          <p>Rezerviši u 3 klika i dobij potvrdu odmah na email ili telefon.</p>
+          <h3>Rezerviši</h3>
+          <p>Potvrdi u par klikova i spreman si za igru.</p>
         </div>
       </div>
 
@@ -304,8 +304,8 @@
         <div class="step-card" data-aos="fade-up" data-aos-delay="0">
           <span class="step-number">01</span>
           <div class="step-icon"><i class="bi bi-building"></i></div>
-          <h3>Registruj se</h3>
-          <p>Kreiraj profil kao vlasnik terena i ostavi osnovne podatke za brz početak.</p>
+          <h3>Kreiraj nalog</h3>
+          <p>Registruj se kao vlasnik i postavi teren za par minuta.</p>
         </div>
         <div class="step-connector" data-aos="fade-up" data-aos-delay="100">
           <div class="connector-line"></div>
@@ -314,8 +314,8 @@
         <div class="step-card" data-aos="fade-up" data-aos-delay="150">
           <span class="step-number">02</span>
           <div class="step-icon"><i class="bi bi-plus-square"></i></div>
-          <h3>Dodaj objekte i cene</h3>
-          <p>Jednostavno unesi radno vreme, slike i formiraj cenovnik onako kako tebi odgovara.</p>
+          <h3>Dodaj teren i cene</h3>
+          <p>Postavi termine, cene i dostupnost — potpuno pod tvojom kontrolom.</p>
         </div>
         <div class="step-connector" data-aos="fade-up" data-aos-delay="200">
           <div class="connector-line"></div>
@@ -325,12 +325,132 @@
           <span class="step-number">03</span>
           <div class="step-icon"><i class="bi bi-cash-coin"></i></div>
           <h3>Prati sve rezervacije</h3>
-          <p>Prati rezervacije i svu statistiku u realnom vremenu i podigni poslovanje na viši nivo.</p>
+          <p>Upravljaj svim rezervacijama na jednom mestu i povećaj popunjenost.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ===== HIW CTA SECTION (UX HACK) ===== -->
+<section class="hiw-cta-section">
+  <div class="section-container">
+    <div class="hiw-cta-grid">
+      <div class="hiw-cta-card player-cta" data-aos="fade-right">
+        <div class="hiw-cta-icon">
+          <i class="bi bi-search"></i>
+        </div>
+        <h3>Želite da igrate?</h3>
+        <p>Pronađite savršen teren u vašoj blizini i rezervišite u par klikova.</p>
+        <button class="btn-hiw-cta" (click)="handlePlayerCTA()">
+          Pronađi teren <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="hiw-cta-card owner-cta" 
+           [class.disabled]="authService.isLoggedIn() && !authService.hasRole('owner')" 
+           data-aos="fade-left">
+        <div class="hiw-cta-icon">
+          <i class="bi bi-plus-circle"></i>
+        </div>
+        <h3>Imate svoj teren?</h3>
+        <p>Postanite deo naše platforme i povećajte broj rezervacija.</p>
+        <button class="btn-hiw-cta btn-gold" 
+                [disabled]="authService.isLoggedIn() && !authService.hasRole('owner')" 
+                (click)="handleOwnerCTA()">
+          Dodaj svoj teren <i class="bi bi-plus"></i>
+        </button>
+        <span class="disabled-hint" *ngIf="authService.isLoggedIn() && !authService.hasRole('owner')">
+          <i class="bi bi-info-circle"></i> Dostupno samo za vlasnike
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INLINE AUTH MODAL (Identical to VenueDetail) -->
+<div class="auth-modal-overlay" *ngIf="showAuthModal" (click)="closeAuthModal()">
+  <div class="auth-modal-content" (click)="$event.stopPropagation()">
+    <button class="btn-close-modal" (click)="closeAuthModal()"><i class="bi bi-x-lg"></i></button>
+
+    <div class="auth-modal-header">
+      <div class="auth-modal-logo">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <h4>Sportski<span>Termin</span></h4>
+    </div>
+
+    <div class="auth-modal-tabs">
+      <button class="auth-tab" [class.active]="authModalTab === 'login'"
+        (click)="authModalTab = 'login'">Prijava</button>
+      <button class="auth-tab" [class.active]="authModalTab === 'register'"
+        (click)="authModalTab = 'register'">Registracija</button>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-modal-body" *ngIf="authModalTab === 'login'">
+      <form (ngSubmit)="submitInlineLogin()">
+        <div class="auth-form-group">
+          <label><i class="bi bi-envelope"></i> Email</label>
+          <input type="email" name="email" [(ngModel)]="authData.email" required placeholder="vaseime@email.com">
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-lock"></i> Lozinka</label>
+          <div class="auth-input-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
+              <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <p class="auth-error" *ngIf="authError"><i class="bi bi-exclamation-circle"></i> {{ authError }}</p>
+        <button type="submit" class="btn-auth-submit" [disabled]="authLoading">
+          <span *ngIf="!authLoading"><i class="bi bi-box-arrow-in-right"></i> Prijavi se</span>
+          <span *ngIf="authLoading"><i class="bi bi-arrow-repeat spin-icon"></i> Sačekajte...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Register Form -->
+    <div class="auth-modal-body" *ngIf="authModalTab === 'register'">
+      <form (ngSubmit)="submitInlineRegister()">
+        <div class="auth-form-row">
+          <div class="auth-form-group">
+            <label><i class="bi bi-person"></i> Ime</label>
+            <input type="text" name="firstName" [(ngModel)]="authData.firstName" required placeholder="Ime">
+          </div>
+          <div class="auth-form-group">
+            <label><i class="bi bi-person"></i> Prezime</label>
+            <input type="text" name="lastName" [(ngModel)]="authData.lastName" required placeholder="Prezime">
+          </div>
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-envelope"></i> Email</label>
+          <input type="email" name="regEmail" [(ngModel)]="authData.email" required placeholder="vaseime@email.com">
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-telephone"></i> Telefon</label>
+          <input type="text" name="phone" [(ngModel)]="authData.phone" required placeholder="+381 ...">
+        </div>
+        <div class="auth-form-group">
+          <label><i class="bi bi-lock"></i> Lozinka</label>
+          <div class="auth-input-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" name="regPassword" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
+              <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <p class="auth-error" *ngIf="authError"><i class="bi bi-exclamation-circle"></i> {{ authError }}</p>
+        <button type="submit" class="btn-auth-submit" [disabled]="authLoading">
+          <span *ngIf="!authLoading"><i class="bi bi-person-plus"></i> Brza Registracija</span>
+          <span *ngIf="authLoading"><i class="bi bi-arrow-repeat spin-icon"></i> Sačekajte...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -372,8 +492,8 @@
       <div class="venue-card" *ngFor="let venue of filteredVenues; let i = index"
         [style.animation-delay]="(i * 50) + 'ms'" [routerLink]="['/tereni/detalji', venue.id]">
         <div class="venue-card-img">
-          <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'"
-            [alt]="venue.name" loading="lazy" />
+          <img [src]="venue.main_image ? apiBase + venue.main_image : 'assets/no-image.jpg'" [alt]="venue.name"
+            loading="lazy" />
           <div class="img-overlay"></div>
           <div class="venue-badge-sport">{{ getSportName(venue.sport_id) }}</div>
           <div class="venue-badge-price">{{ venue.price_per_slot }} RSD</div>

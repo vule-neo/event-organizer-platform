@@ -41,10 +41,10 @@
 
     <!-- Thumbnails -->
     <div class="thumbnails" *ngIf="venue.images?.length > 1">
-      <div *ngFor="let img of venue.images" class="thumb-item"
-        [class.active-thumb]="activeImageUrl === 'http://localhost:5000' + img.url" (click)="setActiveImage(img.url)">
-        <img [src]="'http://localhost:5000' + img.url" [alt]="venue.name" />
-      </div>
+      <div class="thumb-item" *ngFor="let img of venue.images" [class.active]="activeImageUrl === apiBase + img.image_path"
+            (click)="activeImageUrl = apiBase + img.image_path">
+            <img [src]="apiBase + img.image_path" [alt]="venue.name" />
+          </div>
     </div>
 
     <!-- Header -->
@@ -239,16 +239,16 @@
           <label class="recurring-toggle"
             *ngIf="authService.isLoggedIn() && selectedSlot && venue?.owner_id !== authService.getUser().id">
             <input type="checkbox" [(ngModel)]="showRecurring" />
-            <span><i class="bi bi-arrow-repeat"></i> Ponavljaj svake sedmice</span>
+            <span><i class="bi bi-arrow-repeat"></i> Ponavljaj svake nedelje</span>
           </label>
 
           <!-- Recurring panel -->
           <div class="recurring-panel"
             *ngIf="authService.isLoggedIn() && showRecurring && venue?.owner_id !== authService.getUser().id">
-            <span class="booking-label">Broj sedmica (uključujući prvu)</span>
+            <span class="booking-label">Broj nedelja (uključujući prvu)</span>
             <div class="recurring-slider-row">
               <input type="range" min="2" max="8" [(ngModel)]="recurringWeeks" />
-              <span class="weeks-badge">{{ recurringWeeks }} sed.</span>
+              <span class="weeks-badge">{{ recurringWeeks }} ned.</span>
             </div>
             <div class="recurring-total">
               Ukupno: <strong>{{ recurringWeeks * venue.price_per_slot }} RSD</strong>
@@ -325,7 +325,7 @@
       <!-- Success -->
       <div class="review-success" *ngIf="reviewSuccess">
         <i class="bi bi-check-circle-fill"></i>
-        Recenzija uspješno objavljena!
+        Recenzija uspešno objavljena!
       </div>
 
       <!-- No reviews -->
@@ -386,7 +386,12 @@
         </div>
         <div class="auth-form-group">
           <label><i class="bi bi-lock"></i> Lozinka</label>
-          <input type="password" name="password" [(ngModel)]="authData.password" required placeholder="••••••••">
+          <div class="auth-input-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
+              <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
         </div>
         <p class="auth-error" *ngIf="authError"><i class="bi bi-exclamation-circle"></i> {{ authError }}</p>
         <button type="submit" class="btn-auth-submit" [disabled]="authLoading">
@@ -419,7 +424,12 @@
         </div>
         <div class="auth-form-group">
           <label><i class="bi bi-lock"></i> Lozinka</label>
-          <input type="password" name="regPassword" [(ngModel)]="authData.password" required placeholder="••••••••">
+          <div class="auth-input-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" name="regPassword" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
+              <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
         </div>
         <p class="auth-error" *ngIf="authError"><i class="bi bi-exclamation-circle"></i> {{ authError }}</p>
         <button type="submit" class="btn-auth-submit" [disabled]="authLoading">

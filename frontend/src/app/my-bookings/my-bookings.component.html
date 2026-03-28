@@ -33,7 +33,7 @@
 
       <!-- Image -->
       <div class="ovc-image">
-        <img [src]="b.venue_image ? 'http://localhost:5000' + b.venue_image : 'assets/no-image.jpg'"
+        <img [src]="b.venue_image ? apiBase + b.venue_image : 'assets/no-image.jpg'"
           [alt]="b.venue_name" />
         <div class="booking-status-pill" [ngClass]="getStatusClass(b.status)">
           {{ getStatusLabel(b.status) }}

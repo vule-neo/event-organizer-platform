@@ -21,14 +21,14 @@
             <div class="ci-icon"><i class="bi bi-envelope"></i></div>
             <div>
               <span class="ci-label">Email</span>
-              <a class="ci-value" href="mailto:info@sportskitermin.rs">info&#64;sportskitermin.rs</a>
+              <a class="ci-value" href="mailto:vasiljevicvujadin1@gmail.com">vasiljevicvujadin1&#64;gmail.com</a>
             </div>
           </div>
           <div class="contact-info-item">
             <div class="ci-icon"><i class="bi bi-telephone"></i></div>
             <div>
               <span class="ci-label">Telefon</span>
-              <a class="ci-value" href="tel:+381111234567">+381 11 123 4567</a>
+              <a class="ci-value" href="tel:+381645562057">+381 64 556 2057</a>
             </div>
           </div>
           <div class="contact-info-item">
@@ -50,9 +50,14 @@
         <div class="contact-social-card">
           <p class="contact-social-label">Pratite nas</p>
           <div class="contact-socials">
-            <a href="#" class="cs-btn" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="cs-btn" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="cs-btn" aria-label="Twitter/X"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://instagram.com/sportskitermin" target="_blank" rel="noopener noreferrer" class="cs-btn"
+              aria-label="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+            <a href="https://tiktok.com/@sportskitermin" target="_blank" rel="noopener noreferrer" class="cs-btn"
+              aria-label="TikTok">
+              <i class="bi bi-tiktok"></i>
+            </a>
           </div>
         </div>
 
@@ -93,7 +98,8 @@
                 <label>Email adresa</label>
                 <div class="cf-input-wrap">
                   <i class="bi bi-envelope cf-icon"></i>
-                  <input type="email" [(ngModel)]="form.email" name="email" placeholder="marko&#64;email.com" required />
+                  <input type="email" [(ngModel)]="form.email" name="email" placeholder="marko&#64;email.com"
+                    required />
                 </div>
               </div>
             </div>
@@ -117,7 +123,8 @@
 
             <div class="cf-group">
               <label>Poruka</label>
-              <textarea [(ngModel)]="form.message" name="message" placeholder="Opišite vaš problem ili pitanje..." rows="5" required></textarea>
+              <textarea [(ngModel)]="form.message" name="message" placeholder="Opišite vaš problem ili pitanje..."
+                rows="5" required></textarea>
               <span class="cf-char-count">{{ form.message.length }} / 1000</span>
             </div>
 

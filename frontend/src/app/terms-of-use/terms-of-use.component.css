@@ -1,0 +1,125 @@
+.legal-page {
+  background-color: var(--bg-primary);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.legal-hero {
+  background: var(--navy);
+  color: #fff;
+  padding: 80px 20px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-pattern {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.1;
+  background-size: 20px 20px;
+  background-image: radial-gradient(circle at center, #ffffff 1px, transparent 1px);
+}
+
+.legal-hero h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.legal-hero p {
+  font-size: 18px;
+  color: #c9d8e8;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.last-updated {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+.legal-container {
+  max-width: 800px;
+  margin: -40px auto 60px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.legal-content {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 40px;
+  border: 1px solid var(--border);
+}
+
+.legal-section {
+  margin-bottom: 40px;
+}
+
+.legal-section h2 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--navy);
+  font-size: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+}
+
+.legal-section p, .legal-section li {
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.legal-section ul {
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.info-callout {
+  background: rgba(30,58,95,0.05);
+  border-left: 4px solid var(--navy);
+  padding: 16px;
+  border-radius: 4px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.info-callout i {
+  color: var(--gold);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.info-callout span {
+  color: var(--navy);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .legal-content {
+    padding: 24px;
+  }
+  .legal-hero h1 {
+    font-size: 32px;
+  }
+}

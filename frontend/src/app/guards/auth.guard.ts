@@ -7,7 +7,7 @@ export const authGuard: CanActivateFn = () => {
   const token = localStorage.getItem('token');
 
   if (!token) {
-    router.navigate(['/login']);
+    router.navigate(['/prijava']);
     return false;
   }
 

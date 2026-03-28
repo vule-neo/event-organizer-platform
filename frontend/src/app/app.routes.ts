@@ -23,25 +23,25 @@ import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.componen
 import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/explore', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'userRegister', component: UserRegisterComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: '', redirectTo: '/istrazi', pathMatch: 'full' },
+  { path: 'prijava', component: LoginComponent },
+  { path: 'registracija', component: UserRegisterComponent },
+  { path: 'zaboravljena-lozinka', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
-  { path: 'explore', component: VenueListComponent },
-  { path: 'venues/details/:id', component: VenueDetailComponent },
+  { path: 'istrazi', component: VenueListComponent },
+  { path: 'tereni/detalji/:id', component: VenueDetailComponent },
 
   // Legal pages
-  { path: 'privacy-policy', component: PrivacyPolicyComponent },
-  { path: 'terms-of-use', component: TermsOfUseComponent },
+  { path: 'politika-privatnosti', component: PrivacyPolicyComponent },
+  { path: 'uslovi-koriscenja', component: TermsOfUseComponent },
 
-  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
-  { path: 'my-bookings', component: MyBookingsComponent, canActivate: [authGuard] },
+  { path: 'profil', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'moje-rezervacije', component: MyBookingsComponent, canActivate: [authGuard] },
 
-  { path: 'venues/new', component: VenueFormComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
-  { path: 'venues/edit/:id', component: VenueFormComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
-  { path: 'venues/ownerVenues', component: OwnerVenuesComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
-  { path: 'venues/reports', component: OwnerBookingsComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
+  { path: 'tereni/novi', component: VenueFormComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
+  { path: 'tereni/izmena/:id', component: VenueFormComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
+  { path: 'tereni/moji', component: OwnerVenuesComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
+  { path: 'tereni/izvestaji', component: OwnerBookingsComponent, canActivate: [authGuard, roleGuard], data: { expectedRoles: ['owner'] } },
 
   { path: 'bookings/:id', component: BookingDetailComponent, canActivate: [authGuard] },
 
@@ -51,11 +51,11 @@ export const routes: Routes = [
     data: { expectedRoles: ['admin'] },
     children: [
       { path: '', component: AdminDashboardComponent },
-      { path: 'users', component: AdminUsersComponent },
-      { path: 'venues', component: AdminVenuesComponent }
+      { path: 'korisnici', component: AdminUsersComponent },
+      { path: 'tereni', component: AdminVenuesComponent }
     ]
   },
   { path: 'faq', component: FaqComponent },
-  { path: 'help', component: HelpmeComponent },
-  { path: 'contact', component: ContactComponent },
+  { path: 'pomoc', component: HelpmeComponent },
+  { path: 'kontakt', component: ContactComponent },
 ];

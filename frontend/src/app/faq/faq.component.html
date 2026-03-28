@@ -16,26 +16,29 @@
     <aside class="faq-sidebar">
       <div class="faq-sidebar-inner">
         <p class="faq-sidebar-label">Kategorije</p>
-        <a class="faq-nav-item" [class.active]="activeCategory === 'rezervacije'" (click)="activeCategory='rezervacije'">
+        <a class="faq-nav-item" [class.active]="activeCategory === 'rezervacije'"
+          (click)="activeCategory='rezervacije'">
           <i class="bi bi-calendar-check"></i> Rezervacije
         </a>
         <a class="faq-nav-item" [class.active]="activeCategory === 'placanje'" (click)="activeCategory='placanje'">
           <i class="bi bi-credit-card"></i> Plaćanje
         </a>
-        <a class="faq-nav-item" [class.active]="activeCategory === 'otkazivanje'" (click)="activeCategory='otkazivanje'">
+        <a class="faq-nav-item" [class.active]="activeCategory === 'otkazivanje'"
+          (click)="activeCategory='otkazivanje'">
           <i class="bi bi-x-circle"></i> Otkazivanje
         </a>
         <a class="faq-nav-item" [class.active]="activeCategory === 'nalog'" (click)="activeCategory='nalog'">
           <i class="bi bi-person-circle"></i> Nalog
         </a>
-        <a class="faq-nav-item" [class.active]="activeCategory === 'ocenjivanje'" (click)="activeCategory='ocenjivanje'">
+        <a class="faq-nav-item" [class.active]="activeCategory === 'ocenjivanje'"
+          (click)="activeCategory='ocenjivanje'">
           <i class="bi bi-star"></i> Ocenjivanje
         </a>
         <a class="faq-nav-item" [class.active]="activeCategory === 'vlasnici'" (click)="activeCategory='vlasnici'">
           <i class="bi bi-building"></i> Za vlasnike
         </a>
         <div class="faq-sidebar-divider"></div>
-        <a routerLink="/contact" class="faq-nav-contact">
+        <a routerLink="/kontakt" class="faq-nav-contact">
           <i class="bi bi-chat-dots"></i> Kontaktirajte nas
         </a>
       </div>
@@ -177,7 +180,7 @@
           <h3>Niste pronašli odgovor?</h3>
           <p>Pišite nam — odgovaramo u roku od nekoliko sati.</p>
         </div>
-        <a routerLink="/contact" class="btn-faq-cta">Kontaktirajte nas <i class="bi bi-arrow-right"></i></a>
+        <a routerLink="/kontakt" class="btn-faq-cta">Kontaktirajte nas <i class="bi bi-arrow-right"></i></a>
       </div>
 
     </main>

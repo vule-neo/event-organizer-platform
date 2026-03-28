@@ -370,7 +370,7 @@
     <!-- Cards Grid -->
     <div class="venues-grid" *ngIf="!loading && filteredVenues.length > 0" [class.filtering]="isFiltering">
       <div class="venue-card" *ngFor="let venue of filteredVenues; let i = index"
-        [style.animation-delay]="(i * 50) + 'ms'" [routerLink]="['/venues/details', venue.id]">
+        [style.animation-delay]="(i * 50) + 'ms'" [routerLink]="['/tereni/detalji', venue.id]">
         <div class="venue-card-img">
           <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.jpg'"
             [alt]="venue.name" loading="lazy" />
@@ -481,7 +481,7 @@
           <i class="bi bi-clock-history"></i>
         </div>
         <h3>Brza rezervacija</h3>
-        <p>Zaboravi na pozive i čekanje. Rezerviši termin u samo par klikova, 24/7.</p>
+        <p>Zaboravi na pozive i čekanje. Rezerviši termin u samo 3 klika, bilo kada, 24/7.</p>
       </div>
 
       <!-- Feature 2 -->
@@ -522,10 +522,10 @@
       <h2>Spreman za igru?</h2>
       <p>Pridruži se hiljadama sportista koji već uživaju u brzoj i lakoj rezervaciji terena.</p>
       <div class="cta-buttons">
-        <a routerLink="/userRegister" class="btn-cta-primary">
+        <a routerLink="/registracija" class="btn-cta-primary">
           <i class="bi bi-person-plus"></i> Kreiraj nalog besplatno
         </a>
-        <a routerLink="/login" class="btn-cta-secondary">
+        <a routerLink="/prijava" class="btn-cta-secondary">
           Već imaš nalog? Prijavi se
         </a>
       </div>

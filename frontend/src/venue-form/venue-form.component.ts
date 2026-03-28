@@ -231,12 +231,12 @@ export class VenueFormComponent implements OnInit {
     if (this.isEditMode) {
       formData.append('imagesToDelete', JSON.stringify(this.imagesToDelete));
       this.venueService.updateVenue(this.venueId!, formData).subscribe({
-        next: () => this.router.navigate(['/venues/ownerVenues']),
+        next: () => this.router.navigate(['/tereni/moji']),
         error: (err) => this.message = 'Greška pri ažuriranju: ' + (err?.error?.message || 'Pokušaj ponovo.')
       });
     } else {
       this.venueService.createVenue(formData).subscribe({
-        next: () => this.router.navigate(['/venues/ownerVenues']),
+        next: () => this.router.navigate(['/tereni/moji']),
         error: (err) => this.message = 'Greška pri kreiranju: ' + (err?.error?.message || 'Pokušaj ponovo.')
       });
     }

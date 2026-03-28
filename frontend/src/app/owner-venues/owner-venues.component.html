@@ -6,7 +6,7 @@
       <h1>Moji Tereni</h1>
       <p>Upravljajte svojim sportskim objektima</p>
     </div>
-    <button class="btn-add-venue" routerLink="/venues/new">
+    <button class="btn-add-venue" routerLink="/tereni/novi">
       <i class="bi bi-plus-lg"></i> Dodaj novi teren
     </button>
   </div>
@@ -27,7 +27,7 @@
     <div class="owner-empty-icon"><i class="bi bi-building"></i></div>
     <h3>Nemate kreiranih terena</h3>
     <p>Kliknite na dugme iznad da dodate svoj prvi sportski objekat.</p>
-    <button class="btn-add-venue" routerLink="/venues/new">
+    <button class="btn-add-venue" routerLink="/tereni/novi">
       <i class="bi bi-plus-lg"></i> Dodaj teren
     </button>
   </div>
@@ -39,7 +39,7 @@
       <!-- Image -->
       <div class="ovc-image">
         <img [src]="venue.main_image ? 'http://localhost:5000' + venue.main_image : 'assets/no-image.png'"
-             [alt]="venue.name" />
+          [alt]="venue.name" />
         <div class="ovc-status-badge" [class.badge-active]="venue.is_active" [class.badge-inactive]="!venue.is_active">
           <span class="status-dot"></span>
           {{ venue.is_active ? 'Aktivan' : 'Neaktivan' }}
@@ -82,10 +82,8 @@
         <button class="ovc-btn ovc-btn-edit" (click)="onEdit(venue.id)" title="Uredi">
           <i class="bi bi-pencil"></i> Uredi
         </button>
-        <button class="ovc-btn" (click)="onToggleActive(venue)"
-                [class.ovc-btn-activate]="!venue.is_active"
-                [class.ovc-btn-deactivate]="venue.is_active"
-                title="{{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}">
+        <button class="ovc-btn" (click)="onToggleActive(venue)" [class.ovc-btn-activate]="!venue.is_active"
+          [class.ovc-btn-deactivate]="venue.is_active" title="{{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}">
           <i class="bi" [class.bi-toggle-off]="!venue.is_active" [class.bi-toggle-on]="venue.is_active"></i>
           {{ venue.is_active ? 'Deaktiviraj' : 'Aktiviraj' }}
         </button>

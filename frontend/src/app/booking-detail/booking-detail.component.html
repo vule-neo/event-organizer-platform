@@ -1,7 +1,5 @@
 <!-- SUCCESS MESSAGE SA FADE OUT ANIMACIJOM -->
-<div class="success-message" 
-     *ngIf="showSuccessMessage"
-     [class.fade-out]="successMessageFading">
+<div class="success-message" *ngIf="showSuccessMessage" [class.fade-out]="successMessageFading">
   <div class="success-content">
     <i class="bi bi-check-circle-fill"></i>
     <div class="success-text">
@@ -27,19 +25,18 @@
             <i class="bi bi-trophy-fill"></i>
             <span>Sportski<em>Termin</em></span>
           </div>
-          <div class="ticket-confirmed"
-               [class.ticket-status-confirmed]="booking.status === 'confirmed'"
-               [class.ticket-status-completed]="booking.status === 'completed'"
-               [class.ticket-status-cancelled]="booking.status.includes('cancelled')">
-            <i class="bi"
-               [class.bi-check-circle-fill]="booking.status === 'confirmed'"
-               [class.bi-trophy-fill]="booking.status === 'completed'"
-               [class.bi-x-circle-fill]="booking.status.includes('cancelled')"></i>
+          <div class="ticket-confirmed" [class.ticket-status-confirmed]="booking.status === 'confirmed'"
+            [class.ticket-status-completed]="booking.status === 'completed'"
+            [class.ticket-status-cancelled]="booking.status.includes('cancelled')">
+            <i class="bi" [class.bi-check-circle-fill]="booking.status === 'confirmed'"
+              [class.bi-trophy-fill]="booking.status === 'completed'"
+              [class.bi-x-circle-fill]="booking.status.includes('cancelled')"></i>
             {{ booking.status === 'confirmed' ? 'Potvrđena rezervacija' :
-               booking.status === 'completed' ? 'Završena rezervacija' :
-               booking.status === 'cancelled_by_client' ? 'Otkazao klijent' :
-               booking.status === 'cancelled_by_owner' ? 'Otkazao vlasnik' :
-               booking.status === 'cancelled_late' ? 'Kasno otkazano' : booking.status }}</div>
+            booking.status === 'completed' ? 'Završena rezervacija' :
+            booking.status === 'cancelled_by_client' ? 'Otkazao klijent' :
+            booking.status === 'cancelled_by_owner' ? 'Otkazao vlasnik' :
+            booking.status === 'cancelled_late' ? 'Kasno otkazano' : booking.status }}
+          </div>
         </div>
         <div class="ticket-id">#{{ booking.id.substring(0,8).toUpperCase() }}</div>
       </div>
@@ -68,7 +65,8 @@
         </div>
         <div class="ticket-info-item">
           <span class="ticket-info-label"><i class="bi bi-clock"></i> Vreme</span>
-          <span class="ticket-info-value">{{ booking.start_time | date:'HH:mm' }} – {{ booking.end_time | date:'HH:mm' }}</span>
+          <span class="ticket-info-value">{{ booking.start_time | date:'HH:mm' }} – {{ booking.end_time | date:'HH:mm'
+            }}</span>
         </div>
       </div>
 
@@ -111,7 +109,7 @@
         <button class="ticket-btn-primary" (click)="printTicket()">
           <i class="bi bi-printer"></i> Odštampaj potvrdu
         </button>
-        <button class="ticket-btn-secondary" routerLink="/my-bookings">
+        <button class="ticket-btn-secondary" routerLink="/moje-rezervacije">
           <i class="bi bi-arrow-left"></i> Nazad na listu
         </button>
       </div>

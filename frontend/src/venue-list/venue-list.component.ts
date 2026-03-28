@@ -139,7 +139,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToVenue(venueId: string) {
-    if (this.dragDistanceMoved < 8) this.router.navigate(['/venues/details', venueId]);
+    if (this.dragDistanceMoved < 8) this.router.navigate(['/tereni/detalji', venueId]);
   }
 
   // ---- GOOGLE MAPS ----
@@ -259,7 +259,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
           <h4 class="map-popup-name">${venue.name}</h4>
           <div class="map-popup-meta">${rating}<span class="map-popup-price">${venue.price_per_slot} RSD</span></div>
           <p class="map-popup-loc"><i class="bi bi-geo-alt" style="font-size:11px;margin-right:3px;"></i>${venue.city}</p>
-          <a class="map-popup-btn" href="/venues/details/${venue.id}">Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>
+          <a class="map-popup-btn" href="/tereni/detalji/${venue.id}">Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>
         </div>
       </div>`;
     this.infoWindow.setContent(content);
@@ -425,7 +425,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   // Metoda za detalje (postojeća, ali ćemo je prilagoditi)
   viewDetails(venueId: string, event: MouseEvent) {
     event.stopPropagation(); // Spreči da se klik propagira na card
-    this.router.navigate(['/venues/details', venueId]);
+    this.router.navigate(['/tereni/detalji', venueId]);
   }
 
   // Metoda za brzu rezervaciju - vodi na detail i skroluje do booking sekcije
@@ -433,7 +433,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     event.stopPropagation();
 
     // Koristi skipLocationChange da ne triggeruje scroll restoration
-    this.router.navigate(['/venues/details', venueId], {
+    this.router.navigate(['/tereni/detalji', venueId], {
       queryParams: { scrollTo: 'booking' },
       skipLocationChange: false, // Ostavi false, ali dodajemo state
       state: { skipScrollRestoration: true } // Dodajemo custom state
@@ -446,7 +446,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Koristi scroll servis da preskoči automatski scroll na vrh
     // Ako imaš ScrollService, inače samo navigiraj
-    this.router.navigate(['/venues/details', venueId], {
+    this.router.navigate(['/tereni/detalji', venueId], {
       queryParams: { scrollTo: 'booking' },
       state: { skipScroll: true, fromAvailable: true }
     });

@@ -18,7 +18,7 @@ export class OwnerVenuesComponent implements OnInit {
   constructor(
     private venueService: VenueService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadOwnerVenues();
@@ -72,12 +72,12 @@ export class OwnerVenuesComponent implements OnInit {
 
   onEdit(venueId: string) {
     // Šaljemo usera na formu za editovanje
-    this.router.navigate(['/venues/edit', venueId]);
+    this.router.navigate(['/tereni/izmena', venueId]);
   }
 
   onView(venueId: string) {
     // Dodajemo '/details' jer tako piše u tvojim rutama
-    this.router.navigate(['/venues/details', venueId]);
+    this.router.navigate(['/tereni/detalji', venueId]);
   }
 
   onToggleActive(venue: any) {

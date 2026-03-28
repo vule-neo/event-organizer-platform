@@ -6,7 +6,7 @@
       <h1>Moje Rezervacije</h1>
       <p>Pregled svih zakazanih termina</p>
     </div>
-    <a routerLink="/explore" class="btn-add-venue">
+    <a routerLink="/istrazi" class="btn-add-venue">
       <i class="bi bi-search"></i> Pronađi teren
     </a>
   </div>
@@ -22,7 +22,7 @@
     <div class="owner-empty-icon"><i class="bi bi-calendar-x"></i></div>
     <h3>Još uvek nemate zakazanih termina</h3>
     <p>Istražite terene i rezervišite svoju prvu igru.</p>
-    <a routerLink="/explore" class="btn-add-venue">
+    <a routerLink="/istrazi" class="btn-add-venue">
       <i class="bi bi-search"></i> Pronađi teren
     </a>
   </div>
@@ -34,7 +34,7 @@
       <!-- Image -->
       <div class="ovc-image">
         <img [src]="b.venue_image ? 'http://localhost:5000' + b.venue_image : 'assets/no-image.jpg'"
-             [alt]="b.venue_name" />
+          [alt]="b.venue_name" />
         <div class="booking-status-pill" [ngClass]="getStatusClass(b.status)">
           {{ getStatusLabel(b.status) }}
         </div>
@@ -69,12 +69,11 @@
 
         <!-- Confirmed -->
         <ng-container *ngIf="b.status === 'confirmed'">
-          
-<button *ngIf="canCancel(b.start_time)"
-        class="ovc-btn ovc-btn-delete w-full"
-        (click)="$event.stopPropagation(); cancelReservation(b.id)">
-  <i class="bi bi-x-circle"></i> Otkaži termin
-</button>
+
+          <button *ngIf="canCancel(b.start_time)" class="ovc-btn ovc-btn-delete w-full"
+            (click)="$event.stopPropagation(); cancelReservation(b.id)">
+            <i class="bi bi-x-circle"></i> Otkaži termin
+          </button>
           <div class="booking-no-cancel" *ngIf="!canCancel(b.start_time)">
             <i class="bi bi-lock"></i> Otkazivanje više nije moguće
           </div>
@@ -82,11 +81,10 @@
 
         <!-- Completed -->
         <ng-container *ngIf="b.status === 'completed'">
-<button *ngIf="!b.is_reviewed"
-        class="ovc-btn ovc-btn-review w-full"
-        (click)="$event.stopPropagation(); openReviewModal(b)">
-  <i class="bi bi-star"></i> Oceni teren
-</button>
+          <button *ngIf="!b.is_reviewed" class="ovc-btn ovc-btn-review w-full"
+            (click)="$event.stopPropagation(); openReviewModal(b)">
+            <i class="bi bi-star"></i> Oceni teren
+          </button>
           <div class="booking-reviewed" *ngIf="b.is_reviewed">
             <i class="bi bi-check-circle-fill"></i> Već ste ocenili ovaj termin
           </div>
@@ -104,8 +102,6 @@
 </div>
 
 <!-- Review modal -->
-<app-review-modal *ngIf="selectedBooking"
-                  [booking]="selectedBooking!"
-                  (close)="selectedBooking = null"
-                  (done)="handleReviewDone()">
+<app-review-modal *ngIf="selectedBooking" [booking]="selectedBooking!" (close)="selectedBooking = null"
+  (done)="handleReviewDone()">
 </app-review-modal>

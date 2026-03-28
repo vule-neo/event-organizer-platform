@@ -32,7 +32,7 @@
     <div class="auth-form-card">
       <div class="auth-form-header">
         <h1>Kreiraj nalog</h1>
-        <p>Već imaš nalog? <a routerLink="/login">Prijavi se</a></p>
+        <p>Već imaš nalog? <a routerLink="/prijava">Prijavi se</a></p>
       </div>
 
       <form [formGroup]="registerForm" (ngSubmit)="register()" class="auth-form">
@@ -73,15 +73,18 @@
           <div class="input-wrap">
             <i class="bi bi-telephone input-icon"></i>
             <input type="tel" formControlName="phone" placeholder="+381 6x xxx xxxx"
-                   [class.input-error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched" />
+              [class.input-error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched" />
           </div>
-          <div class="error-msg-small" *ngIf="registerForm.get('phone')?.errors?.['pattern'] && registerForm.get('phone')?.touched">
+          <div class="error-msg-small"
+            *ngIf="registerForm.get('phone')?.errors?.['pattern'] && registerForm.get('phone')?.touched">
             * Unesite ispravan format broja (npr. +381 6X...).
           </div>
-          <div class="error-msg-small" *ngIf="registerForm.get('phone')?.errors?.['minlength'] && registerForm.get('phone')?.touched">
+          <div class="error-msg-small"
+            *ngIf="registerForm.get('phone')?.errors?.['minlength'] && registerForm.get('phone')?.touched">
             * Broj telefona mora imati najmanje 9 karaktera.
           </div>
-          <div class="error-msg-small" *ngIf="registerForm.get('phone')?.errors?.['maxlength'] && registerForm.get('phone')?.touched">
+          <div class="error-msg-small"
+            *ngIf="registerForm.get('phone')?.errors?.['maxlength'] && registerForm.get('phone')?.touched">
             * Broj telefona ne može biti duži od 15 karaktera.
           </div>
         </div>
@@ -91,12 +94,9 @@
           <label>Lozinka</label>
           <div class="input-wrap">
             <i class="bi bi-lock input-icon"></i>
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="password"
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
               placeholder="Minimum 6 karaktera"
-              [class.input-error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-            />
+              [class.input-error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" />
             <button type="button" class="input-toggle" (click)="showPassword = !showPassword">
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>

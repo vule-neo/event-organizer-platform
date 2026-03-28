@@ -40,7 +40,7 @@
             <strong>Prvi put si ovde?</strong>
             <span>Rezerviši termin za manje od 2 minuta ⚡</span>
           </div>
-          <a routerLink="/userRegister" class="register-cta-btn">
+          <a routerLink="/registracija" class="register-cta-btn">
             Registruj se
             <i class="bi bi-arrow-right"></i>
           </a>
@@ -53,28 +53,20 @@
           <label>Email adresa</label>
           <div class="input-wrap">
             <i class="bi bi-envelope input-icon"></i>
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="vas&#64;email.com"
-              [class.input-error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-            />
+            <input type="email" formControlName="email" placeholder="vas&#64;email.com"
+              [class.input-error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
           </div>
         </div>
 
         <div class="form-group">
           <div class="label-row">
             <label>Lozinka</label>
-            <a routerLink="/forgot-password" class="forgot-link">Zaboravili ste lozinku?</a>
+            <a routerLink="/zaboravljena-lozinka" class="forgot-link">Zaboravili ste lozinku?</a>
           </div>
           <div class="input-wrap">
             <i class="bi bi-lock input-icon"></i>
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="password"
-              placeholder="Vaša lozinka"
-              [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-            />
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Vaša lozinka"
+              [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
             <button type="button" class="input-toggle" (click)="showPassword = !showPassword">
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>

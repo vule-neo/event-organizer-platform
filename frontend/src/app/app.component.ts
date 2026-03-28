@@ -36,6 +36,6 @@ export class AppComponent implements OnInit {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.mobileMenuOpen = false;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/prijava']);
   }
 }

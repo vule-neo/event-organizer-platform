@@ -13,3 +13,4 @@ dist/
 
 # VS Code
 .vscode/
+frontend/src/environments/environment.prod.local.ts

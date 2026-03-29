@@ -2,7 +2,7 @@
   <div class="nav-container">
 
     <!-- Logo -->
-    <a routerLink="/istrazi" class="nav-logo">
+    <a routerLink="/istrazi" class="nav-logo" (click)="closeMobileMenu()">
       <div class="logo-icon">
         <i class="bi bi-trophy-fill"></i>
       </div>
@@ -30,19 +30,19 @@
       <ng-container *ngIf="authService.isLoggedIn()">
 
         <ng-container *ngIf="authService.hasRole('owner')">
-          <a routerLink="/tereni/moji" routerLinkActive="active" class="nav-link">
+          <a routerLink="/tereni/moji" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
             <i class="bi bi-building"></i> Moji Tereni
           </a>
           <a routerLink="/tereni/izvestaji" routerLinkActive="active" class="nav-link">
             <i class="bi bi-calendar-check"></i> Rezervacije
           </a>
-          <a routerLink="/tereni/novi" class="btn-nav-primary" routerLinkActive="active">
+          <a routerLink="/tereni/novi" class="btn-nav-primary" routerLinkActive="active" (click)="closeMobileMenu()">
             <i class="bi bi-plus-lg"></i> Novi teren
           </a>
         </ng-container>
 
         <ng-container *ngIf="authService.hasRole('customer')">
-          <a routerLink="/moje-rezervacije" routerLinkActive="active" class="nav-link">
+          <a routerLink="/moje-rezervacije" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
             <i class="bi bi-calendar2-heart"></i> Moje rezervacije
           </a>
         </ng-container>
@@ -50,7 +50,7 @@
         <div class="nav-divider"></div>
 
         <div class="user-dropdown">
-          <a routerLink="/profil" class="user-pill" routerLinkActive="active">
+          <a routerLink="/profil" class="user-pill" routerLinkActive="active" (click)="closeMobileMenu()">
             <div class="user-avatar">
               {{ getUserInitial() }}
             </div>
@@ -58,7 +58,7 @@
             <i class="bi bi-chevron-down"></i>
           </a>
           <div class="dropdown-menu">
-            <a routerLink="/profil" class="dropdown-item">
+            <a routerLink="/profil" class="dropdown-item" (click)="closeMobileMenu()">
               <i class="bi bi-person"></i> Profil
             </a>
             <div class="dropdown-divider"></div>

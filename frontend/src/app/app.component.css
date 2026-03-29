@@ -298,10 +298,12 @@
 .hamburger.active span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
+
 .hamburger.active span:nth-child(2) {
   opacity: 0;
   transform: scaleX(0);
 }
+
 .hamburger.active span:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
@@ -341,18 +343,23 @@
 
   .nav-links {
     position: fixed;
-    top: 0;
+    top: 80px;
+    /* starts below navbar */
     left: 0;
     right: 0;
-    height: 100vh;
+    height: auto;
+    /* only as tall as content, not full screen */
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
     background: var(--card);
-    z-index: 999; /* Below navbar (1000) so hamburger stays on top */
-    padding: 100px 24px 24px;
+    z-index: 999;
+    padding: 16px 24px 24px;
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    
-    /* Animation */
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(30, 58, 95, 0.12);
+
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);

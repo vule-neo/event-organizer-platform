@@ -23,6 +23,11 @@ export class AppComponent implements OnInit {
     this.isScrolled = window.scrollY > 20;
   }
 
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+  }
+
   toggleMobile() {
     this.mobileMenuOpen = !this.mobileMenuOpen;
   }

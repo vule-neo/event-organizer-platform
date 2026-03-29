@@ -17,14 +17,14 @@
       </a>
 
       <!-- Added Pomoć link for all users -->
-      <a routerLink="/pomoc" routerLinkActive="active" class="nav-link">
+      <a routerLink="/pomoc" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
         <i class="bi bi-question-circle"></i> Pomoć
       </a>
 
       <ng-container *ngIf="!authService.isLoggedIn()">
         <div class="nav-divider"></div>
-        <a routerLink="/prijava" class="btn-nav-outline">Prijavi se</a>
-        <a routerLink="/registracija" class="btn-nav-primary">Registracija</a>
+        <a routerLink="/prijava" class="btn-nav-outline" (click)="closeMobileMenu()">Prijavi se</a>
+        <a routerLink="/registracija" class="btn-nav-primary" (click)="closeMobileMenu()">Registracija</a>
       </ng-container>
 
       <ng-container *ngIf="authService.isLoggedIn()">
@@ -78,6 +78,11 @@
       <span></span>
     </button>
 
+  </div>
+
+  <!-- Mobile overlay backdrop -->
+  <div *ngIf="mobileMenuOpen" (click)="toggleMobile()"
+    style="position:fixed;inset:0;top:80px;z-index:998;background:rgba(0,0,0,0.2);">
   </div>
 </nav>
 

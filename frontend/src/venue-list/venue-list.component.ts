@@ -5,7 +5,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { VenueService } from '../app/services/venue.service';
 import { AuthService } from '../app/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { environment } from '../environments/environment.prod.local';
+import { environment } from '../environments/environment';
 
 declare var google: any;
 const namePattern = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄČĆĘÈÉÊËĖĮÌÍÎÏŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;

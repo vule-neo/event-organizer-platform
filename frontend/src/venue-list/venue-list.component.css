@@ -7,10 +7,12 @@
   position: relative;
   padding: 60px 24px 40px;
   margin-bottom: 0;
-  overflow: visible; /* CRITICAL: Must be visible for dropdowns */
+  overflow: visible;
+  /* CRITICAL: Must be visible for dropdowns */
   background: var(--bg);
   width: 100%;
-  z-index: 10; /* Higher than following section */
+  z-index: 10;
+  /* Higher than following section */
 }
 
 .hero-blob {
@@ -107,7 +109,8 @@
   flex-wrap: wrap;
   position: relative;
   overflow: visible;
-  z-index: 1000; /* Ensure dropdowns are on top */
+  z-index: 1000;
+  /* Ensure dropdowns are on top */
 }
 
 .search-field {
@@ -787,27 +790,37 @@
   -webkit-backdrop-filter: blur(8px);
   z-index: 99999;
   display: grid;
-  place-items: center; /* Better than flex for complex centering */
+  place-items: center;
+  /* Better than flex for complex centering */
   padding: 16px;
-  overflow-y: auto; /* Just in case */
+  overflow-y: auto;
+  /* Just in case */
 }
 
 .auth-modal-content {
   background: var(--card);
-  width: 92%; 
+  width: 92%;
   max-width: 440px;
-  max-height: 92vh; 
-  overflow-y: auto; 
+  max-height: 92vh;
+  overflow-y: auto;
   position: relative;
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(30, 58, 95, 0.08);
   animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin: auto; /* Ensure centering in grid */
+  margin: auto;
+  /* Ensure centering in grid */
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .btn-close-modal {
@@ -1015,9 +1028,11 @@
   .hiw-cta-grid {
     grid-template-columns: 1fr;
   }
+
   .hiw-cta-section {
     padding: 40px 16px;
   }
+
   .auth-form-row {
     flex-direction: column;
     gap: 0;
@@ -1624,7 +1639,7 @@
     padding: 48px 20px 64px;
     overflow: visible !important;
   }
-  
+
   .hero-container {
     overflow: visible !important;
   }
@@ -3116,29 +3131,7 @@
     word-break: break-word !important;
   }
 
-  /* DROPDOWN PANEL - VISOK Z-INDEX ZA MOBILE */
-  .dropdown-panel {
-    position: fixed !important;
-    top: auto !important;
-    left: 16px !important;
-    right: 16px !important;
-    bottom: auto !important;
-    max-height: 60vh !important;
-    width: calc(100% - 32px) !important;
-    min-width: 0 !important;
-    z-index: 99999 !important;
-    background: white !important;
-    border-radius: 20px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
-    margin-top: 8px;
-  }
-
-  /* Kada je dropdown otvoren - pozicioniraj ga ispod polja */
-  .search-field:has(.dropdown-panel.show) {
-    position: relative;
-    z-index: 10000;
-  }
-
+  /* DROPDOWN PANEL - mobile fix */
   .dropdown-panel.show {
     display: block !important;
     position: absolute !important;
@@ -3148,6 +3141,10 @@
     width: 100% !important;
     max-height: 300px !important;
     overflow-y: auto !important;
+    z-index: 99999 !important;
+    background: white !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
   }
 
   /* Opcije u dropdownu - veći tap target */

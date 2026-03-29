@@ -6,10 +6,10 @@
 .hero {
   position: relative;
   padding: 60px 24px 40px;
-  /* Bilo je 80px 24px 100px - smanjeno */
   margin-bottom: 0;
-  overflow: visible;
+  overflow: hidden; /* Prevent blob overflow */
   background: var(--bg);
+  width: 100%;
 }
 
 .hero-blob {
@@ -421,11 +421,14 @@
 .how-it-works {
   padding: 80px 24px;
   background: var(--bg-secondary);
+  width: 100%;
+  overflow: hidden;
 }
 
 .section-container {
   max-width: 1280px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .section-header {
@@ -619,7 +622,7 @@
 }
 
 .connector-line {
-  width: 40px;
+  width: 100%;
   height: 1px;
   background: var(--border);
 }
@@ -629,6 +632,8 @@
   padding: 80px 24px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
+  width: 100%;
+  overflow: hidden;
 }
 
 .hiw-cta-grid {
@@ -780,22 +785,23 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center; /* Better than flex for complex centering */
   padding: 16px;
+  overflow-y: auto; /* Just in case */
 }
 
 .auth-modal-content {
   background: var(--card);
-  width: 95%; /* Use more width on mobile */
+  width: 92%; 
   max-width: 440px;
-  max-height: 90vh; /* Don't exceed viewport height */
-  overflow-y: auto; /* Allow scrolling for long forms */
+  max-height: 92vh; 
+  overflow-y: auto; 
   position: relative;
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(30, 58, 95, 0.08);
   animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: auto; /* Ensure centering in grid */
 }
 
 @keyframes modalFadeIn {
@@ -1651,6 +1657,8 @@
   .step-connector {
     flex-direction: row;
     transform: rotate(90deg);
+    width: 100%;
+    margin: 10px 0;
   }
 
   .venues-grid {
@@ -2055,6 +2063,13 @@
   min-width: 0;
   overflow: visible;
   position: relative;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+  scroll-behavior: smooth;
 }
 
 .sf-dropdown .custom-select {

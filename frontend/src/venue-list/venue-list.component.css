@@ -7,9 +7,10 @@
   position: relative;
   padding: 60px 24px 40px;
   margin-bottom: 0;
-  overflow: hidden; /* Prevent blob overflow */
+  overflow: visible; /* CRITICAL: Must be visible for dropdowns */
   background: var(--bg);
   width: 100%;
+  z-index: 10; /* Higher than following section */
 }
 
 .hero-blob {
@@ -106,7 +107,7 @@
   flex-wrap: wrap;
   position: relative;
   overflow: visible;
-  z-index: 100;
+  z-index: 1000; /* Ensure dropdowns are on top */
 }
 
 .search-field {
@@ -422,7 +423,7 @@
   padding: 80px 24px;
   background: var(--bg-secondary);
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .section-container {
@@ -633,7 +634,7 @@
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .hiw-cta-grid {
@@ -1621,6 +1622,11 @@
 @media (max-width: 768px) {
   .hero {
     padding: 48px 20px 64px;
+    overflow: visible !important;
+  }
+  
+  .hero-container {
+    overflow: visible !important;
   }
 
   .search-card {
@@ -2065,12 +2071,7 @@
   position: relative;
 }
 
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  position: relative;
-  scroll-behavior: smooth;
-}
+/* Removed duplicate html, body block to prevent parser issues */
 
 .sf-dropdown .custom-select {
   display: flex;

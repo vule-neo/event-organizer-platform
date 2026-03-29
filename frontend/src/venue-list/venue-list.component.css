@@ -788,11 +788,12 @@
 
 .auth-modal-content {
   background: var(--card);
-  width: 100%;
+  width: 95%; /* Use more width on mobile */
   max-width: 440px;
-  border-radius: var(--radius-lg);
+  max-height: 90vh; /* Don't exceed viewport height */
+  overflow-y: auto; /* Allow scrolling for long forms */
   position: relative;
-  overflow: hidden;
+  border-radius: var(--radius-lg);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(30, 58, 95, 0.08);
   animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

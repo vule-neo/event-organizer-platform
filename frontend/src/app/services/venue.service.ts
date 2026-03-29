@@ -34,8 +34,6 @@ export class VenueService {
   }
 
   getAllVenues(): Observable<Venue[]> {
-    const url = `${this.apiUrl}/all`;
-    console.log('🔍 API URL:', url);  // <-- DODAJ OVO
     return this.http.get<Venue[]>(`${this.apiUrl}/all`);
   }
 

@@ -8,7 +8,8 @@ import { environment } from '../../environments/environment';
   selector: 'app-admin-venues',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './admin-venues.component.html'
+  templateUrl: './admin-venues.component.html',
+  styleUrls: ['./admin-venues.component.css']
 })
 export class AdminVenuesComponent implements OnInit {
   venues: any[] = [];

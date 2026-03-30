@@ -7,13 +7,14 @@ import { RouterModule } from '@angular/router';
   selector: 'app-admin-users',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './admin-users.component.html'
+  templateUrl: './admin-users.component.html',
+  styleUrls: ['./admin-users.component.css']
 })
 export class AdminUsersComponent implements OnInit {
   users: any[] = [];
   loading = true;
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService) { }
 
   ngOnInit() {
     this.adminService.getAllUsers().subscribe({

@@ -41,10 +41,10 @@
 
     <!-- Thumbnails -->
     <div class="thumbnails" *ngIf="venue.images?.length > 1">
-      <!-- CORRECT: -->
       <div class="thumb-item" *ngFor="let img of venue.images"
         [class.active]="activeImageUrl === (img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path)"
         (click)="activeImageUrl = img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path">
+        <img [src]="img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path" [alt]="venue.name" />
       </div>
 
       <!-- Header -->

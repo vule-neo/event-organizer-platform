@@ -130,7 +130,7 @@ export class VenueDetailComponent implements OnInit {
         this.venue = data;
         if (data.images && data.images.length > 0) {
           // CORRECT:
-          const firstImg = data.images[0].image_path;
+          const firstImg = data.images[0].url;  // url je ispravno polje
           this.activeImageUrl = firstImg.startsWith('http') ? firstImg : this.apiBase + firstImg;
         }
         this.updateSEOTags();

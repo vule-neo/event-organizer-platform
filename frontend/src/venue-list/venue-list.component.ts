@@ -524,7 +524,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   handleOwnerCTA() {
     if (this.authService.isLoggedIn()) {
       if (this.authService.hasRole('owner')) {
-        this.router.navigate(['/vlasnik/novi-teren']);
+        this.router.navigate(['/tereni/novi']);
       }
     } else {
       this.openAuthModal('register', 'owner');  // <-- add 'owner' here

@@ -334,7 +334,7 @@
 </section>
 
 <!-- ===== HIW CTA SECTION (UX HACK) ===== -->
-<section class="hiw-cta-section">
+<section class="hiw-cta-section" *ngIf="!isFiltering">
   <div class="section-container">
     <div class="hiw-cta-grid">
       <div class="hiw-cta-card player-cta" data-aos="fade-right">
@@ -638,7 +638,7 @@
 
 <!-- ===== CTA SECTION (UNAUTHENTICATED) ===== -->
 <ng-container *ngIf="!authService.isLoggedIn() && !isFiltering">
-  <section class="cta-section" data-aos="zoom-in">
+  <section class="cta-section" data-aos="zoom-in" *ngIf="!isFiltering">
     <div class="cta-overlay"></div>
     <div class="cta-content">
       <h2>Spreman za igru?</h2>

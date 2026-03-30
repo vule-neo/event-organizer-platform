@@ -262,7 +262,9 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     const rating = venue.avg_rating
       ? `<span class="map-popup-rating"><i class="bi bi-star-fill" style="color:#e8b86d;font-size:11px;"></i> ${Number(venue.avg_rating).toFixed(1)}</span>`
       : `<span class="map-popup-new">Novo</span>`;
-    const imgSrc = venue.main_image ? `${this.apiBase}${venue.main_image}` : 'assets/no-image.jpg';
+    const imgSrc = venue.main_image
+      ? (venue.main_image.startsWith('http') ? venue.main_image : this.apiBase + venue.main_image)
+      : 'assets/no-image.jpg';
     const content = `
       <div class="map-popup">
         <div class="map-popup-img">

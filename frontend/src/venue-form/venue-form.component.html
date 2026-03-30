@@ -103,14 +103,16 @@
               <label>Grad</label>
               <div class="input-wrap">
                 <i class="bi bi-geo-alt input-icon"></i>
-                <input type="text" formControlName="city" readonly placeholder="Automatski iz mape..." class="input-readonly" />
+                <input type="text" formControlName="city" readonly placeholder="Automatski iz mape..."
+                  class="input-readonly" />
               </div>
             </div>
             <div class="vf-field">
               <label>Ulica i broj</label>
               <div class="input-wrap">
                 <i class="bi bi-signpost input-icon"></i>
-                <input type="text" formControlName="street" readonly placeholder="Automatski iz mape..." class="input-readonly" />
+                <input type="text" formControlName="street" readonly placeholder="Automatski iz mape..."
+                  class="input-readonly" />
               </div>
             </div>
           </div>
@@ -141,7 +143,7 @@
           <div class="vf-field">
             <label>Opis terena</label>
             <textarea formControlName="description" rows="4" class="vf-textarea"
-                      placeholder="Opišite vaš teren — oprema, podloga, kapacitet, posebne pogodnosti..."></textarea>
+              placeholder="Opišite vaš teren — oprema, podloga, kapacitet, posebne pogodnosti..."></textarea>
           </div>
 
         </div>
@@ -181,10 +183,8 @@
         </div>
 
         <div class="tags-select-grid">
-          <div *ngFor="let tag of allTags"
-               class="tag-select-item"
-               [class.tag-select-active]="isTagSelected(tag.id)"
-               (click)="toggleTag(tag.id)">
+          <div *ngFor="let tag of allTags" class="tag-select-item" [class.tag-select-active]="isTagSelected(tag.id)"
+            (click)="toggleTag(tag.id)">
             <div class="tag-select-icon">
               <i class="bi {{ tag.icon }}"></i>
             </div>
@@ -220,7 +220,8 @@
           <label class="vf-images-label">Trenutne slike</label>
           <div class="vf-preview-grid">
             <div *ngFor="let img of existingImages; let i = index" class="vf-preview-item">
-              <img [src]="apiBase + img.image_path" alt="Existing Image" />
+              <img [src]="img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path"
+                alt="Existing Image" />
               <button type="button" class="vf-remove-btn" (click)="removeExistingImage(img.id, i)">
                 <i class="bi bi-x"></i>
               </button>
@@ -231,13 +232,10 @@
         </div>
 
         <!-- Upload area -->
-        <div class="vf-upload-area" 
-             [class.drag-active]="isDragging"
-             (click)="fileInput.click()"
-             (dragover)="onDragOver($event)"
-             (dragleave)="onDragLeave($event)"
-             (drop)="onDrop($event)">
-          <input #fileInput type="file" (change)="onFileSelected($event)" multiple accept="image/*" style="display:none;" />
+        <div class="vf-upload-area" [class.drag-active]="isDragging" (click)="fileInput.click()"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+          <input #fileInput type="file" (change)="onFileSelected($event)" multiple accept="image/*"
+            style="display:none;" />
           <div class="vf-upload-inner">
             <div class="vf-upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
             <p class="vf-upload-title">Kliknite ili prevucite slike ovde</p>

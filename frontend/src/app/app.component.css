@@ -408,3 +408,13 @@
     margin-top: 8px;
   }
 }
+
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  top: 80px;
+  z-index: 998;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}

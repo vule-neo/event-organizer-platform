@@ -81,9 +81,8 @@
   </div>
 
   <!-- Mobile overlay backdrop -->
-  <div *ngIf="mobileMenuOpen" (click)="toggleMobile()"
-    style="position:fixed;inset:0;top:80px;z-index:998;background:rgba(0,0,0,0.2);">
-  </div>
+  <!-- Mobile overlay backdrop -->
+  <div *ngIf="mobileMenuOpen" class="mobile-overlay" (click)="closeMobileMenu()"></div>
 </nav>
 
 <main class="content-wrapper">

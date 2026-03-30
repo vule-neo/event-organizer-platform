@@ -344,11 +344,9 @@
   .nav-links {
     position: fixed;
     top: 80px;
-    /* starts below navbar */
     left: 0;
     right: 0;
     height: auto;
-    /* only as tall as content, not full screen */
     max-height: calc(100vh - 80px);
     overflow-y: auto;
     background: var(--card);
@@ -362,6 +360,8 @@
 
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
+    /* ADD THIS */
     transform: translateY(-10px);
     transition: all 0.3s ease;
   }
@@ -369,6 +369,8 @@
   .nav-links.open {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+    /* ADD THIS */
     transform: translateY(0);
   }
 

@@ -59,14 +59,16 @@ exports.createVenue = async (venueData, files) => {
       }
     }
 
+    // ========== IZMJENA ZA CLOUDINARY ==========
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         await client.query(
           `INSERT INTO venue_images (venue_id, url, display_order) VALUES ($1, $2, $3)`,
-          [venueId, `/uploads/venues/${files[i].filename}`, i]
+          [venueId, files[i].path, i]  // files[i].path je Cloudinary URL
         );
       }
     }
+    // ==========================================
 
     await client.query('COMMIT');
     return { message: 'Uspešno kreirano', venueId };
@@ -157,6 +159,7 @@ exports.updateVenue = async (venueId, body, files) => {
       }
     }
 
+    // ========== IZMJENA ZA CLOUDINARY ==========
     if (files && files.length > 0) {
       const maxOrderRes = await client.query(
         'SELECT COALESCE(MAX(display_order), 0) as max_order FROM venue_images WHERE venue_id = $1',
@@ -166,10 +169,11 @@ exports.updateVenue = async (venueId, body, files) => {
       for (const file of files) {
         await client.query(
           `INSERT INTO venue_images (venue_id, url, display_order) VALUES ($1, $2, $3)`,
-          [venueId, `/uploads/venues/${file.filename}`, currentOrder++]
+          [venueId, file.path, currentOrder++]  // file.path je Cloudinary URL
         );
       }
     }
+    // ==========================================
 
     await client.query('COMMIT');
     return { success: true, message: 'Teren uspešno ažuriran' };
@@ -284,10 +288,7 @@ exports.deleteVenue = async (venueId) => {
     await client.query('DELETE FROM venues WHERE id = $1', [venueId]);
     await client.query('COMMIT');
 
-    imagesResult.rows.forEach(img => {
-      const filePath = path.join(process.cwd(), img.url);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    });
+
     return { success: true, softDeleted: false };
   } catch (err) {
     await client.query('ROLLBACK');

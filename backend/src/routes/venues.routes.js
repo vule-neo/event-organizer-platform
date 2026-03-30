@@ -3,7 +3,7 @@ const router = express.Router();
 const venueController = require('../controllers/venues.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 const roleMiddleware = require('../middleware/role.middleware');
-const upload = require('../config/multer');
+const upload = require('../config/cloudinary'); // umjesto multer
 
 router.get('/available-today', venueController.getAvailableToday);
 router.post('/new', authMiddleware, roleMiddleware(['owner']), upload.array('images', 5), venueController.createVenue);

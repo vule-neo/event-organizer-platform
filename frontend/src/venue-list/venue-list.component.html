@@ -208,8 +208,9 @@
         (mousemove)="onCarouselDragMove($event)" (mouseup)="onCarouselMouseUp()" (mouseleave)="onCarouselMouseLeave()">
         <div class="avail-card" *ngFor="let venue of availableToday">
           <div class="avail-card-img" (click)="navigateToVenue(venue.id)">
-            <img [src]="venue.main_image ? apiBase + venue.main_image : 'assets/no-image.jpg'" [alt]="venue.name"
-              draggable="false" />
+            <img
+              [src]="venue.main_image ? (venue.main_image.startsWith('http') ? venue.main_image : apiBase + venue.main_image) : 'assets/no-image.jpg'"
+              [alt]="venue.name" draggable="false" />
             <div class="avail-card-overlay"></div>
             <span class="avail-sport-badge">{{ getSportName(venue.sport_id) }}</span>
             <span class="avail-slots-badge">
@@ -347,17 +348,15 @@
         </button>
       </div>
 
-      <div class="hiw-cta-card owner-cta" 
-           [class.disabled]="authService.isLoggedIn() && !authService.hasRole('owner')" 
-           data-aos="fade-left">
+      <div class="hiw-cta-card owner-cta" [class.disabled]="authService.isLoggedIn() && !authService.hasRole('owner')"
+        data-aos="fade-left">
         <div class="hiw-cta-icon">
           <i class="bi bi-plus-circle"></i>
         </div>
         <h3>Imate svoj teren?</h3>
         <p>Postanite deo naše platforme i povećajte broj rezervacija.</p>
-        <button class="btn-hiw-cta btn-gold" 
-                [disabled]="authService.isLoggedIn() && !authService.hasRole('owner')" 
-                (click)="handleOwnerCTA()">
+        <button class="btn-hiw-cta btn-gold" [disabled]="authService.isLoggedIn() && !authService.hasRole('owner')"
+          (click)="handleOwnerCTA()">
           Dodaj svoj teren <i class="bi bi-plus"></i>
         </button>
         <span class="disabled-hint" *ngIf="authService.isLoggedIn() && !authService.hasRole('owner')">
@@ -397,7 +396,8 @@
         <div class="auth-form-group">
           <label><i class="bi bi-lock"></i> Lozinka</label>
           <div class="auth-input-wrap">
-            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="authData.password" required
+              placeholder="••••••••">
             <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>
@@ -435,7 +435,8 @@
         <div class="auth-form-group">
           <label><i class="bi bi-lock"></i> Lozinka</label>
           <div class="auth-input-wrap">
-            <input [type]="showPassword ? 'text' : 'password'" name="regPassword" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <input [type]="showPassword ? 'text' : 'password'" name="regPassword" [(ngModel)]="authData.password"
+              required placeholder="••••••••">
             <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>
@@ -492,8 +493,9 @@
       <div class="venue-card" *ngFor="let venue of filteredVenues; let i = index"
         [style.animation-delay]="(i * 50) + 'ms'" [routerLink]="['/tereni/detalji', venue.id]">
         <div class="venue-card-img">
-          <img [src]="venue.main_image ? apiBase + venue.main_image : 'assets/no-image.jpg'" [alt]="venue.name"
-            loading="lazy" />
+          <img
+            [src]="venue.main_image ? (venue.main_image.startsWith('http') ? venue.main_image : apiBase + venue.main_image) : 'assets/no-image.jpg'"
+            [alt]="venue.name" loading="lazy" />
           <div class="img-overlay"></div>
           <div class="venue-badge-sport">{{ getSportName(venue.sport_id) }}</div>
           <div class="venue-badge-price">{{ venue.price_per_slot }} RSD</div>

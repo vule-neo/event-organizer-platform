@@ -38,7 +38,8 @@
 
       <!-- Image -->
       <div class="ovc-image">
-        <img [src]="venue.main_image ? apiBase + venue.main_image : 'assets/no-image.png'"
+        <img
+          [src]="venue.main_image ? (venue.main_image.startsWith('http') ? venue.main_image : apiBase + venue.main_image) : 'assets/no-image.png'"
           [alt]="venue.name" />
         <div class="ovc-status-badge" [class.badge-active]="venue.is_active" [class.badge-inactive]="!venue.is_active">
           <span class="status-dot"></span>

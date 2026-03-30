@@ -36,15 +36,16 @@
 
     <!-- Main image -->
     <div class="main-image-wrap">
-      <img [src]="activeImageUrl || 'assets/no-image.jpg'" [alt]="venue.name" />
+      <img [src]="img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path" />
     </div>
 
     <!-- Thumbnails -->
     <div class="thumbnails" *ngIf="venue.images?.length > 1">
-      <div class="thumb-item" *ngFor="let img of venue.images" [class.active]="activeImageUrl === apiBase + img.image_path"
-            (click)="activeImageUrl = apiBase + img.image_path">
-            <img [src]="apiBase + img.image_path" [alt]="venue.name" />
-          </div>
+      <div class="thumb-item" *ngFor="let img of venue.images"
+        [class.active]="activeImageUrl === apiBase + img.image_path"
+        (click)="activeImageUrl = apiBase + img.image_path">
+        <img [src]="img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path" />
+      </div>
     </div>
 
     <!-- Header -->
@@ -387,7 +388,8 @@
         <div class="auth-form-group">
           <label><i class="bi bi-lock"></i> Lozinka</label>
           <div class="auth-input-wrap">
-            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="authData.password" required
+              placeholder="••••••••">
             <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>
@@ -425,7 +427,8 @@
         <div class="auth-form-group">
           <label><i class="bi bi-lock"></i> Lozinka</label>
           <div class="auth-input-wrap">
-            <input [type]="showPassword ? 'text' : 'password'" name="regPassword" [(ngModel)]="authData.password" required placeholder="••••••••">
+            <input [type]="showPassword ? 'text' : 'password'" name="regPassword" [(ngModel)]="authData.password"
+              required placeholder="••••••••">
             <button type="button" class="auth-input-toggle" (click)="showPassword = !showPassword">
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>

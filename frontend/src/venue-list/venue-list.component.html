@@ -637,7 +637,7 @@
 </section>
 
 <!-- ===== CTA SECTION (UNAUTHENTICATED) ===== -->
-<ng-container *ngIf="!authService.isLoggedIn()">
+<ng-container *ngIf="!authService.isLoggedIn() && !isFiltering">
   <section class="cta-section" data-aos="zoom-in">
     <div class="cta-overlay"></div>
     <div class="cta-content">

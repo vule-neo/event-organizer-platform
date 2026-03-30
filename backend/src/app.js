@@ -38,8 +38,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Serviranje statičkih fajlova (slike terena)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Rute
 const authRoutes = require('./routes/auth.routes');

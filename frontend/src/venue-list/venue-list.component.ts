@@ -68,6 +68,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
   authLoading = false;
   authError = '';
   showPassword = false;
+  registerRole: 'customer' | 'owner' = 'customer';
 
   constructor(
     private venueService: VenueService,
@@ -526,13 +527,13 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigate(['/vlasnik/novi-teren']);
       }
     } else {
-      this.openAuthModal('register');
+      this.openAuthModal('register', 'owner');  // <-- add 'owner' here
     }
   }
 
-  // ---- AUTH MODAL METHODS ----
-  openAuthModal(tab: 'login' | 'register') {
+  openAuthModal(tab: 'login' | 'register', role: 'customer' | 'owner' = 'customer') {
     this.authModalTab = tab;
+    this.registerRole = role;
     this.showAuthModal = true;
     this.authError = '';
     this.showPassword = false;
@@ -581,7 +582,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       email: this.authData.email,
       password: this.authData.password,
       phone: this.authData.phone,
-      role: 'customer'
+      role: this.registerRole   // was: role: 'customer'
     };
     this.authService.register(payload).subscribe({
       next: () => {

@@ -19,9 +19,21 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
-// CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://event-organizer-platform-weld.vercel.app",
+  "https://sportskitermin.rs",
+  "https://www.sportskitermin.rs"
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:4200",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS blocked"));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

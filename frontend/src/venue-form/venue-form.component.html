@@ -220,8 +220,8 @@
           <label class="vf-images-label">Trenutne slike</label>
           <div class="vf-preview-grid">
             <div *ngFor="let img of existingImages; let i = index" class="vf-preview-item">
-              <img [src]="img.image_path.startsWith('http') ? img.image_path : apiBase + img.image_path"
-                alt="Existing Image" />
+              <!-- CORRECT: -->
+              <img [src]="img.url?.startsWith('http') ? img.url : apiBase + img.url" alt="Existing Image" />
               <button type="button" class="vf-remove-btn" (click)="removeExistingImage(img.id, i)">
                 <i class="bi bi-x"></i>
               </button>

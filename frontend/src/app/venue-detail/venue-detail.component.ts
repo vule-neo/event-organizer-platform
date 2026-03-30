@@ -129,7 +129,9 @@ export class VenueDetailComponent implements OnInit {
       next: (data) => {
         this.venue = data;
         if (data.images && data.images.length > 0) {
-          this.activeImageUrl = this.apiBase + data.images[0].image_path;
+          // CORRECT:
+          const firstImg = data.images[0].image_path;
+          this.activeImageUrl = firstImg.startsWith('http') ? firstImg : this.apiBase + firstImg;
         }
         this.updateSEOTags();
         this.loadOccupiedSlots();
@@ -146,7 +148,7 @@ export class VenueDetailComponent implements OnInit {
     if (!this.venue) return;
     const venueTitle = `${this.venue.name} - Rezervacija | SportskiTermin`;
     const venueDesc = `Rezerviši termin na ${this.venue.name} u gradu ${this.venue.city}. Najbolji sportski tereni na jednom mestu.`;
-    
+
     this.title.setTitle(venueTitle);
     this.meta.updateTag({ name: 'description', content: venueDesc });
     this.meta.updateTag({ name: 'keywords', content: `sport, teren, rezervacija, ${this.venue.name}, ${this.venue.city}, ${this.venue.sport_id}` });
@@ -197,7 +199,9 @@ export class VenueDetailComponent implements OnInit {
     });
   }
 
-  setActiveImage(url: string) { this.activeImageUrl = this.apiBase + url; }
+  setActiveImage(url: string) {
+    this.activeImageUrl = url.startsWith('http') ? url : this.apiBase + url;
+  }
 
   // --- CALENDAR ---
   generateCalendar() {

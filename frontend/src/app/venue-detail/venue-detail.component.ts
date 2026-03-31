@@ -42,13 +42,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   shortDayNames = ['Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub', 'Ned'];
 
   // Reviews
-  canReview = false;
-  reviewRating = 5;
-  reviewComment = '';
-  reviewSubmitting = false;
-  reviewSuccess = false;
-  reviewError = '';
-  hoverRating = 0;
+  reviews: any[] = [];
 
   scrollProgress: number = 0;
 
@@ -124,7 +118,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
         this.updateSEOTags();
         this.loadOccupiedSlots();
         this.generateCalendar();
-        this.checkCanReview();
+        this.loadReviews();
         this.loading = false;
       },
       error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
@@ -140,66 +134,10 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     this.meta.updateTag({ name: 'keywords', content: `sport, teren, rezervacija, ${this.venue.name}, ${this.venue.city}, ${this.venue.sport_id}` });
   }
 
-  checkCanReview() {
-    const user = this.authService.getUser();
-    if (!user || user.id === this.venue.owner_id) return;
-    this.bookingService.getMyBookings().subscribe({
-      next: (bookings: any[]) => {
-        const now = new Date();
-        this.canReview = bookings.some(b =>
-          b.venue_id === this.venue.id &&
-          new Date(b.end_time) < now &&
-          b.status !== 'cancelled_by_client' &&
-          b.status !== 'cancelled_by_owner' &&
-          !b.is_reviewed
-        );
-      },
+  loadReviews() {
+    this.venueService.getVenueReviews(this.venue.id).subscribe({
+      next: (data) => this.reviews = data,
       error: () => { }
-    });
-  }
-
-  getCompletedBookingId(): string | null { return null; }
-
-  submitReview() {
-    if (!this.reviewComment.trim()) { this.reviewError = 'Unesite komentar.'; return; }
-    this.reviewSubmitting = true;
-    this.reviewError = '';
-    this.bookingService.getMyBookings().subscribe({
-      next: (bookings: any[]) => {
-        const now = new Date();
-        const booking = bookings.find(b =>
-          b.venue_id === this.venue.id &&
-          new Date(b.end_time) < now &&
-          b.status !== 'cancelled_by_client' &&
-          b.status !== 'cancelled_by_owner' &&
-          !b.is_reviewed
-        );
-        if (!booking) {
-          this.reviewError = 'Nema završenih termina za recenziju.';
-          this.reviewSubmitting = false;
-          return;
-        }
-        this.venueService.submitReview({
-          venue_id: this.venue.id,
-          booking_id: booking.id,
-          rating: this.reviewRating,
-          comment: this.reviewComment
-        }).subscribe({
-          next: () => {
-            this.reviewSuccess = true;
-            this.reviewSubmitting = false;
-            this.canReview = false;
-          },
-          error: (err) => {
-            this.reviewError = err.error?.message || 'Greška pri slanju recenzije.';
-            this.reviewSubmitting = false;
-          }
-        });
-      },
-      error: () => {
-        this.reviewError = 'Greška pri učitavanju rezervacija.';
-        this.reviewSubmitting = false;
-      }
     });
   }
 

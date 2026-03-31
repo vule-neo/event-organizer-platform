@@ -257,9 +257,6 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // ZAMIJENI cijelu openInfoWindow metodu u venue-list.component.ts sa ovom verzijom
-  // Jedina promjena: dodaje pixelOffset i map.panTo da popup bude uvijek vidljiv
-
   private openInfoWindow(marker: any, venue: any) {
     const sportName = this.getSportName(venue.sport_id);
     const rating = venue.avg_rating
@@ -283,39 +280,14 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       </div>
     </div>`;
 
+    // disableAutoPan: true — popup se prikazuje tačno na lokaciji gdje je korisnik tapnuo
+    // bez automatskog pomjeranja mape
     this.infoWindow.setOptions({
-      pixelOffset: new google.maps.Size(0, -8)
+      pixelOffset: new google.maps.Size(0, -8),
+      disableAutoPan: true
     });
     this.infoWindow.setContent(content);
     this.infoWindow.open(this.map, marker);
-
-    // Nakon otvaranja, pomjeri mapu da popup bude vidljiv
-    // Posebno važno na mobilnom gdje popup može biti van ekrana
-    google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
-      // Pomjeri centar mape malo prema gore da popup bude vidljiv
-      const markerPos = marker.getPosition();
-      if (markerPos) {
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-          // Na mobilnom pomjeri više prema gore jer je popup veći dio ekrana
-          const projection = this.map.getProjection();
-          if (projection) {
-            const point = projection.fromLatLngToPoint(markerPos);
-            const scale = Math.pow(2, this.map.getZoom());
-            // Pomjeri marker prema gore na ekranu da popup ispod bude vidljiv
-            const offsetY = 220 / scale;
-            const newPoint = new google.maps.Point(point.x, point.y + offsetY);
-            const newLatLng = projection.fromPointToLatLng(newPoint);
-            this.map.panTo(newLatLng);
-          } else {
-            this.map.panTo(markerPos);
-          }
-        } else {
-          // Na desktopu samo mali pan da se osigura vidljivost
-          this.map.panTo(markerPos);
-        }
-      }
-    });
   }
 
   // ---- VENUES ----

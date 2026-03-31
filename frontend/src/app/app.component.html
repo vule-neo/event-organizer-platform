@@ -47,6 +47,15 @@
           </a>
         </ng-container>
 
+        <ng-container *ngIf="authService.hasRole('admin')">
+          <a routerLink="/moje-rezervacije" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+            <i class="bi bi-calendar2-heart"></i> Rezervacije
+          </a>
+          <a routerLink="/admin" routerLinkActive="active" class="btn-nav-primary" (click)="closeMobileMenu()">
+            <i class="bi bi-shield-lock-fill"></i> Admin panel
+          </a>
+        </ng-container>
+
         <div class="nav-divider"></div>
 
         <div class="user-dropdown">

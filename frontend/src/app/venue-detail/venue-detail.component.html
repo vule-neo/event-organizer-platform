@@ -292,39 +292,40 @@
 
     <div class="section-divider"></div>
 
-    <!-- ===== REVIEW FORM (samo za korisnike sa završenim terminima) ===== -->
-    <div class="reviews-section" *ngIf="canReview || reviewSuccess">
-
-      <!-- Review form -->
-      <div class="review-form-card" *ngIf="canReview && !reviewSuccess">
-        <h5>Ostavite recenziju</h5>
-
-        <div class="star-selector">
-          <button type="button" class="star-btn" *ngFor="let star of [1,2,3,4,5]"
-            [class.lit]="star <= (hoverRating || reviewRating)" (mouseenter)="hoverRating = star"
-            (mouseleave)="hoverRating = 0" (click)="reviewRating = star">
-            <i class="bi bi-star-fill"></i>
-          </button>
-        </div>
-
-        <textarea class="review-textarea" rows="3" [(ngModel)]="reviewComment"
-          placeholder="Vaše iskustvo sa ovim terenom..."></textarea>
-
-        <div class="review-error" *ngIf="reviewError">
-          <i class="bi bi-exclamation-circle"></i> {{ reviewError }}
-        </div>
-
-        <button class="btn-submit-review" (click)="submitReview()" [disabled]="reviewSubmitting">
-          {{ reviewSubmitting ? 'Slanje...' : 'Objavi recenziju' }}
-        </button>
+    <!-- ===== REVIEWS ===== -->
+    <div class="reviews-section">
+      <div class="reviews-header">
+        <h3>Recenzije</h3>
+        <span class="review-count-badge" *ngIf="reviews.length > 0">{{ reviews.length }}</span>
       </div>
 
-      <!-- Success -->
-      <div class="review-success" *ngIf="reviewSuccess">
-        <i class="bi bi-check-circle-fill"></i>
-        Recenzija uspešno objavljena!
+      <!-- No reviews -->
+      <div class="no-reviews" *ngIf="reviews.length === 0">
+        <i class="bi bi-chat-square-text"></i>
+        Još nema recenzija za ovaj teren.
       </div>
 
+      <!-- Review list — show only reviews that have a comment -->
+      <ng-container *ngFor="let review of reviews">
+        <div class="review-card" *ngIf="review.comment && review.comment.trim()">
+          <div class="review-card-header">
+            <div class="reviewer-info">
+              <div class="reviewer-avatar">
+                {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
+              </div>
+              <div>
+                <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
+                <div class="review-stars">
+                  <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                    [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                </div>
+              </div>
+            </div>
+            <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy':'UTC' }}</span>
+          </div>
+          <p class="review-comment">{{ review.comment }}</p>
+        </div>
+      </ng-container>
     </div>
 
   </div>

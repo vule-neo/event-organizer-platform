@@ -25,12 +25,6 @@ export class ReviewModalComponent {
   saveReview() {
     if (!this.booking) return;
 
-    // Validacija
-    if (!this.comment.trim()) {
-      this.errorMessage = 'Molimo vas unesite komentar.';
-      return;
-    }
-
     this.loading = true;
     this.errorMessage = '';  // Resetuj grešku
 

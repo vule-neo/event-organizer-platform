@@ -302,9 +302,9 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
           if (projection) {
             const point = projection.fromLatLngToPoint(markerPos);
             const scale = Math.pow(2, this.map.getZoom());
-            // Pomjeri za ~180px prema gore u map koordinatama
-            const offsetY = 180 / scale;
-            const newPoint = new google.maps.Point(point.x, point.y - offsetY);
+            // Pomjeri marker prema gore na ekranu da popup ispod bude vidljiv
+            const offsetY = 220 / scale;
+            const newPoint = new google.maps.Point(point.x, point.y + offsetY);
             const newLatLng = projection.fromPointToLatLng(newPoint);
             this.map.panTo(newLatLng);
           } else {

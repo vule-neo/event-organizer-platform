@@ -25,7 +25,7 @@
   </nav>
 
   <!-- ===== STICKY FLOATING CTA ===== -->
-  <button class="sticky-reserve-btn" *ngIf="showStickyButton && !stickyDismissed" (click)="scrollToBooking()">
+  <button class="sticky-reserve-btn" *ngIf="!stickyDismissed" (click)="scrollToBooking()">
     <i class="bi bi-calendar-check-fill"></i>
     <span>REZERVIŠI TERMIN</span>
     <span class="sticky-reserve-price">{{ venue.price_per_slot }} RSD</span>
@@ -292,12 +292,8 @@
 
     <div class="section-divider"></div>
 
-    <!-- ===== REVIEWS (always last) ===== -->
-    <div class="reviews-section">
-      <div class="reviews-header">
-        <h3>Recenzije</h3>
-        <span class="review-count-badge" *ngIf="reviews.length > 0">{{ reviews.length }}</span>
-      </div>
+    <!-- ===== REVIEW FORM (samo za korisnike sa završenim terminima) ===== -->
+    <div class="reviews-section" *ngIf="canReview || reviewSuccess">
 
       <!-- Review form -->
       <div class="review-form-card" *ngIf="canReview && !reviewSuccess">
@@ -329,31 +325,6 @@
         Recenzija uspešno objavljena!
       </div>
 
-      <!-- No reviews -->
-      <div class="no-reviews" *ngIf="reviews.length === 0">
-        <i class="bi bi-chat-square-text"></i>
-        Još nema recenzija za ovaj teren.
-      </div>
-
-      <!-- Review list -->
-      <div class="review-card" *ngFor="let review of reviews">
-        <div class="review-card-header">
-          <div class="reviewer-info">
-            <div class="reviewer-avatar">
-              {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
-            </div>
-            <div>
-              <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
-              <div class="review-stars">
-                <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                  [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
-              </div>
-            </div>
-          </div>
-          <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy' }}</span>
-        </div>
-        <p class="review-comment">{{ review.comment }}</p>
-      </div>
     </div>
 
   </div>

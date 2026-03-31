@@ -2460,7 +2460,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .map-wrapper {
-    height: 340px;
+    height: 420px;
   }
 
   .map-section-header {

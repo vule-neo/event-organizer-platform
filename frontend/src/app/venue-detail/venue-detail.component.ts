@@ -24,7 +24,6 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   activeImageUrl: string = '';
   apiBase = environment.apiBase;
 
-  showStickyButton: boolean = false;
   stickyDismissed: boolean = false;
   private scrollListener: any;
   private venueId: string = '';
@@ -43,7 +42,6 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   shortDayNames = ['Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub', 'Ned'];
 
   // Reviews
-  reviews: any[] = [];
   canReview = false;
   reviewRating = 5;
   reviewComment = '';
@@ -85,8 +83,6 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     if (id) {
       this.venueId = id;
       this.loadVenue(id);
-      // Učitaj dismissed stanje iz sessionStorage
-      this.stickyDismissed = sessionStorage.getItem(`sticky_dismissed_${id}`) === 'true';
     }
 
     this.setupScrollListener();
@@ -108,25 +104,12 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
 
   private setupScrollListener() {
     this.scrollListener = () => {
-      const bookingSection = document.getElementById('booking-section');
-      if (bookingSection) {
-        const rect = bookingSection.getBoundingClientRect();
-        // Sticky se prikazuje kada booking sekcija NIJE vidljiva u viewportu
-        const isBookingVisible = rect.top < window.innerHeight && rect.bottom > 0;
-        this.showStickyButton = !isBookingVisible;
-      } else {
-        this.showStickyButton = (window.scrollY || window.pageYOffset) > 300;
-      }
-
       const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       this.scrollProgress = height > 0 ? (winScroll / height) * 100 : 0;
     };
 
     window.addEventListener('scroll', this.scrollListener, { passive: true });
-    // Pokreni odmah i nakon učitavanja sadržaja
-    setTimeout(() => this.scrollListener(), 300);
-    setTimeout(() => this.scrollListener(), 800);
   }
 
   loadVenue(id: string) {
@@ -141,11 +124,8 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
         this.updateSEOTags();
         this.loadOccupiedSlots();
         this.generateCalendar();
-        this.loadReviews();
         this.checkCanReview();
         this.loading = false;
-        // Pokreni scroll listener nakon učitavanja sadržaja
-        setTimeout(() => this.scrollListener(), 200);
       },
       error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
     });
@@ -158,13 +138,6 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     this.title.setTitle(venueTitle);
     this.meta.updateTag({ name: 'description', content: venueDesc });
     this.meta.updateTag({ name: 'keywords', content: `sport, teren, rezervacija, ${this.venue.name}, ${this.venue.city}, ${this.venue.sport_id}` });
-  }
-
-  loadReviews() {
-    this.venueService.getVenueReviews(this.venue.id).subscribe({
-      next: (data) => this.reviews = data,
-      error: () => { }
-    });
   }
 
   checkCanReview() {
@@ -194,7 +167,6 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     this.bookingService.getMyBookings().subscribe({
       next: (bookings: any[]) => {
         const now = new Date();
-        // Isti uslov kao checkCanReview — po datumu, ne po statusu
         const booking = bookings.find(b =>
           b.venue_id === this.venue.id &&
           new Date(b.end_time) < now &&
@@ -217,14 +189,16 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
             this.reviewSuccess = true;
             this.reviewSubmitting = false;
             this.canReview = false;
-            this.loadReviews();
-            this.loadVenue(this.venue.id);
           },
           error: (err) => {
-            this.reviewError = err.error?.message || 'Greška.';
+            this.reviewError = err.error?.message || 'Greška pri slanju recenzije.';
             this.reviewSubmitting = false;
           }
         });
+      },
+      error: () => {
+        this.reviewError = 'Greška pri učitavanju rezervacija.';
+        this.reviewSubmitting = false;
       }
     });
   }
@@ -620,11 +594,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   }
 
   scrollToBooking() {
-    // Sakrij sticky i zapamti za ovu sesiju (briše se na refresh/novi tab)
     this.stickyDismissed = true;
-    if (this.venueId) {
-      sessionStorage.setItem(`sticky_dismissed_${this.venueId}`, 'true');
-    }
 
     const el = document.getElementById('booking-section');
     if (el) {

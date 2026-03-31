@@ -65,7 +65,8 @@
         </div>
         <div class="ticket-info-item">
           <span class="ticket-info-label"><i class="bi bi-clock"></i> Vreme</span>
-          <span class="ticket-info-value">{{ booking.start_time | date:'HH:mm' }} – {{ booking.end_time | date:'HH:mm'
+          <span class="ticket-info-value">{{ booking.start_time | date:'HH:mm':'UTC' }}
+            {{ booking.start_time | date:'dd.MM.yyyy':'UTC' }} – {{ booking.end_time | date:'HH:mm'
             }}</span>
         </div>
       </div>

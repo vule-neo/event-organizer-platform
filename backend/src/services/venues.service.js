@@ -344,7 +344,7 @@ exports.getPublicStats = async () => {
 // DODATI U: backend/src/services/venues.service.js
 // ============================================================
 
-// ZAMIJENI exports.getAvailableToday u venues.service.js
+// ZAMENI exports.getAvailableToday u venues.service.js
 
 exports.getAvailableToday = async () => {
   const result = await pool.query(`
@@ -353,7 +353,8 @@ exports.getAvailableToday = async () => {
         EXTRACT(DOW FROM NOW() AT TIME ZONE 'Europe/Belgrade')::int AS dow,
         NOW() AT TIME ZONE 'Europe/Belgrade' AS now_local,
         (NOW() AT TIME ZONE 'Europe/Belgrade')::time AS now_time,
-        CURRENT_DATE AS today
+        -- KRITIČAN FIX: koristimo Belgrade datum, ne UTC datum
+        (NOW() AT TIME ZONE 'Europe/Belgrade')::date AS today
     ),
     open_venues AS (
       SELECT 
@@ -361,7 +362,6 @@ exports.getAvailableToday = async () => {
         v.price_per_slot, v.slot_duration_mins,
         v.avg_rating, v.review_count, v.sport_id, v.lat, v.lng,
         wh.open_time, wh.close_time,
-        -- Overnight: close <= open (npr. 08:00 - 02:00)
         CASE WHEN wh.close_time <= wh.open_time THEN TRUE ELSE FALSE END AS is_overnight,
         (SELECT url FROM venue_images WHERE venue_id = v.id ORDER BY display_order ASC LIMIT 1) AS main_image,
         COALESCE(
@@ -376,13 +376,10 @@ exports.getAvailableToday = async () => {
       WHERE v.is_active = TRUE
         AND wh.day_of_week = ti.dow
         AND wh.is_open = TRUE
-        -- Teren još nije završio danas:
-        -- Normal:   close_time > now_time
-        -- Overnight: uvijek TRUE (radi do sutra ujutro)
         AND (
           (wh.close_time > wh.open_time AND wh.close_time > ti.now_time)
           OR
-          (wh.close_time <= wh.open_time) -- overnight, još uvijek aktivan
+          (wh.close_time <= wh.open_time)
         )
       GROUP BY v.id, wh.open_time, wh.close_time
     ),
@@ -390,14 +387,15 @@ exports.getAvailableToday = async () => {
       SELECT venue_id, start_time, end_time
       FROM bookings
       CROSS JOIN today_info ti
-      WHERE status = 'confirmed' AND start_time::date = ti.today
+      -- KRITIČAN FIX: poredimo sa Belgrade datumom
+      WHERE status = 'confirmed' 
+        AND (start_time AT TIME ZONE 'Europe/Belgrade')::date = ti.today
     ),
     venues_with_free_slots AS (
       SELECT ov.*,
         (
           SELECT COUNT(*) FROM generate_series(
             0,
-            -- Overnight: generišemo do close + 24h (u minutima od open_time)
             CASE 
               WHEN ov.is_overnight 
               THEN (EXTRACT(HOUR FROM ov.close_time)::int * 60 + EXTRACT(MINUTE FROM ov.close_time)::int + 1440)
@@ -411,16 +409,13 @@ exports.getAvailableToday = async () => {
           ) AS offset_mins
           CROSS JOIN today_info ti
           WHERE
-            -- Slot je u budućnosti (još nije prošao)
-            (
-              CURRENT_DATE + ov.open_time + (offset_mins || ' minutes')::interval
-            ) > ti.now_local
-            -- Slot nije rezervisan
+            -- KRITIČAN FIX: slot mora biti u budućnosti po Belgrade vremenu
+            (ti.today + ov.open_time + (offset_mins || ' minutes')::interval) > ti.now_local
             AND NOT EXISTS (
               SELECT 1 FROM booked_slots bs
               WHERE bs.venue_id = ov.id
-                AND bs.start_time <= CURRENT_DATE + ov.open_time + (offset_mins || ' minutes')::interval
-                AND bs.end_time   >  CURRENT_DATE + ov.open_time + (offset_mins || ' minutes')::interval
+                AND bs.start_time <= ti.today + ov.open_time + (offset_mins || ' minutes')::interval
+                AND bs.end_time   >  ti.today + ov.open_time + (offset_mins || ' minutes')::interval
             )
         ) AS free_slots_today
       FROM open_venues ov

@@ -280,9 +280,8 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   updateCalendarDaysStatus() {
     const occupiedMapped = this.monthlyOccupiedSlots.map(o => {
       const d = new Date(o.start_time);
-      const zOffset = d.getTimezoneOffset() * 60000;
-      const localDateStr = (new Date(d.getTime() - zOffset)).toISOString().split('T')[0];
-      const timeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+      const localDateStr = d.toISOString().split('T')[0];
+      const timeStr = `${d.getUTCHours().toString().padStart(2, '0')}:${d.getUTCMinutes().toString().padStart(2, '0')}`;
       return { dateString: localDateStr, time: timeStr };
     });
 
@@ -403,7 +402,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       next: (occupied: any[]) => {
         this.occupiedSlots = occupied.map(o => {
           const date = new Date(o.start_time);
-          return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          return `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
         });
         this.generateSlots();
       },

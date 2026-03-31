@@ -280,11 +280,8 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       </div>
     </div>`;
 
-    // disableAutoPan: true — popup se prikazuje tačno na lokaciji gdje je korisnik tapnuo
-    // bez automatskog pomjeranja mape
     this.infoWindow.setOptions({
-      pixelOffset: new google.maps.Size(0, -8),
-      disableAutoPan: true
+      pixelOffset: new google.maps.Size(0, -8)
     });
     this.infoWindow.setContent(content);
     this.infoWindow.open(this.map, marker);

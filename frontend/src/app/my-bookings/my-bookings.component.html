@@ -51,11 +51,11 @@
         <div class="booking-info-grid">
           <div class="booking-info-row">
             <span><i class="bi bi-calendar3"></i> Datum</span>
-            <strong>{{ b.start_time | date:'dd.MM.yyyy' }}</strong>
+            <strong>{{ b.start_time | date:'dd.MM.yyyy':'UTC' }}</strong>
           </div>
           <div class="booking-info-row">
             <span><i class="bi bi-clock"></i> Vreme</span>
-            <strong>{{ b.start_time | date:'HH:mm' }} – {{ b.end_time | date:'HH:mm' }}</strong>
+            <strong>{{ b.start_time | date:'HH:mm':'UTC' }} – {{ b.end_time | date:'HH:mm':'UTC' }}</strong>
           </div>
           <div class="booking-info-row">
             <span><i class="bi bi-cash"></i> Plaćeno</span>

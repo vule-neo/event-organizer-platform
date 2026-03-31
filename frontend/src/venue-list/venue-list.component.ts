@@ -208,6 +208,11 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       ]
     });
     this.infoWindow = new google.maps.InfoWindow();
+    // Klik na mapu (van popupa) zatvara InfoWindow
+    this.map.addListener('click', () => this.ngZone.run(() => {
+      this.infoWindow.close();
+      this.selectedVenue = null;
+    }));
     this.mapReady = true;
     if (this.venues.length > 0) this.placeMarkers(this.filteredVenues);
   }
@@ -267,7 +272,8 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       : 'assets/no-image.jpg';
 
     const content = `
-    <div class="map-popup">
+    <div class="map-popup" style="position:relative;">
+      <button class="map-popup-close" id="map-popup-close-btn" title="Zatvori">&#x2715;</button>
       <div class="map-popup-img">
         <img src="${imgSrc}" alt="${venue.name}" onerror="this.src='assets/no-image.jpg'" />
         <span class="map-popup-sport">${sportName}</span>
@@ -286,6 +292,17 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
     this.infoWindow.setContent(content);
     this.infoWindow.open(this.map, marker);
+
+    // Povezi custom X dugme nakon što Google renderuje sadržaj
+    google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
+      const closeBtn = document.getElementById('map-popup-close-btn');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => this.ngZone.run(() => {
+          this.infoWindow.close();
+          this.selectedVenue = null;
+        }));
+      }
+    });
   }
 
   // ---- VENUES ----

@@ -27,6 +27,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   stickyDismissed: boolean = false;
   private scrollListener: any;
   private venueId: string = '';
+  private pendingScrollToBooking: boolean = false;
 
   today: string = new Date().toISOString().split('T')[0];
   selectedDate: string = this.today;
@@ -83,9 +84,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
 
     this.route.queryParams.subscribe(params => {
       if (params['scrollTo'] === 'booking') {
-        setTimeout(() => {
-          this.scrollToBooking();
-        }, 500);
+        this.pendingScrollToBooking = true;
       }
     });
   }
@@ -120,6 +119,10 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
         this.generateCalendar();
         this.loadReviews();
         this.loading = false;
+        if (this.pendingScrollToBooking) {
+          this.pendingScrollToBooking = false;
+          setTimeout(() => this.scrollToBookingOnly(), 300);
+        }
       },
       error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
     });
@@ -532,7 +535,10 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
 
   scrollToBooking() {
     this.stickyDismissed = true;
+    this.scrollToBookingOnly();
+  }
 
+  scrollToBookingOnly() {
     const el = document.getElementById('booking-section');
     if (el) {
       const elementPosition = el.getBoundingClientRect().top;

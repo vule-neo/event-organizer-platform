@@ -586,26 +586,38 @@ button {
   max-height: none !important;
 }
 
-/* Sakrij default close button - koristimo vlastiti stil */
+/* Sakrij Google-ov default X dugme i strelicu */
 .gm-style .gm-style-iw-t::after {
   display: none !important;
 }
 
 .gm-ui-hover-effect {
-  top: 4px !important;
-  right: 4px !important;
-  width: 28px !important;
-  height: 28px !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  border-radius: 50% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: none !important;
 }
 
-.gm-ui-hover-effect img {
-  width: 14px !important;
-  height: 14px !important;
+/* Naš custom X dugme unutar popup kartice */
+.map-popup-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.45);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.15s ease;
+}
+
+.map-popup-close:hover {
+  background: rgba(0, 0, 0, 0.7);
 }
 
 /* Map popup kartica */

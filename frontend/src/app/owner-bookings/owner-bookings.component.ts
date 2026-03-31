@@ -14,7 +14,6 @@ export class OwnerBookingsComponent implements OnInit {
   bookings: any[] = [];
   loading = true;
 
-  // Osnovne statistike
   stats = {
     totalEarnings: 0,
     confirmedCount: 0,
@@ -22,16 +21,11 @@ export class OwnerBookingsComponent implements OnInit {
     completedCount: 0
   };
 
-  // Zarada po terenu
   earningsByVenue: { name: string, earnings: number, count: number }[] = [];
-
-  // Zarada po mjesecu (poslednjih 6 mjeseci)
   earningsByMonth: { label: string, earnings: number }[] = [];
-
-  // Najpopularniji termini (sati)
   popularHours: { hour: string, count: number }[] = [];
 
-  constructor(private bookingService: BookingService) {}
+  constructor(private bookingService: BookingService) { }
 
   ngOnInit(): void {
     this.bookingService.getOwnerReport().subscribe({
@@ -77,10 +71,10 @@ export class OwnerBookingsComponent implements OnInit {
     const map: { [key: string]: number } = {};
     const now = new Date();
 
-    // Inicijalizuj poslednjih 6 mjeseci sa 0
+    // Koristimo UTC metode — Railway server je u UTC
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
       map[key] = 0;
     }
 
@@ -88,7 +82,8 @@ export class OwnerBookingsComponent implements OnInit {
       .filter(b => b.status === 'confirmed' || b.status === 'completed')
       .forEach(b => {
         const d = new Date(b.start_time);
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        // FIX: getUTCMonth umjesto getMonth — timestamp iz baze je UTC
+        const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
         if (map[key] !== undefined) map[key] += Number(b.price_paid);
       });
 
@@ -105,7 +100,8 @@ export class OwnerBookingsComponent implements OnInit {
     this.bookings
       .filter(b => b.status === 'confirmed' || b.status === 'completed')
       .forEach(b => {
-        const hour = new Date(b.start_time).getHours().toString().padStart(2, '0') + ':00';
+        // FIX: getUTCHours umjesto getHours — timestamp iz baze je UTC
+        const hour = new Date(b.start_time).getUTCHours().toString().padStart(2, '0') + ':00';
         map[hour] = (map[hour] || 0) + 1;
       });
 

@@ -8,12 +8,6 @@
     </div>
   </div>
 
-  <!-- Loading -->
-  <div class="page-loading" *ngIf="loading">
-    <div class="page-spinner"></div>
-    <p>Učitavanje podataka...</p>
-  </div>
-
   <ng-container *ngIf="!loading">
 
     <!-- STAT CARDS -->
@@ -57,9 +51,8 @@
         <div class="bar-chart">
           <div class="bar-wrap" *ngFor="let m of earningsByMonth">
             <span class="bar-value">{{ m.earnings > 0 ? (m.earnings | number) : '' }}</span>
-            <div class="bar-fill"
-                 [style.height.%]="m.earnings > 0 ? (m.earnings / getMaxMonthEarnings() * 100) : 3"
-                 [class.bar-empty]="m.earnings === 0"></div>
+            <div class="bar-fill" [style.height.%]="m.earnings > 0 ? (m.earnings / getMaxMonthEarnings() * 100) : 3"
+              [class.bar-empty]="m.earnings === 0"></div>
             <span class="bar-label">{{ m.label }}</span>
           </div>
         </div>
@@ -76,8 +69,7 @@
               <span class="progress-count">{{ h.count }} rez.</span>
             </div>
             <div class="progress-track">
-              <div class="progress-fill progress-gold"
-                   [style.width.%]="(h.count / popularHours[0].count) * 100"></div>
+              <div class="progress-fill progress-gold" [style.width.%]="(h.count / popularHours[0].count) * 100"></div>
             </div>
           </div>
         </div>
@@ -97,8 +89,8 @@
             </span>
           </div>
           <div class="progress-track">
-            <div class="progress-fill progress-green"
-                 [style.width.%]="(v.earnings / getMaxVenueEarnings()) * 100"></div>
+            <div class="progress-fill progress-green" [style.width.%]="(v.earnings / getMaxVenueEarnings()) * 100">
+            </div>
           </div>
         </div>
       </div>
@@ -127,20 +119,21 @@
               <td class="td-bold">{{ b.venue_name }}</td>
               <td>{{ b.client_name }}</td>
               <td>
-                <div class="td-date">{{ b.start_time | date:'dd.MM.yyyy' }}</div>
-                <div class="td-time">{{ b.start_time | date:'HH:mm' }} – {{ b.end_time | date:'HH:mm' }}</div>
+                <!-- FIX: dodato :'UTC' na oba date pipe-a -->
+                <div class="td-date">{{ b.start_time | date:'dd.MM.yyyy':'UTC' }}</div>
+                <div class="td-time">{{ b.start_time | date:'HH:mm':'UTC' }} – {{ b.end_time | date:'HH:mm':'UTC' }}
+                </div>
               </td>
               <td class="td-price">{{ b.price_paid }} RSD</td>
               <td>
-                <span class="table-status-badge"
-                      [class.badge-confirmed]="b.status === 'confirmed'"
-                      [class.badge-completed]="b.status === 'completed'"
-                      [class.badge-cancelled-owner]="b.status === 'cancelled_by_owner'"
-                      [class.badge-cancelled-client]="b.status === 'cancelled_by_client'">
+                <span class="table-status-badge" [class.badge-confirmed]="b.status === 'confirmed'"
+                  [class.badge-completed]="b.status === 'completed'"
+                  [class.badge-cancelled-owner]="b.status === 'cancelled_by_owner'"
+                  [class.badge-cancelled-client]="b.status === 'cancelled_by_client'">
                   {{ b.status === 'confirmed' ? 'Potvrđeno' :
-                     b.status === 'completed' ? 'Završeno' :
-                     b.status === 'cancelled_by_owner' ? 'Otkazao vlasnik' :
-                     b.status === 'cancelled_by_client' ? 'Otkazao klijent' : b.status }}
+                  b.status === 'completed' ? 'Završeno' :
+                  b.status === 'cancelled_by_owner' ? 'Otkazao vlasnik' :
+                  b.status === 'cancelled_by_client' ? 'Otkazao klijent' : b.status }}
                 </span>
               </td>
               <td>
@@ -158,9 +151,7 @@
                   <button [routerLink]="['/bookings', b.id]" class="ovc-btn ovc-btn-view">
                     <i class="bi bi-ticket"></i> Detalji
                   </button>
-                  <button *ngIf="b.status === 'confirmed'"
-                          (click)="cancelBooking(b.id)"
-                          class="ovc-btn ovc-btn-delete">
+                  <button *ngIf="b.status === 'confirmed'" (click)="cancelBooking(b.id)" class="ovc-btn ovc-btn-delete">
                     <i class="bi bi-x-circle"></i> Otkaži
                   </button>
                 </div>

@@ -281,7 +281,8 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     </div>`;
 
     this.infoWindow.setOptions({
-      pixelOffset: new google.maps.Size(0, -8)
+      pixelOffset: new google.maps.Size(0, -5),
+      disableAutoPan: false
     });
     this.infoWindow.setContent(content);
     this.infoWindow.open(this.map, marker);

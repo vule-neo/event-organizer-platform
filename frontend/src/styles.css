@@ -721,16 +721,14 @@ button {
   color: #1e3a5f;
 }
 
-/* MOBILE: osiguraj da popup bude vidljiv i scrollabilan */
+/* MOBILE: popup sizing */
 @media (max-width: 768px) {
   .gm-style .gm-style-iw-c {
     max-width: 240px !important;
-    /* Na mobilnom - osiguraj da nije van ekrana */
-    position: relative !important;
   }
 
   .map-popup {
-    width: 230px;
+    width: 220px;
   }
 
   .map-popup-img {

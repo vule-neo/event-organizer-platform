@@ -25,7 +25,7 @@
   </nav>
 
   <!-- ===== STICKY FLOATING CTA ===== -->
-  <button class="sticky-reserve-btn" *ngIf="showStickyButton" (click)="scrollToBooking()">
+  <button class="sticky-reserve-btn" *ngIf="showStickyButton && !stickyDismissed" (click)="scrollToBooking()">
     <i class="bi bi-calendar-check-fill"></i>
     <span>REZERVIŠI TERMIN</span>
     <span class="sticky-reserve-price">{{ venue.price_per_slot }} RSD</span>

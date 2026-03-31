@@ -39,7 +39,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden;
   width: 100%;
   position: relative;
@@ -569,4 +570,181 @@ button {
 
 .map-popup-btn:hover {
   background: #2a4f7e;
+}
+
+.gm-style .gm-style-iw-c {
+  max-width: 280px !important;
+  max-height: none !important;
+  padding: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
+  overflow: visible !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Sakrij default close button - koristimo vlastiti stil */
+.gm-style .gm-style-iw-t::after {
+  display: none !important;
+}
+
+.gm-ui-hover-effect {
+  top: 4px !important;
+  right: 4px !important;
+  width: 28px !important;
+  height: 28px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.gm-ui-hover-effect img {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* Map popup kartica */
+.map-popup {
+  width: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: #fff;
+}
+
+.map-popup-img {
+  position: relative;
+  height: 130px;
+  overflow: hidden;
+}
+
+.map-popup-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.map-popup-sport {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #1e3a5f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 50px;
+}
+
+.map-popup-body {
+  padding: 12px 14px 14px;
+}
+
+.map-popup-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px;
+  line-height: 1.3;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.map-popup-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.map-popup-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.map-popup-new {
+  font-size: 11px;
+  font-weight: 600;
+  color: #b88a2e;
+  background: rgba(232, 184, 109, 0.15);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+
+.map-popup-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e3a5f;
+  margin-left: auto;
+}
+
+.map-popup-loc {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-popup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 0;
+  background: #1e3a5f;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.map-popup-btn:hover {
+  background: #e8b86d;
+  color: #1e3a5f;
+}
+
+/* MOBILE: osiguraj da popup bude vidljiv i scrollabilan */
+@media (max-width: 768px) {
+  .gm-style .gm-style-iw-c {
+    max-width: 240px !important;
+    /* Na mobilnom - osiguraj da nije van ekrana */
+    position: relative !important;
+  }
+
+  .map-popup {
+    width: 230px;
+  }
+
+  .map-popup-img {
+    height: 110px;
+  }
+
+  .map-popup-body {
+    padding: 10px 12px 12px;
+  }
+
+  .map-popup-btn {
+    padding: 11px 0;
+    font-size: 14px;
+    /* Veći tap target na mobilnom */
+    min-height: 44px;
+  }
 }

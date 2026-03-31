@@ -65,6 +65,7 @@ export class VenueDetailComponent implements OnInit {
   authLoading = false;
   authError = '';
   showPassword = false;
+  stickyDismissed = false;
 
   dayNames = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 
@@ -80,13 +81,16 @@ export class VenueDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) this.loadVenue(id);
+    if (id) {
+      this.loadVenue(id);
+      // Provjeri da li je korisnik već kliknuo na sticky CTA u ovoj sesiji
+      this.stickyDismissed = sessionStorage.getItem(`sticky_dismissed_${id}`) === 'true';
+    }
 
     this.setupScrollListener();
 
     this.route.queryParams.subscribe(params => {
       if (params['scrollTo'] === 'booking') {
-        // Mali delay da se učita sadržaj
         setTimeout(() => {
           this.scrollToBooking();
         }, 500);
@@ -166,8 +170,13 @@ export class VenueDetailComponent implements OnInit {
     if (!user || user.id === this.venue.owner_id) return;
     this.bookingService.getMyBookings().subscribe({
       next: (bookings: any[]) => {
+        const now = new Date();
         this.canReview = bookings.some(b =>
-          b.venue_id === this.venue.id && b.status === 'completed' && !b.is_reviewed
+          b.venue_id === this.venue.id &&
+          new Date(b.end_time) < now &&
+          b.status !== 'cancelled_by_client' &&
+          b.status !== 'cancelled_by_owner' &&
+          !b.is_reviewed
         );
       },
       error: () => { }
@@ -607,25 +616,29 @@ export class VenueDetailComponent implements OnInit {
   }
 
   scrollToBooking() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      // Sakrij sticky button i zapamti u sessionStorage
+      this.stickyDismissed = true;
+      sessionStorage.setItem(`sticky_dismissed_${id}`, 'true');
+    }
+
     const el = document.getElementById('booking-section');
     if (el) {
-      // Dobij poziciju elementa
       const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset od vrha
+      const offsetPosition = elementPosition + window.pageYOffset - 100;
 
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth'
       });
 
-      // Opciono: dodaj vizuelni efekat da istakneš sekciju
       el.style.transition = 'box-shadow 0.3s ease';
       el.style.boxShadow = '0 0 0 3px var(--gold), 0 0 0 6px rgba(232, 184, 109, 0.3)';
       setTimeout(() => {
         el.style.boxShadow = '';
       }, 1000);
 
-      // Zatvori share menu ako je otvoren
       this.shareMenuOpen = false;
     }
   }

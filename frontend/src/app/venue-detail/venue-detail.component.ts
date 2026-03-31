@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,7 @@ const namePattern = /^[a-zA-Zàáâäãåąčćęèéêëėįìíîïłńòóô�
   templateUrl: './venue-detail.component.html',
   styleUrl: './venue-detail.component.css'
 })
-export class VenueDetailComponent implements OnInit {
+export class VenueDetailComponent implements OnInit, OnDestroy {
   venue: any = null;
   loading = true;
   errorMessage = '';
@@ -25,7 +25,9 @@ export class VenueDetailComponent implements OnInit {
   apiBase = environment.apiBase;
 
   showStickyButton: boolean = false;
+  stickyDismissed: boolean = false;
   private scrollListener: any;
+  private venueId: string = '';
 
   today: string = new Date().toISOString().split('T')[0];
   selectedDate: string = this.today;
@@ -65,7 +67,6 @@ export class VenueDetailComponent implements OnInit {
   authLoading = false;
   authError = '';
   showPassword = false;
-  stickyDismissed = false;
 
   dayNames = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 
@@ -82,8 +83,9 @@ export class VenueDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      this.venueId = id;
       this.loadVenue(id);
-      // Provjeri da li je korisnik već kliknuo na sticky CTA u ovoj sesiji
+      // Učitaj dismissed stanje iz sessionStorage
       this.stickyDismissed = sessionStorage.getItem(`sticky_dismissed_${id}`) === 'true';
     }
 
@@ -99,7 +101,6 @@ export class VenueDetailComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    // Očisti scroll listener kada se komponenta uništi
     if (this.scrollListener) {
       window.removeEventListener('scroll', this.scrollListener);
     }
@@ -110,21 +111,22 @@ export class VenueDetailComponent implements OnInit {
       const bookingSection = document.getElementById('booking-section');
       if (bookingSection) {
         const rect = bookingSection.getBoundingClientRect();
-        const isBookingVisible = rect.top <= window.innerHeight && rect.bottom >= 0;
-        const scrollY = window.scrollY || window.pageYOffset;
-        this.showStickyButton = !isBookingVisible || scrollY > 300;
+        // Sticky se prikazuje kada booking sekcija NIJE vidljiva u viewportu
+        const isBookingVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        this.showStickyButton = !isBookingVisible;
       } else {
-        this.showStickyButton = window.scrollY > 300;
+        this.showStickyButton = (window.scrollY || window.pageYOffset) > 300;
       }
 
-      // DODAJ OVO ZA PROGRESS BAR:
       const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      this.scrollProgress = (winScroll / height) * 100;
+      this.scrollProgress = height > 0 ? (winScroll / height) * 100 : 0;
     };
 
-    window.addEventListener('scroll', this.scrollListener);
-    setTimeout(() => this.scrollListener(), 100);
+    window.addEventListener('scroll', this.scrollListener, { passive: true });
+    // Pokreni odmah i nakon učitavanja sadržaja
+    setTimeout(() => this.scrollListener(), 300);
+    setTimeout(() => this.scrollListener(), 800);
   }
 
   loadVenue(id: string) {
@@ -133,8 +135,7 @@ export class VenueDetailComponent implements OnInit {
       next: (data) => {
         this.venue = data;
         if (data.images && data.images.length > 0) {
-          // CORRECT:
-          const firstImg = data.images[0].url;  // url je ispravno polje
+          const firstImg = data.images[0].url;
           this.activeImageUrl = firstImg.startsWith('http') ? firstImg : this.apiBase + firstImg;
         }
         this.updateSEOTags();
@@ -143,6 +144,8 @@ export class VenueDetailComponent implements OnInit {
         this.loadReviews();
         this.checkCanReview();
         this.loading = false;
+        // Pokreni scroll listener nakon učitavanja sadržaja
+        setTimeout(() => this.scrollListener(), 200);
       },
       error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
     });
@@ -152,7 +155,6 @@ export class VenueDetailComponent implements OnInit {
     if (!this.venue) return;
     const venueTitle = `${this.venue.name} - Rezervacija | SportskiTermin`;
     const venueDesc = `Rezerviši termin na ${this.venue.name} u gradu ${this.venue.city}. Najbolji sportski tereni na jednom mestu.`;
-
     this.title.setTitle(venueTitle);
     this.meta.updateTag({ name: 'description', content: venueDesc });
     this.meta.updateTag({ name: 'keywords', content: `sport, teren, rezervacija, ${this.venue.name}, ${this.venue.city}, ${this.venue.sport_id}` });
@@ -191,18 +193,37 @@ export class VenueDetailComponent implements OnInit {
     this.reviewError = '';
     this.bookingService.getMyBookings().subscribe({
       next: (bookings: any[]) => {
+        const now = new Date();
+        // Isti uslov kao checkCanReview — po datumu, ne po statusu
         const booking = bookings.find(b =>
-          b.venue_id === this.venue.id && b.status === 'completed' && !b.is_reviewed
+          b.venue_id === this.venue.id &&
+          new Date(b.end_time) < now &&
+          b.status !== 'cancelled_by_client' &&
+          b.status !== 'cancelled_by_owner' &&
+          !b.is_reviewed
         );
-        if (!booking) { this.reviewError = 'Nema završenih rezervacija za recenziju.'; this.reviewSubmitting = false; return; }
+        if (!booking) {
+          this.reviewError = 'Nema završenih termina za recenziju.';
+          this.reviewSubmitting = false;
+          return;
+        }
         this.venueService.submitReview({
           venue_id: this.venue.id,
           booking_id: booking.id,
           rating: this.reviewRating,
           comment: this.reviewComment
         }).subscribe({
-          next: () => { this.reviewSuccess = true; this.reviewSubmitting = false; this.canReview = false; this.loadReviews(); this.loadVenue(this.venue.id); },
-          error: (err) => { this.reviewError = err.error?.message || 'Greška.'; this.reviewSubmitting = false; }
+          next: () => {
+            this.reviewSuccess = true;
+            this.reviewSubmitting = false;
+            this.canReview = false;
+            this.loadReviews();
+            this.loadVenue(this.venue.id);
+          },
+          error: (err) => {
+            this.reviewError = err.error?.message || 'Greška.';
+            this.reviewSubmitting = false;
+          }
         });
       }
     });
@@ -274,12 +295,11 @@ export class VenueDetailComponent implements OnInit {
 
   onDateChange() { this.selectedSlot = null; this.loadOccupiedSlots(); }
 
-  // --- SLOTS: OVERNIGHT SUPPORT ---
   generateSlots() {
     if (!this.venue || !this.venue.working_hours) return;
 
     const dateObj = new Date(this.selectedDate + 'T12:00:00');
-    const dayOfWeek = dateObj.getDay(); // 0=Sun, 1=Mon...
+    const dayOfWeek = dateObj.getDay();
     const workingDay = this.venue.working_hours.find((h: any) => h.day_of_week === dayOfWeek);
 
     if (!workingDay || !workingDay.is_open) {
@@ -292,17 +312,13 @@ export class VenueDetailComponent implements OnInit {
     let closeMins = this.parseTime(workingDay.close_time);
     const duration = this.venue.slot_duration_mins;
 
-    // Overnight: ako close <= open, dodaj 24h na close
-    // npr. open=08:00 (480), close=02:00 (120) → closeMins = 120 + 1440 = 1560
     const isOvernight = closeMins <= openMins;
     if (isOvernight) closeMins += 24 * 60;
 
-    // Ako je odabrani datum danas, računaj trenutno vreme u Beogradu
     const isToday = this.selectedDate === this.today;
     let nowMins = 0;
     if (isToday) {
       const now = new Date();
-      // Beograd = UTC+1 (zimsko) ili UTC+2 (ljetno)
       const belgradeOffset = this.getBelgradeOffsetMins();
       const utcMins = now.getUTCHours() * 60 + now.getUTCMinutes();
       nowMins = (utcMins + belgradeOffset) % (24 * 60);
@@ -315,16 +331,13 @@ export class VenueDetailComponent implements OnInit {
       const startStr = this.formatTime(displayStart);
       const endStr = this.formatTime(displayEnd);
 
-      // Preskoči prošle slotove za danas
-      // Za overnight slotove poslije ponoći, displayStart je mali broj (npr. 30 = 00:30)
-      // ali currentTime je > 1440, pa ih ne preskačemo zbog nowMins poređenja
       const slotStartForComparison = isOvernight && currentTime >= 24 * 60
-        ? displayStart + 24 * 60  // sutrašnji slot, nikad u prošlosti za danas
+        ? displayStart + 24 * 60
         : displayStart;
 
       if (isToday && slotStartForComparison <= nowMins) {
         currentTime += duration;
-        continue; // preskači prošle i trenutne slotove
+        continue;
       }
 
       slots.push({
@@ -498,16 +511,12 @@ export class VenueDetailComponent implements OnInit {
 
     this.bookingService.createBooking(bookingData).subscribe({
       next: (response: any) => {
-        // Dohvati ID kreirane rezervacije (zavisi od tvog API response-a)
         const bookingId = response.id || response.booking?.id;
-
         if (bookingId) {
-          // Redirect na detail stranicu sa porukom
           this.router.navigate(['/bookings', bookingId], {
             queryParams: { success: 'true' }
           });
         } else {
-          // Fallback ako nema ID-a
           alert('Uspešno rezervisano!');
           this.loadOccupiedSlots();
         }
@@ -541,8 +550,6 @@ export class VenueDetailComponent implements OnInit {
         this.recurringResult = res;
         this.recurringLoading = false;
         this.loadOccupiedSlots();
-
-        // Ako ima uspešnih rezervacija, pitaj korisnika da li želi da vidi prvu
         if (res.created > 0 && res.bookingIds && res.bookingIds.length > 0) {
           if (confirm(`Rezervisano ${res.created} termina. Želite li da vidite detalje prve rezervacije?`)) {
             this.router.navigate(['/bookings', res.bookingIds[0]]);
@@ -556,9 +563,7 @@ export class VenueDetailComponent implements OnInit {
     });
   }
 
-  /** Vraća offset Beograda u minutima (60 zimsko, 120 ljetno) */
   private getBelgradeOffsetMins(): number {
-    // Provjeravamo da li je ljetno računanje: CET=UTC+1, CEST=UTC+2
     const jan = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset();
     const jul = new Date(new Date().getFullYear(), 6, 1).getTimezoneOffset();
     const isDST = new Date().getTimezoneOffset() < Math.max(jan, jul);
@@ -604,7 +609,6 @@ export class VenueDetailComponent implements OnInit {
         this.shareMenuOpen = false;
         break;
       case 'instagram':
-        // Instagram ne podržava direktan URL share — kopiraj link
         navigator.clipboard.writeText(url).then(() => {
           this.linkCopied = true;
           alert('Link kopiran! Otvori Instagram i zalijepi ga u Story.');
@@ -616,11 +620,10 @@ export class VenueDetailComponent implements OnInit {
   }
 
   scrollToBooking() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      // Sakrij sticky button i zapamti u sessionStorage
-      this.stickyDismissed = true;
-      sessionStorage.setItem(`sticky_dismissed_${id}`, 'true');
+    // Sakrij sticky i zapamti za ovu sesiju (briše se na refresh/novi tab)
+    this.stickyDismissed = true;
+    if (this.venueId) {
+      sessionStorage.setItem(`sticky_dismissed_${this.venueId}`, 'true');
     }
 
     const el = document.getElementById('booking-section');

@@ -257,6 +257,9 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  // ZAMIJENI cijelu openInfoWindow metodu u venue-list.component.ts sa ovom verzijom
+  // Jedina promjena: dodaje pixelOffset i map.panTo da popup bude uvijek vidljiv
+
   private openInfoWindow(marker: any, venue: any) {
     const sportName = this.getSportName(venue.sport_id);
     const rating = venue.avg_rating
@@ -265,21 +268,54 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     const imgSrc = venue.main_image
       ? (venue.main_image.startsWith('http') ? venue.main_image : this.apiBase + venue.main_image)
       : 'assets/no-image.jpg';
+
     const content = `
-      <div class="map-popup">
-        <div class="map-popup-img">
-          <img src="${imgSrc}" alt="${venue.name}" onerror="this.src='assets/no-image.jpg'" />
-          <span class="map-popup-sport">${sportName}</span>
-        </div>
-        <div class="map-popup-body">
-          <h4 class="map-popup-name">${venue.name}</h4>
-          <div class="map-popup-meta">${rating}<span class="map-popup-price">${venue.price_per_slot} RSD</span></div>
-          <p class="map-popup-loc"><i class="bi bi-geo-alt" style="font-size:11px;margin-right:3px;"></i>${venue.city}</p>
-          <a class="map-popup-btn" href="/tereni/detalji/${venue.id}">Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>
-        </div>
-      </div>`;
+    <div class="map-popup">
+      <div class="map-popup-img">
+        <img src="${imgSrc}" alt="${venue.name}" onerror="this.src='assets/no-image.jpg'" />
+        <span class="map-popup-sport">${sportName}</span>
+      </div>
+      <div class="map-popup-body">
+        <h4 class="map-popup-name">${venue.name}</h4>
+        <div class="map-popup-meta">${rating}<span class="map-popup-price">${venue.price_per_slot} RSD</span></div>
+        <p class="map-popup-loc"><i class="bi bi-geo-alt" style="font-size:11px;margin-right:3px;"></i>${venue.city}</p>
+        <a class="map-popup-btn" href="/tereni/detalji/${venue.id}">Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>
+      </div>
+    </div>`;
+
+    this.infoWindow.setOptions({
+      pixelOffset: new google.maps.Size(0, -8)
+    });
     this.infoWindow.setContent(content);
     this.infoWindow.open(this.map, marker);
+
+    // Nakon otvaranja, pomjeri mapu da popup bude vidljiv
+    // Posebno važno na mobilnom gdje popup može biti van ekrana
+    google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
+      // Pomjeri centar mape malo prema gore da popup bude vidljiv
+      const markerPos = marker.getPosition();
+      if (markerPos) {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          // Na mobilnom pomjeri više prema gore jer je popup veći dio ekrana
+          const projection = this.map.getProjection();
+          if (projection) {
+            const point = projection.fromLatLngToPoint(markerPos);
+            const scale = Math.pow(2, this.map.getZoom());
+            // Pomjeri za ~180px prema gore u map koordinatama
+            const offsetY = 180 / scale;
+            const newPoint = new google.maps.Point(point.x, point.y - offsetY);
+            const newLatLng = projection.fromPointToLatLng(newPoint);
+            this.map.panTo(newLatLng);
+          } else {
+            this.map.panTo(markerPos);
+          }
+        } else {
+          // Na desktopu samo mali pan da se osigura vidljivost
+          this.map.panTo(markerPos);
+        }
+      }
+    });
   }
 
   // ---- VENUES ----

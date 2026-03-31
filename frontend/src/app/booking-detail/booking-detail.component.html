@@ -11,7 +11,7 @@
     </button>
   </div>
 </div>
-<!-- Ostatak tvog HTML-a za booking detail -->
+
 <div class="owner-page" *ngIf="booking">
   <div class="booking-detail-wrap">
 
@@ -57,17 +57,17 @@
         <div class="ticket-notch ticket-notch-right"></div>
       </div>
 
-      <!-- Info grid -->
+      <!-- Info grid — FIX: dodato 'UTC' na sve date pipe-ove -->
       <div class="ticket-info-grid">
         <div class="ticket-info-item">
           <span class="ticket-info-label"><i class="bi bi-calendar3"></i> Datum</span>
-          <span class="ticket-info-value">{{ booking.start_time | date:'dd.MM.yyyy' }}</span>
+          <span class="ticket-info-value">{{ booking.start_time | date:'dd.MM.yyyy':'UTC' }}</span>
         </div>
         <div class="ticket-info-item">
           <span class="ticket-info-label"><i class="bi bi-clock"></i> Vreme</span>
-          <span class="ticket-info-value">{{ booking.start_time | date:'HH:mm':'UTC' }}
-            {{ booking.start_time | date:'dd.MM.yyyy':'UTC' }} – {{ booking.end_time | date:'HH:mm'
-            }}</span>
+          <span class="ticket-info-value">
+            {{ booking.start_time | date:'HH:mm':'UTC' }} – {{ booking.end_time | date:'HH:mm':'UTC' }}
+          </span>
         </div>
       </div>
 

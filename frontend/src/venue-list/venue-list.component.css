@@ -3224,3 +3224,15 @@
     overflow: hidden;
   }
 }
+
+@media (max-width: 768px) {
+  .avail-section .section-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Carousel wrap kompenzuje negativan margin */
+  .avail-carousel-wrap {
+    margin: 0 -4px;
+  }
+}

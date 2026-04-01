@@ -25,3 +25,22 @@ exports.getByVenue = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+exports.update = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const result = await reviewService.updateReview(req.params.id, req.user.id, { rating, comment });
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+exports.remove = async (req, res) => {
+    try {
+        await reviewService.deleteReview(req.params.id, req.user.id);
+        res.json({ message: 'Recenzija je obrisana.' });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};

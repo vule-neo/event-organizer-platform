@@ -5,5 +5,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 
 router.post('/', authMiddleware, reviewController.create);
 router.get('/venue/:venueId', reviewController.getByVenue);
+router.put('/:id', authMiddleware, reviewController.update);
+router.delete('/:id', authMiddleware, reviewController.remove);
 
 module.exports = router;

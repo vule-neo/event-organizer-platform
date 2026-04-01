@@ -76,4 +76,12 @@ export class VenueService {
   submitReview(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/reviews`, data);
   }
+
+  updateReview(id: string, data: { rating: number; comment: string }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/reviews/${id}`, data);
+  }
+
+  deleteReview(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/reviews/${id}`);
+  }
 }

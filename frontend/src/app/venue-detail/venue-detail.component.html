@@ -299,35 +299,106 @@
         <span class="review-count-badge" *ngIf="reviews.length > 0">{{ reviews.length }}</span>
       </div>
 
+      <!-- My review (pinned first) -->
+      <div class="review-card review-card-mine" *ngIf="myReview && myReview.comment?.trim()">
+        <div class="review-mine-badge"><i class="bi bi-person-fill"></i> Vaša recenzija</div>
+        <div class="review-card-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">
+              {{ myReview.first_name?.charAt(0) }}{{ myReview.last_name?.charAt(0) }}
+            </div>
+            <div>
+              <div class="reviewer-name">{{ myReview.first_name }} {{ myReview.last_name }}</div>
+              <div class="review-stars">
+                <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                  [ngClass]="star <= myReview.rating ? 'bi-star-fill' : 'bi-star'"></i>
+              </div>
+            </div>
+          </div>
+          <div class="review-actions-wrap">
+            <span class="review-date">{{ myReview.created_at | date:'dd.MM.yyyy':'UTC' }}</span>
+            <button class="review-action-btn review-action-edit" (click)="openEditReview()" title="Uredi">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="review-action-btn review-action-delete" (click)="openDeleteConfirm()" title="Obriši">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        <p class="review-comment">{{ myReview.comment }}</p>
+      </div>
+
       <!-- No reviews -->
       <div class="no-reviews" *ngIf="reviews.length === 0">
         <i class="bi bi-chat-square-text"></i>
         Još nema recenzija za ovaj teren.
       </div>
 
-      <!-- Review list — show only reviews that have a comment -->
-      <ng-container *ngFor="let review of reviews">
-        <div class="review-card" *ngIf="review.comment && review.comment.trim()">
-          <div class="review-card-header">
-            <div class="reviewer-info">
-              <div class="reviewer-avatar">
-                {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
-              </div>
-              <div>
-                <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
-                <div class="review-stars">
-                  <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                    [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
-                </div>
+      <!-- Other reviews (paginated, only those with comment) -->
+      <div class="review-card" *ngFor="let review of displayedOtherReviews">
+        <div class="review-card-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">
+              {{ review.first_name?.charAt(0) }}{{ review.last_name?.charAt(0) }}
+            </div>
+            <div>
+              <div class="reviewer-name">{{ review.first_name }} {{ review.last_name }}</div>
+              <div class="review-stars">
+                <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                  [ngClass]="star <= review.rating ? 'bi-star-fill' : 'bi-star'"></i>
               </div>
             </div>
-            <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy':'UTC' }}</span>
           </div>
-          <p class="review-comment">{{ review.comment }}</p>
+          <span class="review-date">{{ review.created_at | date:'dd.MM.yyyy':'UTC' }}</span>
         </div>
-      </ng-container>
+        <p class="review-comment">{{ review.comment }}</p>
+      </div>
+
+      <!-- Load more -->
+      <div class="load-more-wrap" *ngIf="hasMoreReviews">
+        <button class="btn-load-more" (click)="loadMoreReviews()">
+          <i class="bi bi-arrow-down-circle"></i> Pročitaj još
+          <span class="load-more-count">({{ otherReviewsWithCommentCount - displayCount }} preostalih)</span>
+        </button>
+      </div>
     </div>
 
+  </div>
+</div>
+
+<!-- DELETE REVIEW CONFIRM MODAL -->
+<div class="confirm-modal-overlay" *ngIf="showDeleteConfirm" (click)="showDeleteConfirm = false">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-modal-icon confirm-icon-danger"><i class="bi bi-trash-fill"></i></div>
+    <h5>Obriši recenziju</h5>
+    <p>Da li ste sigurni da želite da obrišete svoju recenziju? Ova akcija je nepovratna.</p>
+    <div class="confirm-modal-actions">
+      <button class="btn-confirm-cancel" (click)="showDeleteConfirm = false">Otkaži</button>
+      <button class="btn-confirm-delete" [disabled]="reviewActionLoading" (click)="confirmDeleteReview()">
+        <i class="bi bi-trash"></i> {{ reviewActionLoading ? 'Brisanje...' : 'Obriši' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT REVIEW MODAL -->
+<div class="confirm-modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="confirm-modal confirm-modal-edit" (click)="$event.stopPropagation()">
+    <h5><i class="bi bi-pencil-square"></i> Uredi recenziju</h5>
+    <div class="star-selector">
+      <button *ngFor="let star of [1,2,3,4,5]" type="button" class="star-btn"
+        [class.lit]="star <= editRating" (click)="editRating = star">
+        <i class="bi" [ngClass]="star <= editRating ? 'bi-star-fill' : 'bi-star'"></i>
+      </button>
+    </div>
+    <textarea class="review-textarea" rows="4" placeholder="Vaš komentar..." [(ngModel)]="editComment"></textarea>
+    <p class="review-error" *ngIf="editError"><i class="bi bi-exclamation-circle"></i> {{ editError }}</p>
+    <div class="confirm-modal-actions">
+      <button class="btn-confirm-cancel" (click)="closeEditModal()">Otkaži</button>
+      <button class="btn-confirm-save" [disabled]="reviewActionLoading" (click)="submitEditReview()">
+        <i class="bi bi-check-circle"></i> {{ reviewActionLoading ? 'Čuvanje...' : 'Sačuvaj' }}
+      </button>
+    </div>
   </div>
 </div>
 

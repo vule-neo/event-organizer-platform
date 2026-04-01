@@ -45,6 +45,17 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
 
   // Reviews
   reviews: any[] = [];
+  myReview: any = null;
+  otherReviews: any[] = [];
+  displayCount = 5;
+
+  // Review edit/delete state
+  showDeleteConfirm = false;
+  showEditModal = false;
+  editRating = 0;
+  editComment = '';
+  editError = '';
+  reviewActionLoading = false;
 
   scrollProgress: number = 0;
 
@@ -141,8 +152,98 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
 
   loadReviews() {
     this.venueService.getVenueReviews(this.venue.id).subscribe({
-      next: (data) => this.reviews = data,
+      next: (data) => {
+        this.reviews = data;
+        const currentUser = this.authService.getUser();
+        if (currentUser) {
+          this.myReview = data.find((r: any) => r.client_id === currentUser.id) || null;
+          this.otherReviews = data.filter((r: any) => r.client_id !== currentUser.id);
+        } else {
+          this.myReview = null;
+          this.otherReviews = data;
+        }
+      },
       error: () => { }
+    });
+  }
+
+  get displayedOtherReviews(): any[] {
+    return this.otherReviews.filter(r => r.comment?.trim()).slice(0, this.displayCount);
+  }
+
+  get otherReviewsWithCommentCount(): number {
+    return this.otherReviews.filter(r => r.comment?.trim()).length;
+  }
+
+  get hasMoreReviews(): boolean {
+    return this.otherReviewsWithCommentCount > this.displayCount;
+  }
+
+  loadMoreReviews() {
+    this.displayCount += 5;
+  }
+
+  openDeleteConfirm() {
+    this.showDeleteConfirm = true;
+  }
+
+  confirmDeleteReview() {
+    if (!this.myReview) return;
+    this.reviewActionLoading = true;
+    this.venueService.deleteReview(this.myReview.id).subscribe({
+      next: () => {
+        this.reviewActionLoading = false;
+        this.showDeleteConfirm = false;
+        this.loadReviews();
+        this.loadVenueRating();
+      },
+      error: (err) => {
+        this.reviewActionLoading = false;
+        this.notif.error(err.error?.message || 'Greška pri brisanju recenzije.');
+      }
+    });
+  }
+
+  openEditReview() {
+    if (!this.myReview) return;
+    this.editRating = this.myReview.rating;
+    this.editComment = this.myReview.comment || '';
+    this.editError = '';
+    this.showEditModal = true;
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+  }
+
+  submitEditReview() {
+    if (!this.myReview) return;
+    if (!this.editRating) { this.editError = 'Odaberite ocjenu.'; return; }
+    this.reviewActionLoading = true;
+    this.editError = '';
+    this.venueService.updateReview(this.myReview.id, { rating: this.editRating, comment: this.editComment }).subscribe({
+      next: () => {
+        this.reviewActionLoading = false;
+        this.showEditModal = false;
+        this.loadReviews();
+        this.loadVenueRating();
+      },
+      error: (err) => {
+        this.editError = err.error?.message || 'Greška pri izmjeni recenzije.';
+        this.reviewActionLoading = false;
+      }
+    });
+  }
+
+  loadVenueRating() {
+    this.venueService.getVenueById(this.venueId).subscribe({
+      next: (data) => {
+        if (this.venue) {
+          this.venue.avg_rating = data.avg_rating;
+          this.venue.review_count = data.review_count;
+        }
+      },
+      error: () => {}
     });
   }
 

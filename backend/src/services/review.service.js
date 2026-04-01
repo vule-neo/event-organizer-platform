@@ -39,12 +39,35 @@ exports.createReview = async ({ booking_id, venue_id, client_id, rating, comment
 
 exports.getVenueReviews = async (venueId) => {
     const result = await pool.query(
-        `SELECT r.*, u.first_name, u.last_name 
-         FROM reviews r 
-         JOIN users u ON r.client_id = u.id 
-         WHERE r.venue_id = $1 
+        `SELECT r.*, u.first_name, u.last_name
+         FROM reviews r
+         JOIN users u ON r.client_id = u.id
+         WHERE r.venue_id = $1
          ORDER BY r.created_at DESC`,
         [venueId]
     );
     return result.rows;
+};
+
+exports.updateReview = async (reviewId, clientId, { rating, comment }) => {
+    const result = await pool.query(
+        `UPDATE reviews SET rating = $1, comment = $2
+         WHERE id = $3 AND client_id = $4 RETURNING *`,
+        [rating, comment, reviewId, clientId]
+    );
+    if (result.rows.length === 0) {
+        throw new Error('Recenzija nije pronađena ili nemate pravo izmjene.');
+    }
+    return result.rows[0];
+};
+
+exports.deleteReview = async (reviewId, clientId) => {
+    const result = await pool.query(
+        'DELETE FROM reviews WHERE id = $1 AND client_id = $2 RETURNING *',
+        [reviewId, clientId]
+    );
+    if (result.rows.length === 0) {
+        throw new Error('Recenzija nije pronađena ili nemate pravo brisanja.');
+    }
+    return result.rows[0];
 };

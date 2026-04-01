@@ -156,6 +156,28 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.dragDistanceMoved < 8) this.router.navigate(['/tereni/detalji', venueId]);
   }
 
+  // Touch handlers for mobile smooth scrolling
+  private touchStartX = 0;
+  private touchScrollStartX = 0;
+
+  onCarouselTouchStart(e: TouchEvent) {
+    const track = this.carouselTrackRef?.nativeElement;
+    if (!track) return;
+    this.touchStartX = e.touches[0].pageX;
+    this.touchScrollStartX = track.scrollLeft;
+  }
+
+  onCarouselTouchMove(e: TouchEvent) {
+    const track = this.carouselTrackRef?.nativeElement;
+    if (!track) return;
+    const delta = this.touchStartX - e.touches[0].pageX;
+    track.scrollLeft = this.touchScrollStartX + delta;
+  }
+
+  onCarouselTouchEnd() {
+    // Native touch scroll handles momentum; nothing extra needed
+  }
+
   // ---- GOOGLE MAPS ----
   private loadGoogleMapsScript() {
     if (typeof google !== 'undefined' && google.maps) { this.tryInitMap(); return; }

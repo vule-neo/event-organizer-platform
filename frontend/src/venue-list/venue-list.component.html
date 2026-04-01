@@ -83,7 +83,6 @@
               </div>
               <div *ngFor="let sport of sports" class="dropdown-option" [class.active]="selectedSport === sport.id"
                 (click)="selectSport(sport.id, $event)">
-                <i class="bi" [ngClass]="sport.icon_name || 'bi-dribbble'"></i>
                 {{ sport.name }}
               </div>
             </div>
@@ -204,8 +203,11 @@
 
     <!-- Carousel -->
     <div class="avail-carousel-wrap" *ngIf="!availableTodayLoading && availableToday.length > 0">
-      <div class="avail-track" #carouselTrack (mousedown)="onCarouselDragStart($event)"
-        (mousemove)="onCarouselDragMove($event)" (mouseup)="onCarouselMouseUp()" (mouseleave)="onCarouselMouseLeave()">
+      <div class="avail-track" #carouselTrack
+        (mousedown)="onCarouselDragStart($event)" (mousemove)="onCarouselDragMove($event)"
+        (mouseup)="onCarouselMouseUp()" (mouseleave)="onCarouselMouseLeave()"
+        (touchstart)="onCarouselTouchStart($event)" (touchmove)="onCarouselTouchMove($event)"
+        (touchend)="onCarouselTouchEnd()">
         <div class="avail-card" *ngFor="let venue of availableToday">
           <div class="avail-card-img" (click)="navigateToVenue(venue.id)">
             <img

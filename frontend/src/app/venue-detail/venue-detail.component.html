@@ -163,7 +163,7 @@
         </span>
       </div>
       <div class="pricing-schedule-grid">
-        <div class="pricing-day-card" *ngFor="let day of pricingByDay; let i = index"
+        <div class="pricing-day-card" *ngFor="let day of pricingByDayData; let i = index"
              [style.animation-delay]="(i * 60) + 'ms'">
           <div class="pricing-day-name">{{ dayNames[day.day] }}</div>
           <div class="pricing-rule-item" *ngFor="let rule of day.rules">
@@ -242,7 +242,7 @@
 
             <!-- Dynamic pricing: grouped by price -->
             <ng-container *ngIf="venue.has_dynamic_pricing">
-              <div *ngFor="let group of slotGroups" class="slot-price-group">
+              <div *ngFor="let group of slotGroupsData" class="slot-price-group">
                 <div class="slot-group-price-label">
                   <i class="bi bi-tag-fill"></i> {{ group.price | number:'1.0-0' }} RSD
                 </div>

@@ -130,6 +130,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
           this.activeImageUrl = firstImg.startsWith('http') ? firstImg : this.apiBase + firstImg;
         }
         this.updateSEOTags();
+        this.computePricingByDay();
         this.loadOccupiedSlots();
         this.generateCalendar();
         this.loadReviews();
@@ -407,16 +408,17 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       slot.price = this.computeSlotPrice(slot);
     }
     this.availableSlots = slots;
+    this.computeSlotGroups();
   }
 
-  get pricingByDay(): any[] {
-    if (!this.venue?.pricing?.length) return [];
+  private computePricingByDay() {
+    if (!this.venue?.pricing?.length) { this.pricingByDayData = []; return; }
     const map = new Map<number, any[]>();
     for (const rule of this.venue.pricing) {
       if (!map.has(rule.day_of_week)) map.set(rule.day_of_week, []);
       map.get(rule.day_of_week)!.push(rule);
     }
-    return [1, 2, 3, 4, 5, 6, 0]
+    this.pricingByDayData = [1, 2, 3, 4, 5, 6, 0]
       .filter(d => map.has(d))
       .map(d => ({
         day: d,
@@ -424,8 +426,8 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       }));
   }
 
-  get slotGroups(): Array<{ price: number; slots: any[] }> {
-    if (!this.venue?.has_dynamic_pricing || this.availableSlots.length === 0) return [];
+  private computeSlotGroups() {
+    if (!this.venue?.has_dynamic_pricing || this.availableSlots.length === 0) { this.slotGroupsData = []; return; }
     const groups: Array<{ price: number; slots: any[] }> = [];
     for (const slot of this.availableSlots) {
       const last = groups[groups.length - 1];
@@ -435,8 +437,12 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
         last.slots.push(slot);
       }
     }
-    return groups;
+    this.slotGroupsData = groups;
   }
+
+  // Cached computed properties (ne koristiti gettere — svaki poziv kreira nove objekte i uzrokuje treperenje)
+  pricingByDayData: any[] = [];
+  slotGroupsData: Array<{ price: number; slots: any[] }> = [];
 
   monthlyOccupiedSlots: any[] = [];
 

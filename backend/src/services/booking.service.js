@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const mailer = require('../config/mailer');
+const pricingService = require('./pricing.service');
 
 // Helper za formatiranje datuma
 const formatDateTime = (dt) => {
@@ -38,9 +39,9 @@ exports.getOccupiedSlots = async (venueId, dateOrMonth) => {
     }
 };
 
-exports.createBooking = async ({ venue_id, client_id, start_time, end_time, price_paid }) => {
+exports.createBooking = async ({ venue_id, client_id, start_time, end_time }) => {
     const conflict = await pool.query(
-        `SELECT id FROM bookings 
+        `SELECT id FROM bookings
          WHERE venue_id = $1 AND status = 'confirmed'
          AND (start_time, end_time) OVERLAPS ($2, $3)`,
         [venue_id, start_time, end_time]
@@ -49,6 +50,9 @@ exports.createBooking = async ({ venue_id, client_id, start_time, end_time, pric
     if (conflict.rows.length > 0) {
         throw new Error('Termin je već zauzet.');
     }
+
+    // Izračunaj cijenu server-side (ignoriši price_paid sa frontenda)
+    const price_paid = await pricingService.getVenuePrice(venue_id, start_time);
 
     const result = await pool.query(
         `INSERT INTO bookings (venue_id, client_id, start_time, end_time, price_paid, status)
@@ -330,9 +334,12 @@ exports.cancelByOwner = async (bookingId, ownerId) => {
 };
 
 
-exports.createRecurring = async ({ venue_id, client_id, start_time, end_time, price_paid, weeks }) => {
+exports.createRecurring = async ({ venue_id, client_id, start_time, end_time, weeks }) => {
     const created = [];
     const failed = [];
+
+    // Svi recurring termini su isti dan u sedmici → cijena je ista za sve
+    const price_paid = await pricingService.getVenuePrice(venue_id, start_time);
 
     for (let i = 0; i < weeks; i++) {
         const start = new Date(start_time);
@@ -343,7 +350,7 @@ exports.createRecurring = async ({ venue_id, client_id, start_time, end_time, pr
 
         // Provjeri konflikt
         const conflict = await pool.query(
-            `SELECT id FROM bookings 
+            `SELECT id FROM bookings
              WHERE venue_id = $1 AND status = 'confirmed'
              AND (start_time, end_time) OVERLAPS ($2, $3)`,
             [venue_id, start.toISOString(), end.toISOString()]

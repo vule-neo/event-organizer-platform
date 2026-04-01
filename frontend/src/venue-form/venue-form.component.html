@@ -8,6 +8,7 @@
     </div>
 
     <div class="vf-steps">
+      <!-- Step 1 -->
       <div class="vf-step" [class.step-done]="step > 1" [class.step-active]="step === 1">
         <div class="vf-step-circle">
           <i class="bi bi-check-lg" *ngIf="step > 1"></i>
@@ -21,6 +22,7 @@
 
       <div class="vf-step-line"></div>
 
+      <!-- Step 2 -->
       <div class="vf-step" [class.step-done]="step > 2" [class.step-active]="step === 2">
         <div class="vf-step-circle">
           <i class="bi bi-check-lg" *ngIf="step > 2"></i>
@@ -34,10 +36,25 @@
 
       <div class="vf-step-line"></div>
 
+      <!-- Step 3 — NOVO: Cenovnik -->
       <div class="vf-step" [class.step-done]="step > 3" [class.step-active]="step === 3">
         <div class="vf-step-circle">
           <i class="bi bi-check-lg" *ngIf="step > 3"></i>
           <span *ngIf="step <= 3">3</span>
+        </div>
+        <div class="vf-step-info">
+          <span class="vf-step-title">Cenovnik</span>
+          <span class="vf-step-desc">Fiksna ili dinamička cena</span>
+        </div>
+      </div>
+
+      <div class="vf-step-line"></div>
+
+      <!-- Step 4 -->
+      <div class="vf-step" [class.step-done]="step > 4" [class.step-active]="step === 4">
+        <div class="vf-step-circle">
+          <i class="bi bi-check-lg" *ngIf="step > 4"></i>
+          <span *ngIf="step <= 4">4</span>
         </div>
         <div class="vf-step-info">
           <span class="vf-step-title">Tagovi</span>
@@ -47,9 +64,10 @@
 
       <div class="vf-step-line"></div>
 
-      <div class="vf-step" [class.step-active]="step === 4">
+      <!-- Step 5 -->
+      <div class="vf-step" [class.step-active]="step === 5">
         <div class="vf-step-circle">
-          <span>4</span>
+          <span>5</span>
         </div>
         <div class="vf-step-info">
           <span class="vf-step-title">Slike</span>
@@ -63,7 +81,7 @@
   <div class="vf-main">
     <form [formGroup]="venueForm">
 
-      <!-- ===== KORAK 1 ===== -->
+      <!-- ===== KORAK 1: Osnovni podaci ===== -->
       <div *ngIf="step === 1" class="vf-step-content">
         <div class="vf-step-header">
           <h1>{{ isEditMode ? 'Izmeni osnovne podatke' : 'Informacije o terenu' }}</h1>
@@ -119,12 +137,13 @@
 
           <div class="vf-row">
             <div class="vf-field">
-              <label>Cena po terminu (RSD) <span class="req">*</span></label>
+              <label>Podrazumjevana cena (RSD) <span class="req">*</span></label>
               <div class="input-wrap">
                 <i class="bi bi-cash input-icon"></i>
                 <input type="number" formControlName="price_per_slot" placeholder="npr. 1500"
                   [class.input-error]="venueForm.get('price_per_slot')?.invalid && venueForm.get('price_per_slot')?.touched" />
               </div>
+              <span class="vf-field-hint">Koristi se kao rezervna cijena ako nema cenovnika.</span>
             </div>
             <div class="vf-field">
               <label>Trajanje termina <span class="req">*</span></label>
@@ -159,7 +178,7 @@
         </div>
       </div>
 
-      <!-- ===== KORAK 2 ===== -->
+      <!-- ===== KORAK 2: Radno vreme ===== -->
       <div *ngIf="step === 2" class="vf-step-content">
         <div class="vf-step-header">
           <h1>Radno vreme</h1>
@@ -173,13 +192,126 @@
             <i class="bi bi-arrow-left"></i> Nazad
           </button>
           <button type="button" class="vf-btn-next" (click)="nextStep()">
+            Dalje: Cenovnik <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== KORAK 3: Cenovnik (NOVO) ===== -->
+      <div *ngIf="step === 3" class="vf-step-content">
+        <div class="vf-step-header">
+          <h1>Cenovnik</h1>
+          <p>Izaberi kako se naplaćuju termini — fiksno ili po danu i vremenu.</p>
+        </div>
+
+        <!-- Mode selector -->
+        <div class="pricing-mode-wrap">
+          <div class="pricing-mode-card" [class.pricing-mode-active]="pricingMode === 'fixed'"
+            (click)="pricingMode = 'fixed'">
+            <div class="pricing-mode-radio">
+              <div class="pricing-radio-dot" [class.active]="pricingMode === 'fixed'"></div>
+            </div>
+            <div class="pricing-mode-icon"><i class="bi bi-tag-fill"></i></div>
+            <div class="pricing-mode-text">
+              <strong>Fiksna cijena</strong>
+              <span>Svi termini: <b>{{ fallbackPrice | number:'1.0-0' }} RSD</b></span>
+            </div>
+          </div>
+
+          <div class="pricing-mode-card" [class.pricing-mode-active]="pricingMode === 'dynamic'"
+            (click)="pricingMode = 'dynamic'">
+            <div class="pricing-mode-radio">
+              <div class="pricing-radio-dot" [class.active]="pricingMode === 'dynamic'"></div>
+            </div>
+            <div class="pricing-mode-icon"><i class="bi bi-calendar-range-fill"></i></div>
+            <div class="pricing-mode-text">
+              <strong>Dinamički cenovnik</strong>
+              <span>Različite cijene po danima i vremenima</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic pricing table -->
+        <div class="pricing-table-wrap" *ngIf="pricingMode === 'dynamic'">
+
+          <!-- Header -->
+          <div class="pricing-table-head">
+            <span>Dan</span>
+            <span>Od</span>
+            <span>Do</span>
+            <span>Cijena (RSD)</span>
+            <span></span>
+          </div>
+
+          <!-- Empty state -->
+          <div class="pricing-empty" *ngIf="pricingRules.length === 0">
+            <i class="bi bi-calendar-plus"></i>
+            <p>Nema pravila. Klikni "Dodaj pravilo" da počneš.</p>
+          </div>
+
+          <!-- Rules -->
+          <div class="pricing-table-row" *ngFor="let rule of pricingRules; let i = index"
+            [class.pricing-row-error]="rule.error">
+            <div class="pricing-cell">
+              <select [(ngModel)]="rule.day_of_week" [ngModelOptions]="{standalone: true}" class="pricing-select">
+                <option *ngFor="let name of dayNames; let d = index" [value]="d">{{ name }}</option>
+              </select>
+            </div>
+            <div class="pricing-cell">
+              <input type="time" [(ngModel)]="rule.start_time" [ngModelOptions]="{standalone: true}"
+                class="pricing-time" />
+            </div>
+            <div class="pricing-cell">
+              <input type="time" [(ngModel)]="rule.end_time" [ngModelOptions]="{standalone: true}"
+                class="pricing-time" />
+            </div>
+            <div class="pricing-cell">
+              <div class="pricing-price-wrap">
+                <input type="number" [(ngModel)]="rule.price" [ngModelOptions]="{standalone: true}"
+                  class="pricing-price" min="1" placeholder="1500" />
+                <span class="pricing-currency">RSD</span>
+              </div>
+            </div>
+            <div class="pricing-cell pricing-cell-action">
+              <button type="button" class="pricing-remove-btn" (click)="removePricingRule(i)" title="Ukloni">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            <div class="pricing-row-error-msg" *ngIf="rule.error">
+              <i class="bi bi-exclamation-circle"></i> {{ rule.error }}
+            </div>
+          </div>
+
+          <!-- Add button -->
+          <button type="button" class="pricing-add-btn" (click)="addPricingRule()">
+            <i class="bi bi-plus-circle-fill"></i> Dodaj pravilo
+          </button>
+
+          <!-- Fallback note -->
+          <div class="pricing-fallback-note" *ngIf="pricingRules.length > 0">
+            <i class="bi bi-info-circle-fill"></i>
+            Termini koji ne odgovaraju nijednom pravilu naplatit će se po podrazumjevanoj cijeni:
+            <strong>{{ fallbackPrice | number:'1.0-0' }} RSD</strong>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div class="vf-step-error" *ngIf="pricingError">
+          <i class="bi bi-exclamation-circle-fill"></i> {{ pricingError }}
+        </div>
+
+        <div class="vf-actions">
+          <button type="button" class="vf-btn-back" (click)="prevStep()">
+            <i class="bi bi-arrow-left"></i> Nazad
+          </button>
+          <button type="button" class="vf-btn-next" (click)="nextStep()">
             Dalje: Tagovi <i class="bi bi-arrow-right"></i>
           </button>
         </div>
       </div>
 
-      <!-- ===== KORAK 3 ===== -->
-      <div *ngIf="step === 3" class="vf-step-content">
+      <!-- ===== KORAK 4: Tagovi ===== -->
+      <div *ngIf="step === 4" class="vf-step-content">
         <div class="vf-step-header">
           <h1>Sadržaj i pogodnosti</h1>
           <p>Označite šta vaš teren nudi korisnicima.</p>
@@ -211,8 +343,8 @@
         </div>
       </div>
 
-      <!-- ===== KORAK 4 ===== -->
-      <div *ngIf="step === 4" class="vf-step-content">
+      <!-- ===== KORAK 5: Slike ===== -->
+      <div *ngIf="step === 5" class="vf-step-content">
         <div class="vf-step-header">
           <h1>Slike terena</h1>
           <p>Dodajte do 5 fotografija. Prva slika biće naslovna.</p>
@@ -223,7 +355,6 @@
           <label class="vf-images-label">Trenutne slike</label>
           <div class="vf-preview-grid">
             <div *ngFor="let img of existingImages; let i = index" class="vf-preview-item">
-              <!-- CORRECT: -->
               <img [src]="img.url?.startsWith('http') ? img.url : apiBase + img.url" alt="Existing Image" />
               <button type="button" class="vf-remove-btn" (click)="removeExistingImage(img.id, i)">
                 <i class="bi bi-x"></i>

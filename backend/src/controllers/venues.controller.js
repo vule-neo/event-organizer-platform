@@ -1,4 +1,5 @@
 const venueService = require('../services/venues.service');
+const pricingService = require('../services/pricing.service');
 
 exports.createVenue = async (req, res) => {
   try {
@@ -106,5 +107,36 @@ exports.getAvailableToday = async (req, res) => {
   } catch (err) {
     console.error('getAvailableToday error:', err);
     res.status(500).json({ message: 'Greška pri učitavanju slobodnih terena.' });
+  }
+};
+
+exports.getPricing = async (req, res) => {
+  try {
+    const pricing = await pricingService.getVenuePricing(req.params.id);
+    res.json(pricing);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updatePricing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rules = req.body.pricing || req.body;
+    const pool = require('../config/db');
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await pricingService.upsertPricingInTransaction(client, id, Array.isArray(rules) ? rules : []);
+      await client.query('COMMIT');
+      res.json({ success: true });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 };

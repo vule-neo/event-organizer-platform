@@ -28,7 +28,9 @@
   <button class="sticky-reserve-btn" *ngIf="!stickyDismissed" (click)="scrollToBooking()">
     <i class="bi bi-calendar-check-fill"></i>
     <span>REZERVIŠI TERMIN</span>
-    <span class="sticky-reserve-price">{{ venue.price_per_slot }} RSD</span>
+    <span class="sticky-reserve-price">
+      <span *ngIf="venue.has_dynamic_pricing" style="font-size:10px;opacity:.75;">od </span>{{ venue.min_price || venue.price_per_slot }} RSD
+    </span>
   </button>
 
   <!-- ===== VENUE INFO (full-width, single column) ===== -->
@@ -100,7 +102,7 @@
 
       <!-- Price -->
       <div class="venue-price">
-        {{ venue.price_per_slot }} RSD <span>/ termin</span>
+        <span *ngIf="venue.has_dynamic_pricing" class="price-from-label">od </span>{{ venue.min_price || venue.price_per_slot }} RSD <span>/ termin</span>
       </div>
     </div>
 
@@ -151,7 +153,7 @@
       <div class="booking-section-header">
         <h3><i class="bi bi-calendar-check"></i> Rezervacija termina</h3>
         <div class="booking-price-badge">
-          {{ venue.price_per_slot }} RSD <span>/ termin</span>
+          <span *ngIf="venue.has_dynamic_pricing" class="price-from-label">od </span>{{ venue.min_price || venue.price_per_slot }} RSD <span>/ termin</span>
         </div>
       </div>
 
@@ -214,7 +216,7 @@
               <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Termin</div>
               <div class="slot-summary-time">{{ selectedSlot.start }} – {{ selectedSlot.end }}</div>
             </div>
-            <div class="slot-summary-price">{{ venue.price_per_slot }} RSD</div>
+            <div class="slot-summary-price">{{ slotPrice }} RSD</div>
           </div>
 
           <!-- Nelogovan korisnik -->
@@ -252,7 +254,8 @@
               <span class="weeks-badge">{{ recurringWeeks }} ned.</span>
             </div>
             <div class="recurring-total">
-              Ukupno: <strong>{{ recurringWeeks * venue.price_per_slot }} RSD</strong>
+              Ukupno: <strong>{{ recurringWeeks * slotPrice }} RSD</strong>
+              <span *ngIf="venue.has_dynamic_pricing" class="recurring-total-note">(po trenutnoj cijeni termina)</span>
             </div>
 
             <button class="btn-recurring-book" [disabled]="recurringLoading" (click)="confirmRecurringBooking()">

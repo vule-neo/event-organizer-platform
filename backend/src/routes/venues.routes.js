@@ -15,6 +15,8 @@ router.get('/all', venueController.getAllVenues);
 router.get('/stats', venueController.getPublicStats); // NOVO — mora prije /:id
 router.delete('/:id', authMiddleware, roleMiddleware(['owner']), venueController.deleteVenue);
 router.put('/:id', authMiddleware, roleMiddleware(['owner']), upload.array('images', 5), venueController.updateVenue);
+router.get('/:id/pricing', venueController.getPricing);
+router.put('/:id/pricing', authMiddleware, roleMiddleware(['owner']), venueController.updatePricing);
 router.get('/:id', venueController.getVenueById);
 
 module.exports = router;

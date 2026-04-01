@@ -224,7 +224,9 @@
             </p>
             <div class="avail-card-footer">
               <div class="avail-card-price-info" (click)="navigateToVenue(venue.id)">
-                <span class="avail-card-price">{{ venue.price_per_slot }} RSD</span>
+                <span class="avail-card-price">
+                  <span *ngIf="venue.has_dynamic_pricing" style="font-size:10px;opacity:.75;">od </span>{{ venue.min_price || venue.price_per_slot }} RSD
+                </span>
                 <div class="avail-card-rating" *ngIf="venue.avg_rating">
                   <i class="bi bi-star-fill"></i>
                   {{ venue.avg_rating | number:'1.1-1' }}
@@ -498,7 +500,9 @@
             [alt]="venue.name" loading="lazy" />
           <div class="img-overlay"></div>
           <div class="venue-badge-sport">{{ getSportName(venue.sport_id) }}</div>
-          <div class="venue-badge-price">{{ venue.price_per_slot }} RSD</div>
+          <div class="venue-badge-price">
+            <span *ngIf="venue.has_dynamic_pricing" style="font-size:10px;opacity:.8;">od </span>{{ venue.min_price || venue.price_per_slot }} RSD
+          </div>
           <div class="venue-rating-badge" *ngIf="venue.avg_rating">
             <i class="bi bi-star-fill"></i> {{ venue.avg_rating | number:'1.1-1' }}
           </div>

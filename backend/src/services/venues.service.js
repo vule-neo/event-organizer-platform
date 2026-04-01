@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const fs = require('fs');
 const path = require('path');
+const pricingService = require('./pricing.service');
 
 exports.createVenue = async (venueData, files) => {
   const client = await pool.connect();
@@ -67,6 +68,15 @@ exports.createVenue = async (venueData, files) => {
           [venueId, files[i].path, i]  // files[i].path je Cloudinary URL
         );
       }
+    }
+    // ==========================================
+
+    // ========== FLEKSIBILNI CENOVNIK ==========
+    if (venueData.pricing) {
+      const pricing = typeof venueData.pricing === 'string'
+        ? JSON.parse(venueData.pricing)
+        : venueData.pricing;
+      await pricingService.upsertPricingInTransaction(client, venueId, pricing);
     }
     // ==========================================
 
@@ -175,6 +185,15 @@ exports.updateVenue = async (venueId, body, files) => {
     }
     // ==========================================
 
+    // ========== FLEKSIBILNI CENOVNIK ==========
+    if (body.pricing !== undefined) {
+      const pricing = typeof body.pricing === 'string'
+        ? JSON.parse(body.pricing)
+        : body.pricing;
+      await pricingService.upsertPricingInTransaction(client, venueId, pricing);
+    }
+    // ==========================================
+
     await client.query('COMMIT');
     return { success: true, message: 'Teren uspešno ažuriran' };
   } catch (err) {
@@ -188,14 +207,19 @@ exports.updateVenue = async (venueId, body, files) => {
 
 exports.getVenuesForOwner = async (ownerId) => {
   const result = await pool.query(
-    `SELECT v.*, 
+    `SELECT v.*,
       (SELECT url FROM venue_images WHERE venue_id = v.id ORDER BY display_order ASC LIMIT 1) as main_image,
       COALESCE(
         json_agg(
           json_build_object('id', vt.id, 'name', vt.name, 'icon', vt.icon)
-        ) FILTER (WHERE vt.id IS NOT NULL), 
+        ) FILTER (WHERE vt.id IS NOT NULL),
         '[]'
-      ) as tags
+      ) as tags,
+      EXISTS(SELECT 1 FROM venue_pricing WHERE venue_id = v.id) as has_dynamic_pricing,
+      COALESCE(
+        (SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id),
+        v.price_per_slot
+      )::float as min_price
      FROM venues v
      LEFT JOIN venue_tag_map vtm ON vtm.venue_id = v.id
      LEFT JOIN venue_tags vt ON vt.id = vtm.tag_id
@@ -242,11 +266,20 @@ exports.getVenueById = async (id) => {
     [id]
   );
 
+  const pricing = await pool.query(
+    `SELECT id, day_of_week, start_time, end_time, price::float AS price
+     FROM venue_pricing WHERE venue_id = $1
+     ORDER BY day_of_week ASC, start_time ASC`,
+    [id]
+  );
+
   return {
     ...venue.rows[0],
     working_hours: hours.rows,
     images: images.rows,
-    tags: tags.rows
+    tags: tags.rows,
+    pricing: pricing.rows,
+    has_dynamic_pricing: pricing.rows.length > 0
   };
 };
 
@@ -300,14 +333,19 @@ exports.deleteVenue = async (venueId) => {
 
 exports.getAllVenues = async () => {
   const result = await pool.query(
-    `SELECT v.*, 
+    `SELECT v.*,
       (SELECT url FROM venue_images WHERE venue_id = v.id LIMIT 1) as main_image,
       COALESCE(
         json_agg(
           json_build_object('id', vt.id, 'name', vt.name, 'icon', vt.icon)
-        ) FILTER (WHERE vt.id IS NOT NULL), 
+        ) FILTER (WHERE vt.id IS NOT NULL),
         '[]'
-      ) as tags
+      ) as tags,
+      EXISTS(SELECT 1 FROM venue_pricing WHERE venue_id = v.id) as has_dynamic_pricing,
+      COALESCE(
+        (SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id),
+        v.price_per_slot
+      )::float as min_price
      FROM venues v
      LEFT JOIN venue_tag_map vtm ON vtm.venue_id = v.id
      LEFT JOIN venue_tags vt ON vt.id = vtm.tag_id
@@ -357,7 +395,7 @@ exports.getAvailableToday = async () => {
         (NOW() AT TIME ZONE 'Europe/Belgrade')::date AS today
     ),
     open_venues AS (
-      SELECT 
+      SELECT
         v.id, v.name, v.city, v.street,
         v.price_per_slot, v.slot_duration_mins,
         v.avg_rating, v.review_count, v.sport_id, v.lat, v.lng,
@@ -367,7 +405,12 @@ exports.getAvailableToday = async () => {
         COALESCE(
           json_agg(json_build_object('id', vt.id, 'name', vt.name, 'icon', vt.icon))
           FILTER (WHERE vt.id IS NOT NULL), '[]'
-        ) AS tags
+        ) AS tags,
+        EXISTS(SELECT 1 FROM venue_pricing WHERE venue_id = v.id) as has_dynamic_pricing,
+        COALESCE(
+          (SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id),
+          v.price_per_slot
+        )::float as min_price
       FROM venues v
       JOIN working_hours wh ON wh.venue_id = v.id
       CROSS JOIN today_info ti

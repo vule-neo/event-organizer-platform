@@ -280,7 +280,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
       </div>
       <div class="map-popup-body">
         <h4 class="map-popup-name">${venue.name}</h4>
-        <div class="map-popup-meta">${rating}<span class="map-popup-price">${venue.price_per_slot} RSD</span></div>
+        <div class="map-popup-meta">${rating}<span class="map-popup-price">${venue.has_dynamic_pricing ? '<span style="font-size:10px;opacity:.75;">od </span>' : ''}${venue.min_price ?? venue.price_per_slot} RSD</span></div>
         <p class="map-popup-loc"><i class="bi bi-geo-alt" style="font-size:11px;margin-right:3px;"></i>${venue.city}</p>
         <a class="map-popup-btn" href="/tereni/detalji/${venue.id}">Pogledaj teren <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>
       </div>

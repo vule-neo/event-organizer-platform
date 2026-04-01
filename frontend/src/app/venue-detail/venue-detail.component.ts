@@ -35,6 +35,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
   availableSlots: any[] = [];
   selectedSlot: any = null;
   occupiedSlots: string[] = [];
+  slotPrice: number = 0;
 
   // Custom Calendar State
   currentMonth: number = new Date().getMonth();
@@ -123,6 +124,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     this.venueService.getVenueById(id).subscribe({
       next: (data) => {
         this.venue = data;
+        this.slotPrice = data.price_per_slot;
         if (data.images && data.images.length > 0) {
           const firstImg = data.images[0].url;
           this.activeImageUrl = firstImg.startsWith('http') ? firstImg : this.apiBase + firstImg;
@@ -139,6 +141,38 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       },
       error: () => { this.errorMessage = 'Greška pri učitavanju detalja terena.'; this.loading = false; }
     });
+  }
+
+  /**
+   * Izračunaj cijenu za izabrani slot koristeći venue_pricing pravila.
+   * Ako nema poklapanja → fallback na price_per_slot.
+   */
+  private computeSlotPrice(slot: any): number {
+    if (!this.venue || !slot) return this.venue?.price_per_slot || 0;
+
+    const pricing: any[] = this.venue.pricing || [];
+    if (pricing.length === 0) return this.venue.price_per_slot;
+
+    const dateObj = new Date(this.selectedDate + 'T12:00:00');
+    const dayOfWeek = dateObj.getDay(); // 0=Nedjelja
+
+    const [sh, sm] = slot.start.split(':').map(Number);
+    const slotMins = sh * 60 + sm;
+
+    for (const rule of pricing) {
+      if (rule.day_of_week !== dayOfWeek) continue;
+
+      const [rsh, rsm] = rule.start_time.substring(0, 5).split(':').map(Number);
+      const [reh, rem] = rule.end_time.substring(0, 5).split(':').map(Number);
+      const ruleMins  = rsh * 60 + rsm;
+      const ruleEnd   = reh * 60 + rem;
+
+      if (slotMins >= ruleMins && slotMins < ruleEnd) {
+        return parseFloat(rule.price);
+      }
+    }
+
+    return this.venue.price_per_slot;
   }
 
   private updateSEOTags() {
@@ -303,6 +337,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     if (day.isPast) return;
     this.selectedDate = day.dateString;
     this.selectedSlot = null;
+    this.slotPrice = this.venue?.price_per_slot || 0;
     this.loadOccupiedSlots();
     if (!day.isCurrentMonth) {
       this.currentMonth = day.date.getMonth();
@@ -483,7 +518,12 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     return `${h}:${m}`;
   }
 
-  selectSlot(slot: any) { if (!slot.isOccupied) this.selectedSlot = slot; }
+  selectSlot(slot: any) {
+    if (!slot.isOccupied) {
+      this.selectedSlot = slot;
+      this.slotPrice = this.computeSlotPrice(slot);
+    }
+  }
 
   blockSelectedSlot() {
     if (!this.selectedSlot || !this.venue) return;
@@ -523,8 +563,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     const bookingData = {
       venue_id: this.venue.id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
-      end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
-      price_paid: this.venue.price_per_slot
+      end_time:   `${this.selectedDate}T${this.selectedSlot.end}:00Z`
     };
 
     this.bookingService.createBooking(bookingData).subscribe({
@@ -558,8 +597,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     const data = {
       venue_id: this.venue.id,
       start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
-      end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
-      price_paid: this.venue.price_per_slot,
+      end_time:   `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
       weeks: this.recurringWeeks
     };
 

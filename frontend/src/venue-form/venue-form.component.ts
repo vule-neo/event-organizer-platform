@@ -1,16 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { VenueService } from '../app/services/venue.service';
 import { WorkingHoursComponent } from '../app/working-hours/working-hours.component';
 import { AddressPickerComponent, AddressResult } from '../app/address-picker/address-picker.component';
 import { environment } from '../environments/environment';
 
+interface PricingRule {
+  day_of_week: number;
+  start_time: string;
+  end_time:   string;
+  price:      number | null;
+  error?:     string;
+}
+
+const DAY_NAMES = ['Nedjelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
+
 @Component({
   selector: 'app-venue-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule, WorkingHoursComponent, AddressPickerComponent],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, RouterModule, WorkingHoursComponent, AddressPickerComponent],
   templateUrl: './venue-form.component.html',
   styleUrl: './venue-form.component.css'
 })
@@ -20,6 +30,7 @@ export class VenueFormComponent implements OnInit {
   venueForm!: FormGroup;
   message = '';
   step: number = 1;
+  readonly totalSteps = 5;
   apiBase = environment.apiBase;
 
   venueId: string | null = null;
@@ -32,9 +43,14 @@ export class VenueFormComponent implements OnInit {
   sports: any[] = [];
   isDragging = false;
 
-  // Tagovi
   allTags: any[] = [];
   selectedTagIds: string[] = [];
+
+  // ===== CENOVNIK =====
+  pricingMode: 'fixed' | 'dynamic' = 'fixed';
+  pricingRules: PricingRule[] = [];
+  pricingError = '';
+  readonly dayNames = DAY_NAMES;
 
   constructor(
     private fb: FormBuilder,
@@ -48,16 +64,16 @@ export class VenueFormComponent implements OnInit {
     this.isEditMode = !!this.venueId;
 
     this.venueForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(200)]],
-      sport_id: ['', [Validators.required]],
-      country: ['Srbija', [Validators.required, Validators.maxLength(100)]],
-      city: ['', [Validators.required, Validators.maxLength(100)]],
-      street: ['', [Validators.required, Validators.maxLength(255)]],
-      lat: [null],
-      lng: [null],
-      price_per_slot: [null, [Validators.required, Validators.min(0.01)]],
-      slot_duration_mins: [60, [Validators.required]],
-      description: ['', [Validators.maxLength(1000)]]
+      name:              ['', [Validators.required, Validators.maxLength(200)]],
+      sport_id:          ['', [Validators.required]],
+      country:           ['Srbija', [Validators.required, Validators.maxLength(100)]],
+      city:              ['', [Validators.required, Validators.maxLength(100)]],
+      street:            ['', [Validators.required, Validators.maxLength(255)]],
+      lat:               [null],
+      lng:               [null],
+      price_per_slot:    [null, [Validators.required, Validators.min(0.01)]],
+      slot_duration_mins:[60, [Validators.required]],
+      description:       ['', [Validators.maxLength(1000)]]
     });
 
     this.loadSports();
@@ -87,9 +103,22 @@ export class VenueFormComponent implements OnInit {
       next: (data) => {
         this.venueForm.patchValue(data);
         if (data.working_hours) this.savedWorkingHours = data.working_hours;
-        if (data.images) this.existingImages = data.images;
-        // Učitaj postojeće tagove
-        if (data.tags) this.selectedTagIds = data.tags.map((t: any) => t.id);
+        if (data.images)        this.existingImages = data.images;
+        if (data.tags)          this.selectedTagIds = data.tags.map((t: any) => t.id);
+
+        // Učitaj pricing pravila
+        if (data.pricing && data.pricing.length > 0) {
+          this.pricingMode = 'dynamic';
+          this.pricingRules = data.pricing.map((r: any) => ({
+            day_of_week: r.day_of_week,
+            start_time:  r.start_time.substring(0, 5),
+            end_time:    r.end_time.substring(0, 5),
+            price:       parseFloat(r.price)
+          }));
+        } else {
+          this.pricingMode = 'fixed';
+          this.pricingRules = [];
+        }
       },
       error: () => this.message = 'Greška pri učitavanju podataka.'
     });
@@ -97,26 +126,78 @@ export class VenueFormComponent implements OnInit {
 
   onAddressChange(event: AddressResult) {
     this.venueForm.patchValue({
-      city: event.city,
-      street: event.street,
+      city:    event.city,
+      street:  event.street,
       country: event.country,
-      lat: event.lat,
-      lng: event.lng
+      lat:     event.lat,
+      lng:     event.lng
     });
   }
 
   toggleTag(tagId: string) {
     const index = this.selectedTagIds.indexOf(tagId);
-    if (index === -1) {
-      this.selectedTagIds.push(tagId);
-    } else {
-      this.selectedTagIds.splice(index, 1);
-    }
+    if (index === -1) this.selectedTagIds.push(tagId);
+    else              this.selectedTagIds.splice(index, 1);
   }
 
   isTagSelected(tagId: string): boolean {
     return this.selectedTagIds.includes(tagId);
   }
+
+  // ===== CENOVNIK HELPERS =====
+
+  addPricingRule() {
+    this.pricingRules.push({
+      day_of_week: 1,
+      start_time:  '08:00',
+      end_time:    '22:00',
+      price:       null
+    });
+  }
+
+  removePricingRule(i: number) {
+    this.pricingRules.splice(i, 1);
+  }
+
+  get fallbackPrice(): number {
+    return this.venueForm.get('price_per_slot')?.value || 0;
+  }
+
+  validatePricingRules(): boolean {
+    this.pricingError = '';
+    if (this.pricingMode === 'fixed') return true;
+
+    for (let i = 0; i < this.pricingRules.length; i++) {
+      const r = this.pricingRules[i];
+      r.error = '';
+
+      if (!r.start_time || !r.end_time) {
+        r.error = 'Unesite vremena.';
+        this.pricingError = `Pravilo ${i + 1}: unesite početno i krajnje vrijeme.`;
+        return false;
+      }
+
+      const [sh, sm] = r.start_time.split(':').map(Number);
+      const [eh, em] = r.end_time.split(':').map(Number);
+      const startMins = sh * 60 + sm;
+      const endMins   = eh * 60 + em;
+
+      if (endMins <= startMins) {
+        r.error = 'Kraj mora biti poslije početka.';
+        this.pricingError = `Pravilo ${i + 1}: krajnje vrijeme mora biti poslije početnog.`;
+        return false;
+      }
+
+      if (!r.price || r.price <= 0) {
+        r.error = 'Unesite cijenu > 0.';
+        this.pricingError = `Pravilo ${i + 1}: cijena mora biti veća od 0.`;
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // ===== NAVIGATION =====
 
   savedWorkingHours: any[] = [];
   stepOneError = '';
@@ -125,8 +206,6 @@ export class VenueFormComponent implements OnInit {
     if (this.step === 1) {
       this.stepOneError = '';
       const f = this.venueForm;
-      // city and street are set only when address is selected (readonly fields)
-      // lat/lng are optional — if city+street present, we can proceed
       const hasAddress = f.get('city')?.value && f.get('street')?.value;
       if (!hasAddress) {
         this.stepOneError = 'Pretraži i odaberi adresu iz Google Maps padajuće liste — polja Grad i Ulica moraju biti popunjena.';
@@ -144,24 +223,32 @@ export class VenueFormComponent implements OnInit {
         this.venueForm.markAllAsTouched();
         this.stepOneError = 'Popuni sva obavezna polja pre nego što nastaviš.';
       }
+
     } else if (this.step === 2) {
       if (this.workingHoursComp) {
         this.savedWorkingHours = this.workingHoursComp.getWorkingHoursData();
-        this.step = 3;
       }
+      this.step = 3;
+
     } else if (this.step === 3) {
+      if (!this.validatePricingRules()) return;
       this.step = 4;
+
+    } else if (this.step === 4) {
+      this.step = 5;
     }
   }
 
   prevStep() {
     this.step--;
     this.message = '';
+    this.pricingError = '';
   }
 
+  // ===== FILE HANDLING =====
+
   onFileSelected(event: any) {
-    const files: FileList = event.target.files;
-    this.handleFiles(files);
+    this.handleFiles(event.target.files);
   }
 
   onDragOver(event: DragEvent) {
@@ -180,10 +267,7 @@ export class VenueFormComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
-
-    if (event.dataTransfer && event.dataTransfer.files) {
-      this.handleFiles(event.dataTransfer.files);
-    }
+    if (event.dataTransfer?.files) this.handleFiles(event.dataTransfer.files);
   }
 
   private handleFiles(files: FileList) {
@@ -191,15 +275,10 @@ export class VenueFormComponent implements OnInit {
     const currentTotal = this.existingImages.length + this.selectedFiles.length;
     let availableSlots = totalAllowed - currentTotal;
 
-    if (availableSlots <= 0) {
-      this.message = 'Maksimalan broj slika je 5.';
-      return;
-    }
+    if (availableSlots <= 0) { this.message = 'Maksimalan broj slika je 5.'; return; }
 
     Array.from(files).forEach(file => {
       if (availableSlots <= 0) return;
-
-      // Validate that it's an image
       if (file.type.match(/image\/*/)) {
         this.selectedFiles.push(file);
         const reader = new FileReader();
@@ -208,10 +287,6 @@ export class VenueFormComponent implements OnInit {
         availableSlots--;
       }
     });
-
-    if (Array.from(files).length > availableSlots && availableSlots === 0) {
-       this.message = 'Neke slike nisu dodate jer je dostignut limit od 5 slika.';
-    }
   }
 
   removeImage(index: number) {
@@ -224,7 +299,7 @@ export class VenueFormComponent implements OnInit {
     this.existingImages.splice(index, 1);
   }
 
-  // ZAMIJENI createVenue() metodu u venue-form.component.ts
+  // ===== SUBMIT =====
 
   createVenue() {
     if (this.venueForm.invalid) {
@@ -242,21 +317,20 @@ export class VenueFormComponent implements OnInit {
 
     Object.keys(formValues).forEach(key => {
       const val = formValues[key];
-      // Šalji i null vrijednosti kao prazan string — backend treba sva polja
-      // Za lat/lng šalji kao broj ili preskoči ako null (backend će zadržati staru vrijednost)
       if (val !== null && val !== undefined && val !== '') {
         formData.append(key, val);
       }
     });
 
-    // Ako je edit mode i lat/lng nisu promenjeni (null u formi),
-    // ne šalji ih — backend će zadržati stare vrijednosti
-    // ALI moramo osigurati da UPDATE ne pokuša SET lat=undefined
     formData.append('working_hours', JSON.stringify(this.savedWorkingHours));
     formData.append('tags', JSON.stringify(this.selectedTagIds));
     this.selectedFiles.forEach(file => formData.append('images', file));
     formData.append('owner_id', ownerId);
     formData.append('currency', 'RSD');
+
+    // Pricing: pošalji pravila ili prazan niz (= briše stara)
+    const pricingToSend = this.pricingMode === 'dynamic' ? this.pricingRules : [];
+    formData.append('pricing', JSON.stringify(pricingToSend));
 
     if (this.isEditMode) {
       formData.append('imagesToDelete', JSON.stringify(this.imagesToDelete));

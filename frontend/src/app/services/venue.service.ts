@@ -69,6 +69,14 @@ export class VenueService {
     return this.http.patch(`${this.apiUrl}/${id}/toggle-active`, {});
   }
 
+  getVenuePricing(venueId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${venueId}/pricing`);
+  }
+
+  saveVenuePricing(venueId: string, rules: any[]): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${venueId}/pricing`, rules);
+  }
+
   getVenueReviews(venueId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/reviews/venue/${venueId}`);
   }

@@ -25,6 +25,28 @@ exports.upsertPricingInTransaction = async (client, venueId, pricingRules) => {
 
     if (!pricingRules || pricingRules.length === 0) return;
 
+    // Provjeri preklapanja prije upisa
+    const toMins = (t) => {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    };
+    for (let i = 0; i < pricingRules.length; i++) {
+        const a = pricingRules[i];
+        const aStart = toMins(a.start_time);
+        const aEnd   = toMins(a.end_time);
+        if (aEnd <= aStart) throw new Error(`Pravilo ${i + 1}: krajnje vrijeme mora biti poslije početnog.`);
+        if (!a.price || a.price <= 0) throw new Error(`Pravilo ${i + 1}: cijena mora biti veća od 0.`);
+        for (let j = i + 1; j < pricingRules.length; j++) {
+            const b = pricingRules[j];
+            if (a.day_of_week !== b.day_of_week) continue;
+            const bStart = toMins(b.start_time);
+            const bEnd   = toMins(b.end_time);
+            if (aStart < bEnd && bStart < aEnd) {
+                throw new Error(`Pravila ${i + 1} i ${j + 1} se preklapaju za isti dan.`);
+            }
+        }
+    }
+
     for (const rule of pricingRules) {
         await client.query(
             `INSERT INTO venue_pricing (venue_id, day_of_week, start_time, end_time, price)

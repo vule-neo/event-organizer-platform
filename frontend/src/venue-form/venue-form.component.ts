@@ -147,11 +147,24 @@ export class VenueFormComponent implements OnInit {
 
   // ===== CENOVNIK HELPERS =====
 
+  get openDays(): { day_of_week: number; name: string; open_time: string; close_time: string }[] {
+    return this.savedWorkingHours
+      .filter(d => d.is_open && d.open_time && d.close_time)
+      .map(d => ({
+        day_of_week: d.day_of_week,
+        name: this.dayNames[d.day_of_week],
+        open_time:  d.open_time.substring(0, 5),
+        close_time: d.close_time.substring(0, 5)
+      }))
+      .sort((a, b) => a.day_of_week - b.day_of_week);
+  }
+
   addPricingRule() {
+    const firstOpen = this.openDays[0];
     this.pricingRules.push({
-      day_of_week: 1,
-      start_time:  '08:00',
-      end_time:    '22:00',
+      day_of_week: firstOpen ? firstOpen.day_of_week : 1,
+      start_time:  firstOpen ? firstOpen.open_time  : '08:00',
+      end_time:    firstOpen ? firstOpen.close_time : '22:00',
       price:       null
     });
   }
@@ -175,9 +188,10 @@ export class VenueFormComponent implements OnInit {
     this.pricingError = '';
     if (this.pricingMode === 'fixed') return true;
 
+    this.pricingRules.forEach(r => r.error = '');
+
     for (let i = 0; i < this.pricingRules.length; i++) {
       const r = this.pricingRules[i];
-      r.error = '';
 
       if (!r.start_time || !r.end_time) {
         r.error = 'Unesite vremena.';
@@ -201,7 +215,57 @@ export class VenueFormComponent implements OnInit {
         this.pricingError = `Pravilo ${i + 1}: cijena mora biti veća od 0.`;
         return false;
       }
+
+      // Provjeri da li je dan otvoren
+      const wh = this.savedWorkingHours.find(d => d.day_of_week === r.day_of_week);
+      if (!wh || !wh.is_open) {
+        r.error = `${this.dayNames[r.day_of_week]} je zatvoren — uklonite ovo pravilo.`;
+        this.pricingError = `Pravilo ${i + 1}: ${this.dayNames[r.day_of_week]} je zatvoren dan.`;
+        return false;
+      }
+
+      // Provjeri da li je unutar radnog vremena
+      if (wh.open_time && wh.close_time) {
+        const openStr  = wh.open_time.substring(0, 5);
+        const closeStr = wh.close_time.substring(0, 5);
+        const [oh, om] = openStr.split(':').map(Number);
+        const [ch, cm] = closeStr.split(':').map(Number);
+        const openMins  = oh * 60 + om;
+        const closeMins = ch * 60 + cm;
+        if (startMins < openMins || endMins > closeMins) {
+          r.error = `Mora biti unutar radnog vremena (${openStr}–${closeStr}).`;
+          this.pricingError = `Pravilo ${i + 1}: vremenski raspon mora biti unutar radnog vremena (${openStr}–${closeStr}).`;
+          return false;
+        }
+      }
     }
+
+    // Provjeri preklapanja između pravila na istom danu
+    for (let i = 0; i < this.pricingRules.length; i++) {
+      const a = this.pricingRules[i];
+      const [ash, asm] = a.start_time.split(':').map(Number);
+      const [aeh, aem] = a.end_time.split(':').map(Number);
+      const aStart = ash * 60 + asm;
+      const aEnd   = aeh * 60 + aem;
+
+      for (let j = i + 1; j < this.pricingRules.length; j++) {
+        const b = this.pricingRules[j];
+        if (a.day_of_week !== b.day_of_week) continue;
+
+        const [bsh, bsm] = b.start_time.split(':').map(Number);
+        const [beh, bem] = b.end_time.split(':').map(Number);
+        const bStart = bsh * 60 + bsm;
+        const bEnd   = beh * 60 + bem;
+
+        if (aStart < bEnd && bStart < aEnd) {
+          a.error = 'Preklapa se s drugim pravilom.';
+          b.error = 'Preklapa se s drugim pravilom.';
+          this.pricingError = `Pravila ${i + 1} i ${j + 1} se preklapaju za ${this.dayNames[a.day_of_week]}.`;
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 

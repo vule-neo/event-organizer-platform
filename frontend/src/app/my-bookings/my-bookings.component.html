@@ -69,7 +69,6 @@
 
         <!-- Confirmed -->
         <ng-container *ngIf="b.status === 'confirmed'">
-
           <button *ngIf="canCancel(b.start_time)" class="ovc-btn ovc-btn-delete w-full"
             (click)="$event.stopPropagation(); cancelReservation(b.id)">
             <i class="bi bi-x-circle"></i> Otkaži termin
@@ -94,6 +93,15 @@
         <div class="booking-cancelled" *ngIf="b.status.includes('cancelled')">
           <i class="bi bi-x-circle"></i> Termin je otkazan
         </div>
+
+        <!-- Rezerviši ponovo (svi statusi osim aktivne confirmed rezervacije) -->
+        <a *ngIf="b.status !== 'confirmed'"
+           [routerLink]="['/tereni/detalji', b.venue_id]"
+           [queryParams]="{scrollTo: 'booking'}"
+           class="ovc-btn ovc-btn-rebook w-full"
+           (click)="$event.stopPropagation()">
+          <i class="bi bi-arrow-repeat"></i> Rezerviši ponovo
+        </a>
 
       </div>
     </div>

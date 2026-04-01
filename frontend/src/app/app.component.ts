@@ -24,6 +24,14 @@ export class AppComponent implements OnInit {
     this.isScrolled = window.scrollY > 20;
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.mobileMenuOpen) return;
+    const target = event.target as HTMLElement;
+    if (!target.closest('.navbar')) {
+      this.mobileMenuOpen = false;
+    }
+  }
 
   closeMobileMenu() {
     this.mobileMenuOpen = false;

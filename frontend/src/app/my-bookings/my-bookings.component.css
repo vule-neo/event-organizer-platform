@@ -713,6 +713,23 @@
   padding: 8px;
 }
 
+.ovc-btn-rebook {
+  background: rgba(30, 58, 95, 0.05);
+  border-color: rgba(30, 58, 95, 0.2);
+  color: var(--navy);
+  font-size: 13px;
+  padding: 10px;
+  margin-top: 8px;
+  text-decoration: none;
+  justify-content: center;
+}
+
+.ovc-btn-rebook:hover {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
 /* ---- CLICKABLE CARD FIX ---- */
 .booking-card-item {
   cursor: pointer;

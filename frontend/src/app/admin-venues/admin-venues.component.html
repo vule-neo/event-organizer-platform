@@ -33,7 +33,7 @@
           <tr *ngFor="let v of venues" [class.row-inactive]="!v.is_active">
             <td>
               <div class="venue-thumb-cell">
-                <img [src]="v.main_image ? apiBase + v.main_image : 'assets/no-image.png'"
+                <img [src]="v.main_image ? (v.main_image.startsWith('http') ? v.main_image : apiBase + v.main_image) : 'assets/no-image.png'"
                      class="venue-thumb-img" />
                 <span class="td-bold">{{ v.name }}</span>
               </div>

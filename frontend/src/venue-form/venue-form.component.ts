@@ -151,8 +151,8 @@ export class VenueFormComponent implements OnInit {
     return this.savedWorkingHours
       .filter(d => d.is_open && d.open_time && d.close_time)
       .map(d => ({
-        day_of_week: d.day_of_week,
-        name: this.dayNames[d.day_of_week],
+        day_of_week: +d.day_of_week,
+        name: this.dayNames[+d.day_of_week],
         open_time:  d.open_time.substring(0, 5),
         close_time: d.close_time.substring(0, 5)
       }))
@@ -216,11 +216,12 @@ export class VenueFormComponent implements OnInit {
         return false;
       }
 
-      // Provjeri da li je dan otvoren
-      const wh = this.savedWorkingHours.find(d => d.day_of_week === r.day_of_week);
+      // Provjeri da li je dan otvoren (coerce u broj jer HTML select vraća string)
+      const dayNum = +r.day_of_week;
+      const wh = this.savedWorkingHours.find(d => +d.day_of_week === dayNum);
       if (!wh || !wh.is_open) {
-        r.error = `${this.dayNames[r.day_of_week]} je zatvoren — uklonite ovo pravilo.`;
-        this.pricingError = `Pravilo ${i + 1}: ${this.dayNames[r.day_of_week]} je zatvoren dan.`;
+        r.error = `${this.dayNames[dayNum]} je zatvoren — uklonite ovo pravilo.`;
+        this.pricingError = `Pravilo ${i + 1}: ${this.dayNames[dayNum]} je zatvoren dan.`;
         return false;
       }
 
@@ -250,7 +251,7 @@ export class VenueFormComponent implements OnInit {
 
       for (let j = i + 1; j < this.pricingRules.length; j++) {
         const b = this.pricingRules[j];
-        if (a.day_of_week !== b.day_of_week) continue;
+        if (+a.day_of_week !== +b.day_of_week) continue;
 
         const [bsh, bsm] = b.start_time.split(':').map(Number);
         const [beh, bem] = b.end_time.split(':').map(Number);

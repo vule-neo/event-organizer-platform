@@ -468,6 +468,13 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.mapReady) this.placeMarkers(this.filteredVenues);
   }
 
+  scrollToResults() {
+    setTimeout(() => {
+      const el = document.getElementById('venues-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
   applyFilters() {
     const term = this.searchTerm.trim().toLowerCase();
     const city = this.selectedCity;

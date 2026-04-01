@@ -89,7 +89,7 @@
           </div>
         </div>
 
-        <button class="search-btn" (click)="applyFilters()">
+        <button class="search-btn" (click)="applyFilters(); scrollToResults()">
           <i class="bi bi-search"></i>
           <span>Pretraži</span>
         </button>
@@ -460,7 +460,7 @@
 
 
 <!-- ===== VENUES SECTION ===== -->
-<section class="venues-section">
+<section class="venues-section" id="venues-section">
   <div class="section-container">
 
     <!-- Section header -->

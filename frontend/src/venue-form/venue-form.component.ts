@@ -71,7 +71,7 @@ export class VenueFormComponent implements OnInit {
       street:            ['', [Validators.required, Validators.maxLength(255)]],
       lat:               [null],
       lng:               [null],
-      price_per_slot:    [null, [Validators.required, Validators.min(0.01)]],
+      price_per_slot:    [null, [Validators.min(0.01)]],
       slot_duration_mins:[60, [Validators.required]],
       description:       ['', [Validators.maxLength(1000)]]
     });
@@ -231,6 +231,12 @@ export class VenueFormComponent implements OnInit {
       this.step = 3;
 
     } else if (this.step === 3) {
+      const price = this.venueForm.get('price_per_slot')?.value;
+      if (!price || price <= 0) {
+        this.pricingError = 'Unesite podrazumijevanu cijenu po terminu (mora biti > 0).';
+        this.venueForm.get('price_per_slot')?.markAsTouched();
+        return;
+      }
       if (!this.validatePricingRules()) return;
       this.step = 4;
 

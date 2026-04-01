@@ -16,7 +16,7 @@
         </div>
         <div class="vf-step-info">
           <span class="vf-step-title">Osnovni podaci</span>
-          <span class="vf-step-desc">Naziv, sport, lokacija, cena</span>
+          <span class="vf-step-desc">Naziv, sport, lokacija</span>
         </div>
       </div>
 
@@ -135,30 +135,6 @@
             </div>
           </div>
 
-          <div class="vf-row">
-            <div class="vf-field">
-              <label>Podrazumjevana cena (RSD) <span class="req">*</span></label>
-              <div class="input-wrap">
-                <i class="bi bi-cash input-icon"></i>
-                <input type="number" formControlName="price_per_slot" placeholder="npr. 1500"
-                  [class.input-error]="venueForm.get('price_per_slot')?.invalid && venueForm.get('price_per_slot')?.touched" />
-              </div>
-              <span class="vf-field-hint">Koristi se kao rezervna cijena ako nema cenovnika.</span>
-            </div>
-            <div class="vf-field">
-              <label>Trajanje termina <span class="req">*</span></label>
-              <div class="input-wrap">
-                <i class="bi bi-clock input-icon"></i>
-                <select formControlName="slot_duration_mins" class="vf-select">
-                  <option [value]="60">60 minuta</option>
-                  <option [value]="90">90 minuta</option>
-                  <option [value]="120">120 minuta</option>
-                </select>
-                <i class="bi bi-chevron-down select-arrow"></i>
-              </div>
-            </div>
-          </div>
-
           <div class="vf-field">
             <label>Opis terena</label>
             <textarea formControlName="description" rows="4" class="vf-textarea"
@@ -202,6 +178,31 @@
         <div class="vf-step-header">
           <h1>Cenovnik</h1>
           <p>Izaberi kako se naplaćuju termini — fiksno ili po danu i vremenu.</p>
+        </div>
+
+        <!-- Podrazumijevana cena i trajanje termina -->
+        <div class="vf-row" style="margin-bottom: 24px;">
+          <div class="vf-field">
+            <label>Podrazumijevana cena (RSD) <span class="req">*</span></label>
+            <div class="input-wrap">
+              <i class="bi bi-cash input-icon"></i>
+              <input type="number" formControlName="price_per_slot" placeholder="npr. 1500"
+                [class.input-error]="venueForm.get('price_per_slot')?.invalid && venueForm.get('price_per_slot')?.touched" />
+            </div>
+            <span class="vf-field-hint">Koristi se kao rezervna cijena ako nema cenovnika.</span>
+          </div>
+          <div class="vf-field">
+            <label>Trajanje termina <span class="req">*</span></label>
+            <div class="input-wrap">
+              <i class="bi bi-clock input-icon"></i>
+              <select formControlName="slot_duration_mins" class="vf-select">
+                <option [value]="60">60 minuta</option>
+                <option [value]="90">90 minuta</option>
+                <option [value]="120">120 minuta</option>
+              </select>
+              <i class="bi bi-chevron-down select-arrow"></i>
+            </div>
+          </div>
         </div>
 
         <!-- Mode selector -->

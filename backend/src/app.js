@@ -73,9 +73,34 @@ app.use('/api/admin', adminRoutes);
 // POKRETANJE CRON POSLA (Automatizacija statusa)
 cronService.initCron();
 
+// AUTO-MIGRACIJA: kreira tabele koje možda nedostaju u produkcijskoj bazi
+async function runMigrations() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS venue_pricing (
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        venue_id    UUID NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+        day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
+        start_time  TIME WITHOUT TIME ZONE NOT NULL,
+        end_time    TIME WITHOUT TIME ZONE NOT NULL,
+        price       DECIMAL(10,2) NOT NULL CHECK (price > 0),
+        created_at  TIMESTAMPTZ DEFAULT NOW(),
+        CONSTRAINT chk_end_after_start CHECK (end_time > start_time)
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_venue_pricing_venue_id ON venue_pricing(venue_id)
+    `);
+    console.log('✅ Migracije završene (venue_pricing OK)');
+  } catch (err) {
+    console.error('❌ Greška pri migraciji:', err.message);
+  }
+}
+
 // POKRETANJE SERVERA (Samo jednom baki!)
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Server radi na portu ${PORT}`);
   console.log('⏰ Automatizacija termina aktivirana...');
+  await runMigrations();
 });

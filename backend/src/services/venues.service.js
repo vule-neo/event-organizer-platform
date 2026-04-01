@@ -216,8 +216,8 @@ exports.getVenuesForOwner = async (ownerId) => {
         '[]'
       ) as tags,
       EXISTS(SELECT 1 FROM venue_pricing WHERE venue_id = v.id) as has_dynamic_pricing,
-      COALESCE(
-        (SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id),
+      LEAST(
+        COALESCE((SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id), v.price_per_slot),
         v.price_per_slot
       )::float as min_price
      FROM venues v
@@ -342,8 +342,8 @@ exports.getAllVenues = async () => {
         '[]'
       ) as tags,
       EXISTS(SELECT 1 FROM venue_pricing WHERE venue_id = v.id) as has_dynamic_pricing,
-      COALESCE(
-        (SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id),
+      LEAST(
+        COALESCE((SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id), v.price_per_slot),
         v.price_per_slot
       )::float as min_price
      FROM venues v
@@ -407,8 +407,8 @@ exports.getAvailableToday = async () => {
           FILTER (WHERE vt.id IS NOT NULL), '[]'
         ) AS tags,
         EXISTS(SELECT 1 FROM venue_pricing WHERE venue_id = v.id) as has_dynamic_pricing,
-        COALESCE(
-          (SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id),
+        LEAST(
+          COALESCE((SELECT MIN(price)::float FROM venue_pricing WHERE venue_id = v.id), v.price_per_slot),
           v.price_per_slot
         )::float as min_price
       FROM venues v

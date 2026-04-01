@@ -101,8 +101,14 @@
       </div>
 
       <!-- Price -->
-      <div class="venue-price">
-        <span *ngIf="venue.has_dynamic_pricing" class="price-from-label">od </span>{{ venue.min_price || venue.price_per_slot }} RSD <span>/ termin</span>
+      <div class="venue-price-row">
+        <div class="venue-price">
+          <span *ngIf="venue.has_dynamic_pricing" class="price-from-label">od </span>{{ venue.min_price || venue.price_per_slot }} RSD <span>/ termin</span>
+        </div>
+        <span class="pricing-type-tag" [class.tag-dynamic]="venue.has_dynamic_pricing" [class.tag-fixed]="!venue.has_dynamic_pricing">
+          <i class="bi" [ngClass]="venue.has_dynamic_pricing ? 'bi-calendar-range-fill' : 'bi-tag-fill'"></i>
+          {{ venue.has_dynamic_pricing ? 'Varijabilna cena' : 'Fiksna cena' }}
+        </span>
       </div>
     </div>
 
@@ -147,6 +153,35 @@
     </div>
 
     <div class="section-divider"></div>
+
+    <!-- ===== CENOVNIK (prikazati samo ako postoje pravila) ===== -->
+    <div class="detail-section pricing-schedule-section" *ngIf="venue.pricing?.length > 0">
+      <div class="pricing-section-header">
+        <h3>Cenovnik</h3>
+        <span class="pricing-type-tag tag-dynamic">
+          <i class="bi bi-calendar-range-fill"></i> Varijabilna cena
+        </span>
+      </div>
+      <div class="pricing-schedule-grid">
+        <div class="pricing-day-card" *ngFor="let day of pricingByDay; let i = index"
+             [style.animation-delay]="(i * 60) + 'ms'">
+          <div class="pricing-day-name">{{ dayNames[day.day] }}</div>
+          <div class="pricing-rule-item" *ngFor="let rule of day.rules">
+            <span class="ptime">
+              <i class="bi bi-clock"></i>
+              {{ rule.start_time.substring(0,5) }} – {{ rule.end_time.substring(0,5) }}
+            </span>
+            <span class="pprice">{{ rule.price | number:'1.0-0' }} RSD</span>
+          </div>
+        </div>
+      </div>
+      <div class="pricing-fallback-row">
+        <i class="bi bi-info-circle-fill"></i>
+        Ostali termini (van definisanog cenovnika): <strong>{{ venue.price_per_slot | number:'1.0-0' }} RSD</strong>
+      </div>
+    </div>
+
+    <div class="section-divider" *ngIf="venue.pricing?.length > 0"></div>
 
     <!-- ===== BOOKING SECTION (full-width, above reviews) ===== -->
     <div class="booking-section-full" id="booking-section">
@@ -197,10 +232,39 @@
         <div class="booking-col-slots">
           <!-- Slots -->
           <div class="slots-wrap" *ngIf="availableSlots.length > 0">
-            <span class="booking-label">Dostupni termini</span>
-            <div class="slots-grid">
-              <button *ngFor="let slot of availableSlots" class="slot-btn" [class.slot-selected]="selectedSlot === slot"
-                [class.slot-occupied]="slot.isOccupied" [disabled]="slot.isOccupied" (click)="selectSlot(slot)">
+            <div class="booking-label-row">
+              <span class="booking-label">Dostupni termini</span>
+              <span class="pricing-type-tag" [class.tag-dynamic]="venue.has_dynamic_pricing" [class.tag-fixed]="!venue.has_dynamic_pricing">
+                <i class="bi" [ngClass]="venue.has_dynamic_pricing ? 'bi-calendar-range-fill' : 'bi-tag-fill'"></i>
+                {{ venue.has_dynamic_pricing ? 'Varijabilna' : 'Fiksna cena' }}
+              </span>
+            </div>
+
+            <!-- Dynamic pricing: grouped by price -->
+            <ng-container *ngIf="venue.has_dynamic_pricing">
+              <div *ngFor="let group of slotGroups" class="slot-price-group">
+                <div class="slot-group-price-label">
+                  <i class="bi bi-tag-fill"></i> {{ group.price | number:'1.0-0' }} RSD
+                </div>
+                <div class="slots-grid">
+                  <button *ngFor="let slot of group.slots" class="slot-btn"
+                    [class.slot-selected]="selectedSlot === slot"
+                    [class.slot-occupied]="slot.isOccupied"
+                    [disabled]="slot.isOccupied"
+                    (click)="selectSlot(slot)">
+                    {{ slot.start }}
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Fixed pricing: flat grid -->
+            <div class="slots-grid" *ngIf="!venue.has_dynamic_pricing">
+              <button *ngFor="let slot of availableSlots" class="slot-btn"
+                [class.slot-selected]="selectedSlot === slot"
+                [class.slot-occupied]="slot.isOccupied"
+                [disabled]="slot.isOccupied"
+                (click)="selectSlot(slot)">
                 {{ slot.start }}
               </button>
             </div>

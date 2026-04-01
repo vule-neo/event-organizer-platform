@@ -532,6 +532,10 @@
             <span class="venue-duration">
               <i class="bi bi-clock"></i> {{ venue.slot_duration_mins }} min
             </span>
+            <span class="venue-pricing-type-tag" [class.vpt-dynamic]="venue.has_dynamic_pricing" [class.vpt-fixed]="!venue.has_dynamic_pricing">
+              <i class="bi" [ngClass]="venue.has_dynamic_pricing ? 'bi-calendar-range-fill' : 'bi-tag-fill'"></i>
+              {{ venue.has_dynamic_pricing ? 'Varijabilna' : 'Fiksna' }}
+            </span>
             <div class="card-buttons">
               <button class="btn-card-detail" (click)="viewDetails(venue.id, $event)">
                 Pogledaj <i class="bi bi-arrow-right"></i>

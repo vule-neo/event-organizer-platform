@@ -2044,3 +2044,228 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+/* ============================================================
+   PRICING TYPE TAG
+   ============================================================ */
+.pricing-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.pricing-type-tag.tag-fixed {
+  background: rgba(30, 58, 95, 0.08);
+  color: var(--navy);
+  border: 1.5px solid rgba(30, 58, 95, 0.15);
+}
+
+.pricing-type-tag.tag-dynamic {
+  background: linear-gradient(135deg, rgba(232, 184, 109, 0.15), rgba(232, 184, 109, 0.08));
+  color: #92651a;
+  border: 1.5px solid rgba(232, 184, 109, 0.4);
+}
+
+/* ---- Venue price row ---- */
+.venue-price-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.venue-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.venue-price span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.price-from-label {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* ============================================================
+   PRICING SCHEDULE SECTION
+   ============================================================ */
+.pricing-schedule-section {
+  /* inherits .detail-section padding/margin */
+}
+
+.pricing-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.pricing-section-header h3 {
+  margin-bottom: 0 !important;
+}
+
+.pricing-schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pricing-day-card {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  animation: priceDaySlideIn 0.4s ease both;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.pricing-day-card:hover {
+  box-shadow: 0 4px 16px rgba(30, 58, 95, 0.1);
+  transform: translateY(-2px);
+}
+
+@keyframes priceDaySlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pricing-day-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.pricing-rule-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+}
+
+.ptime {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.ptime i {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.pprice {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.pricing-fallback-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(30, 58, 95, 0.04);
+  border: 1px solid rgba(30, 58, 95, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.pricing-fallback-row i {
+  color: var(--navy);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.pricing-fallback-row strong {
+  color: var(--navy);
+}
+
+/* ============================================================
+   SLOT PRICE GROUPS (in booking section)
+   ============================================================ */
+.booking-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.booking-label-row .booking-label {
+  margin-bottom: 0;
+}
+
+.slot-price-group {
+  margin-bottom: 14px;
+}
+
+.slot-group-price-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, rgba(232, 184, 109, 0.18), rgba(232, 184, 109, 0.08));
+  border: 1.5px solid rgba(232, 184, 109, 0.45);
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #92651a;
+  margin-bottom: 8px;
+}
+
+.slot-group-price-label i {
+  font-size: 11px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .pricing-schedule-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .venue-price-row {
+    gap: 8px;
+  }
+
+  .booking-label-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pricing-fallback-row {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .pricing-schedule-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -997,3 +997,47 @@
     grid-column: span 1;
   }
 }
+
+/* ---- Custom Time Selects (24h, no AM/PM) ---- */
+.pricing-time-wrap {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pricing-time-select {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 5px 4px;
+  width: 48px;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+
+.pricing-time-select:focus {
+  outline: none;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.08);
+}
+
+.time-sep {
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .pricing-time-select {
+    width: 44px;
+    font-size: 12px;
+    padding: 4px 2px;
+  }
+}

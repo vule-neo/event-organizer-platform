@@ -51,6 +51,7 @@ export class VenueFormComponent implements OnInit {
   pricingRules: PricingRule[] = [];
   pricingError = '';
   readonly dayNames = DAY_NAMES;
+  readonly hoursArr = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 
   constructor(
     private fb: FormBuilder,
@@ -153,6 +154,13 @@ export class VenueFormComponent implements OnInit {
       end_time:    '22:00',
       price:       null
     });
+  }
+
+  getTimeHour(t: string): string { return t ? t.substring(0, 2) : '08'; }
+  getTimeMin(t: string): string  { return t ? t.substring(3, 5) : '00'; }
+  setTimePart(rule: PricingRule, field: 'start_time' | 'end_time', part: 'h' | 'm', val: string) {
+    const cur = rule[field] || '00:00';
+    rule[field] = part === 'h' ? `${val}:${cur.substring(3, 5)}` : `${cur.substring(0, 2)}:${val}`;
   }
 
   removePricingRule(i: number) {

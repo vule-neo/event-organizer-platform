@@ -259,12 +259,40 @@
               </select>
             </div>
             <div class="pricing-cell">
-              <input type="time" [(ngModel)]="rule.start_time" [ngModelOptions]="{standalone: true}"
-                class="pricing-time" />
+              <div class="pricing-time-wrap">
+                <select class="pricing-time-select"
+                        [ngModel]="getTimeHour(rule.start_time)"
+                        (ngModelChange)="setTimePart(rule, 'start_time', 'h', $event)"
+                        [ngModelOptions]="{standalone: true}">
+                  <option *ngFor="let h of hoursArr" [value]="h">{{ h }}</option>
+                </select>
+                <span class="time-sep">:</span>
+                <select class="pricing-time-select"
+                        [ngModel]="getTimeMin(rule.start_time)"
+                        (ngModelChange)="setTimePart(rule, 'start_time', 'm', $event)"
+                        [ngModelOptions]="{standalone: true}">
+                  <option value="00">00</option>
+                  <option value="30">30</option>
+                </select>
+              </div>
             </div>
             <div class="pricing-cell">
-              <input type="time" [(ngModel)]="rule.end_time" [ngModelOptions]="{standalone: true}"
-                class="pricing-time" />
+              <div class="pricing-time-wrap">
+                <select class="pricing-time-select"
+                        [ngModel]="getTimeHour(rule.end_time)"
+                        (ngModelChange)="setTimePart(rule, 'end_time', 'h', $event)"
+                        [ngModelOptions]="{standalone: true}">
+                  <option *ngFor="let h of hoursArr" [value]="h">{{ h }}</option>
+                </select>
+                <span class="time-sep">:</span>
+                <select class="pricing-time-select"
+                        [ngModel]="getTimeMin(rule.end_time)"
+                        (ngModelChange)="setTimePart(rule, 'end_time', 'm', $event)"
+                        [ngModelOptions]="{standalone: true}">
+                  <option value="00">00</option>
+                  <option value="30">30</option>
+                </select>
+              </div>
             </div>
             <div class="pricing-cell">
               <div class="pricing-price-wrap">

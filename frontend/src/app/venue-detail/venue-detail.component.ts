@@ -397,11 +397,45 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
         start: startStr,
         end: endStr,
         isOvernight: isOvernight && currentTime >= 24 * 60,
-        isOccupied: this.occupiedSlots.includes(startStr)
+        isOccupied: this.occupiedSlots.includes(startStr),
+        price: 0
       });
       currentTime += duration;
     }
+    // Compute price for each slot (needed for grouping by price)
+    for (const slot of slots) {
+      slot.price = this.computeSlotPrice(slot);
+    }
     this.availableSlots = slots;
+  }
+
+  get pricingByDay(): any[] {
+    if (!this.venue?.pricing?.length) return [];
+    const map = new Map<number, any[]>();
+    for (const rule of this.venue.pricing) {
+      if (!map.has(rule.day_of_week)) map.set(rule.day_of_week, []);
+      map.get(rule.day_of_week)!.push(rule);
+    }
+    return [1, 2, 3, 4, 5, 6, 0]
+      .filter(d => map.has(d))
+      .map(d => ({
+        day: d,
+        rules: map.get(d)!.sort((a: any, b: any) => a.start_time.localeCompare(b.start_time))
+      }));
+  }
+
+  get slotGroups(): Array<{ price: number; slots: any[] }> {
+    if (!this.venue?.has_dynamic_pricing || this.availableSlots.length === 0) return [];
+    const groups: Array<{ price: number; slots: any[] }> = [];
+    for (const slot of this.availableSlots) {
+      const last = groups[groups.length - 1];
+      if (!last || last.price !== slot.price) {
+        groups.push({ price: slot.price, slots: [slot] });
+      } else {
+        last.slots.push(slot);
+      }
+    }
+    return groups;
   }
 
   monthlyOccupiedSlots: any[] = [];

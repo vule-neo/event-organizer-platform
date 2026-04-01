@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BookingService } from '../services/booking.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-owner-bookings',
@@ -25,7 +26,7 @@ export class OwnerBookingsComponent implements OnInit {
   earningsByMonth: { label: string, earnings: number }[] = [];
   popularHours: { hour: string, count: number }[] = [];
 
-  constructor(private bookingService: BookingService) { }
+  constructor(private bookingService: BookingService, private notif: NotificationService) { }
 
   ngOnInit(): void {
     this.bookingService.getOwnerReport().subscribe({
@@ -119,19 +120,19 @@ export class OwnerBookingsComponent implements OnInit {
     return Math.max(...this.earningsByVenue.map(v => v.earnings), 1);
   }
 
-  cancelBooking(id: string) {
-    if (confirm('Da li ste sigurni da želite da otkažete ovaj termin?')) {
-      this.bookingService.cancelByOwner(id).subscribe({
-        next: () => {
-          const booking = this.bookings.find(b => b.id === id);
-          if (booking) booking.status = 'cancelled_by_owner';
-          this.calculateStats();
-          this.calculateEarningsByVenue();
-          this.calculateEarningsByMonth();
-          alert('Termin otkazan.');
-        },
-        error: (err) => alert(err.error.message || 'Greška pri otkazivanju')
-      });
-    }
+  async cancelBooking(id: string) {
+    const ok = await this.notif.confirm('Da li ste sigurni da želite da otkažete ovaj termin?');
+    if (!ok) return;
+    this.bookingService.cancelByOwner(id).subscribe({
+      next: () => {
+        const booking = this.bookings.find(b => b.id === id);
+        if (booking) booking.status = 'cancelled_by_owner';
+        this.calculateStats();
+        this.calculateEarningsByVenue();
+        this.calculateEarningsByMonth();
+        this.notif.success('Termin je otkazan.');
+      },
+      error: (err) => this.notif.error(err.error?.message || 'Greška pri otkazivanju.')
+    });
   }
 }

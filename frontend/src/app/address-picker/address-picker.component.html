@@ -1,14 +1,13 @@
 <div class="address-picker-wrapper">
-  <label class="form-label">Pretraži adresu (Google Maps) *</label>
   <div class="input-group">
-    <span class="input-icon">📍</span>
+    <i class="bi bi-geo-alt input-icon-bi"></i>
     <input
       #addressInput
       type="text"
-      placeholder="Unesite ulicu i broj..."
+      placeholder="Pretraži adresu (npr. Knez Mihailova 10, Beograd)..."
       class="address-input"
       autocomplete="off"
     />
   </div>
-  <small class="text-muted">Obavezno odaberite predlog iz liste.</small>
+  <small class="address-hint"><i class="bi bi-info-circle"></i> Odaberite predlog iz padajuće liste da se automatski popune grad i ulica.</small>
 </div>

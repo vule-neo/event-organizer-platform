@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AdminService } from '../services/admin.service';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-admin-venues',
@@ -16,7 +17,7 @@ export class AdminVenuesComponent implements OnInit {
   loading = true;
   apiBase = environment.apiBase;
 
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService, private notif: NotificationService) { }
 
   ngOnInit() {
     this.adminService.getAllVenues().subscribe({
@@ -25,22 +26,22 @@ export class AdminVenuesComponent implements OnInit {
     });
   }
 
-  toggleVenue(venue: any) {
+  async toggleVenue(venue: any) {
     const akcija = venue.is_active ? 'deaktivirate' : 'aktivirate';
-    if (confirm(`Da li želite da ${akcija} teren "${venue.name}"?`)) {
-      this.adminService.toggleVenueActive(venue.id).subscribe({
-        next: (res) => venue.is_active = res.is_active,
-        error: () => alert('Greška.')
-      });
-    }
+    const ok = await this.notif.confirm(`Da li želite da ${akcija} teren "${venue.name}"?`);
+    if (!ok) return;
+    this.adminService.toggleVenueActive(venue.id).subscribe({
+      next: (res) => { venue.is_active = res.is_active; this.notif.success('Status terena je promenjen.'); },
+      error: () => this.notif.error('Greška.')
+    });
   }
 
-  deleteVenue(venue: any) {
-    if (confirm(`BRISANJE: Da li ste sigurni da želite trajno obrisati "${venue.name}"? Ova akcija je nepovratna.`)) {
-      this.adminService.deleteVenue(venue.id).subscribe({
-        next: () => this.venues = this.venues.filter(v => v.id !== venue.id),
-        error: () => alert('Greška pri brisanju.')
-      });
-    }
+  async deleteVenue(venue: any) {
+    const ok = await this.notif.confirm(`BRISANJE: Da li ste sigurni da želite trajno obrisati "${venue.name}"? Ova akcija je nepovratna.`);
+    if (!ok) return;
+    this.adminService.deleteVenue(venue.id).subscribe({
+      next: () => { this.venues = this.venues.filter(v => v.id !== venue.id); this.notif.success('Teren je obrisan.'); },
+      error: () => this.notif.error('Greška pri brisanju.')
+    });
   }
 }

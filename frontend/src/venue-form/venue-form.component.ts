@@ -53,8 +53,8 @@ export class VenueFormComponent implements OnInit {
       country: ['Srbija', [Validators.required, Validators.maxLength(100)]],
       city: ['', [Validators.required, Validators.maxLength(100)]],
       street: ['', [Validators.required, Validators.maxLength(255)]],
-      lat: [null, [Validators.required]],
-      lng: [null, [Validators.required]],
+      lat: [null],
+      lng: [null],
       price_per_slot: [null, [Validators.required, Validators.min(0.01)]],
       slot_duration_mins: [60, [Validators.required]],
       description: ['', [Validators.maxLength(1000)]]
@@ -119,10 +119,21 @@ export class VenueFormComponent implements OnInit {
   }
 
   savedWorkingHours: any[] = [];
+  stepOneError = '';
 
   nextStep() {
     if (this.step === 1) {
-      if (this.venueForm.valid) {
+      this.stepOneError = '';
+      const f = this.venueForm;
+      // city and street are set only when address is selected (readonly fields)
+      // lat/lng are optional — if city+street present, we can proceed
+      const hasAddress = f.get('city')?.value && f.get('street')?.value;
+      if (!hasAddress) {
+        this.stepOneError = 'Pretraži i odaberi adresu iz Google Maps padajuće liste — polja Grad i Ulica moraju biti popunjena.';
+        this.venueForm.markAllAsTouched();
+        return;
+      }
+      if (f.valid) {
         this.step = 2;
         setTimeout(() => {
           if (this.workingHoursComp && this.savedWorkingHours.length > 0) {
@@ -131,6 +142,7 @@ export class VenueFormComponent implements OnInit {
         }, 100);
       } else {
         this.venueForm.markAllAsTouched();
+        this.stepOneError = 'Popuni sva obavezna polja pre nego što nastaviš.';
       }
     } else if (this.step === 2) {
       if (this.workingHoursComp) {

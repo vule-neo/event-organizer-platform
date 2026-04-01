@@ -127,7 +127,7 @@ exports.getUserBookings = async (clientId) => {
             b.id, b.venue_id, b.start_time, b.end_time, b.price_paid, b.status,
             v.name as venue_name, v.city, v.street,
             (SELECT url FROM venue_images WHERE venue_id = v.id LIMIT 1) as venue_image,
-            EXISTS (SELECT 1 FROM reviews WHERE booking_id = b.id) as is_reviewed
+            EXISTS (SELECT 1 FROM reviews WHERE venue_id = v.id AND client_id = b.client_id) as is_reviewed
          FROM bookings b
          JOIN venues v ON b.venue_id = v.id
          WHERE b.client_id = $1

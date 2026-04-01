@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { VenueService } from '../services/venue.service';
 import { Router, RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-owner-venues',
@@ -19,7 +20,8 @@ export class OwnerVenuesComponent implements OnInit {
 
   constructor(
     private venueService: VenueService,
-    private router: Router
+    private router: Router,
+    private notif: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -49,25 +51,23 @@ export class OwnerVenuesComponent implements OnInit {
     });
   }
 
-  onDelete(venueId: string) {
-    if (!confirm('Da li ste sigurni da želite da obrišete ovaj teren?')) return;
+  async onDelete(venueId: string) {
+    const ok = await this.notif.confirm('Da li ste sigurni da želite da obrišete ovaj teren?');
+    if (!ok) return;
 
     this.venueService.deleteVenue(venueId).subscribe({
       next: (result: any) => {
         if (result.softDeleted) {
-          // Venue had bookings — deactivated instead of deleted
-          alert('Teren ima postojeće rezervacije i ne može biti trajno obrisan. Teren je deaktiviran i neće biti vidljiv korisnicima. Sve buduće rezervacije su otkazane.');
-          // Update local list — mark as inactive instead of removing
+          this.notif.info('Teren ima rezervacije i ne može biti trajno obrisan — deaktiviran je i neće biti vidljiv korisnicima.');
           const venue = this.venues.find(v => v.id === venueId);
           if (venue) venue.is_active = false;
         } else {
-          // Fully deleted
           this.venues = this.venues.filter(v => v.id !== venueId);
+          this.notif.success('Teren je uspešno obrisan.');
         }
       },
       error: (err: any) => {
-        console.error(err);
-        alert('Greška pri brisanju terena: ' + (err?.error?.message || 'Pokušaj ponovo.'));
+        this.notif.error('Greška pri brisanju terena: ' + (err?.error?.message || 'Pokušaj ponovo.'));
       }
     });
   }
@@ -82,15 +82,16 @@ export class OwnerVenuesComponent implements OnInit {
     this.router.navigate(['/tereni/detalji', venueId]);
   }
 
-  onToggleActive(venue: any) {
+  async onToggleActive(venue: any) {
     const akcija = venue.is_active ? 'deaktivirate' : 'aktivirate';
-    if (confirm(`Da li želite da ${akcija} teren "${venue.name}"?`)) {
-      this.venueService.toggleVenueActive(venue.id).subscribe({
-        next: (res) => {
-          venue.is_active = res.is_active;
-        },
-        error: () => alert('Greška pri promjeni statusa.')
-      });
-    }
+    const ok = await this.notif.confirm(`Da li želite da ${akcija} teren "${venue.name}"?`);
+    if (!ok) return;
+    this.venueService.toggleVenueActive(venue.id).subscribe({
+      next: (res) => {
+        venue.is_active = res.is_active;
+        this.notif.success(`Teren je ${res.is_active ? 'aktiviran' : 'deaktiviran'}.`);
+      },
+      error: () => this.notif.error('Greška pri promeni statusa.')
+    });
   }
 }

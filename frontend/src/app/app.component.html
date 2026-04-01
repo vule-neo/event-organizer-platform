@@ -98,6 +98,30 @@
   <router-outlet></router-outlet>
 </main>
 
+<!-- ===== TOAST NOTIFICATIONS ===== -->
+<div class="toast-container">
+  <div class="toast-item" *ngFor="let t of (notif.toasts$ | async)" [ngClass]="'toast-' + t.type">
+    <i class="bi"
+      [ngClass]="t.type === 'success' ? 'bi-check-circle-fill' : t.type === 'error' ? 'bi-x-circle-fill' : 'bi-info-circle-fill'"></i>
+    <span>{{ t.message }}</span>
+    <button class="toast-dismiss" (click)="notif.dismiss(t.id)">&#x2715;</button>
+  </div>
+</div>
+
+<!-- ===== CONFIRM MODAL ===== -->
+<div class="confirm-overlay" *ngIf="notif.confirmState$ | async" (click)="notif.resolveConfirm(false)">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-icon-wrap">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <p class="confirm-message">{{ (notif.confirmState$ | async)?.message }}</p>
+    <div class="confirm-actions">
+      <button class="confirm-btn-cancel" (click)="notif.resolveConfirm(false)">Odustani</button>
+      <button class="confirm-btn-ok" (click)="notif.resolveConfirm(true)">Potvrdi</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
   <div class="footer-container">

@@ -17,14 +17,14 @@ exports.createReview = async ({ booking_id, venue_id, client_id, rating, comment
         throw new Error('Rezervacija nije pronađena, nije završena ili je otkazana.');
     }
 
-    // Provjeri da recenzija već ne postoji za ovaj booking
+    // Provjeri da klijent nije već ostavio recenziju za ovaj teren
     const existing = await pool.query(
-        'SELECT id FROM reviews WHERE booking_id = $1',
-        [booking_id]
+        'SELECT id FROM reviews WHERE venue_id = $1 AND client_id = $2',
+        [venue_id, client_id]
     );
 
     if (existing.rows.length > 0) {
-        throw new Error('Već ste ostavili recenziju za ovaj termin.');
+        throw new Error('Već ste ostavili recenziju za ovaj teren.');
     }
 
     // Upiši recenziju

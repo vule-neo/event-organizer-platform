@@ -154,6 +154,9 @@
             Dalje: Radno vreme <i class="bi bi-arrow-right"></i>
           </button>
         </div>
+        <div class="vf-step-error" *ngIf="stepOneError">
+          <i class="bi bi-exclamation-circle-fill"></i> {{ stepOneError }}
+        </div>
       </div>
 
       <!-- ===== KORAK 2 ===== -->

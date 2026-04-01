@@ -18,8 +18,6 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Ako nije ulogovan ili nema ulogu, šalji ga na login ili home
-  alert('Nemate dozvolu za pristup ovoj stranici.');
   router.navigate(['/prijava']);
   return false;
 };

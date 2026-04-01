@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { BookingService } from '../services/booking.service';
 
@@ -20,7 +20,8 @@ export class BookingDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +72,10 @@ export class BookingDetailComponent implements OnInit {
 
   closeSuccessMessage() {
     this.startFadeOut();  // Koristi istu fade out logiku
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   printTicket() {

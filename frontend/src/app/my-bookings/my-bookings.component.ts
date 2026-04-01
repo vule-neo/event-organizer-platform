@@ -4,6 +4,7 @@ import { BookingService } from '../services/booking.service';
 import { ReviewModalComponent } from '../review-modal/review-modal.component';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-my-bookings',
@@ -18,7 +19,7 @@ export class MyBookingsComponent implements OnInit {
   selectedBooking: any | null = null;
   apiBase = environment.apiBase;
 
-  constructor(private bookingService: BookingService) { }
+  constructor(private bookingService: BookingService, private notif: NotificationService) { }
 
   ngOnInit(): void {
     this.loadBookings();
@@ -61,18 +62,18 @@ export class MyBookingsComponent implements OnInit {
     return map[status] || status;
   }
 
-  cancelReservation(id: string) {
-    if (confirm('Da li ste sigurni da želite da otkažete ovaj termin?')) {
-      this.bookingService.cancelBooking(id).subscribe({
-        next: (res: any) => {
-          alert(res.message);
-          this.loadBookings(); // Osveži listu nakon otkazivanja
-        },
-        error: (err) => {
-          alert(err.error.message || 'Greška pri otkazivanju');
-        }
-      });
-    }
+  async cancelReservation(id: string) {
+    const ok = await this.notif.confirm('Da li ste sigurni da želite da otkažete ovaj termin?');
+    if (!ok) return;
+    this.bookingService.cancelBooking(id).subscribe({
+      next: () => {
+        this.notif.success('Termin je uspešno otkazan.');
+        this.loadBookings();
+      },
+      error: (err) => {
+        this.notif.error(err.error?.message || 'Greška pri otkazivanju.');
+      }
+    });
   }
 
   canCancel(startTime: string): boolean {

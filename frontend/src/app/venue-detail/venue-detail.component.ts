@@ -6,6 +6,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { VenueService } from '../services/venue.service';
 import { BookingService } from '../services/booking.service';
 import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
 import { environment } from '../../environments/environment';
 
 const namePattern = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄČĆĘÈÉÊËĖĮÌÍÎÏŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -70,7 +71,8 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private router: Router,
     private meta: Meta,
-    private title: Title
+    private title: Title,
+    private notif: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -391,12 +393,13 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
       reason: 'Ručna blokada termina'
     };
-    if (confirm(`Blokirati termin ${this.selectedSlot.start}?`)) {
+    this.notif.confirm(`Blokirati termin ${this.selectedSlot.start}?`).then(ok => {
+      if (!ok) return;
       this.bookingService.blockSlot(blockData).subscribe({
-        next: () => { alert('Termin blokiran.'); this.loadOccupiedSlots(); },
-        error: (err) => alert(err.error.message)
+        next: () => { this.notif.success('Termin je blokiran.'); this.loadOccupiedSlots(); },
+        error: (err) => this.notif.error(err.error?.message || 'Greška pri blokiranju.')
       });
-    }
+    });
   }
 
   loadOccupiedSlots() {
@@ -431,11 +434,11 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
             queryParams: { success: 'true' }
           });
         } else {
-          alert('Uspešno rezervisano!');
+          this.notif.success('Rezervacija je uspešno kreirana!');
           this.loadOccupiedSlots();
         }
       },
-      error: (err) => alert(err.error.message || 'Greška')
+      error: (err) => this.notif.error(err.error?.message || 'Greška pri rezervaciji.')
     });
   }
 
@@ -465,13 +468,13 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
         this.recurringLoading = false;
         this.loadOccupiedSlots();
         if (res.created > 0 && res.bookingIds && res.bookingIds.length > 0) {
-          if (confirm(`Rezervisano ${res.created} termina. Želite li da vidite detalje prve rezervacije?`)) {
-            this.router.navigate(['/bookings', res.bookingIds[0]]);
-          }
+          this.notif.confirm(`Rezervisano ${res.created} termina. Želite li da vidite detalje prve rezervacije?`).then(ok => {
+            if (ok) this.router.navigate(['/bookings', res.bookingIds[0]]);
+          });
         }
       },
       error: (err) => {
-        alert(err.error?.message || 'Greška');
+        this.notif.error(err.error?.message || 'Greška pri kreiranju rezervacija.');
         this.recurringLoading = false;
       }
     });
@@ -525,7 +528,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       case 'instagram':
         navigator.clipboard.writeText(url).then(() => {
           this.linkCopied = true;
-          alert('Link kopiran! Otvori Instagram i zalijepi ga u Story.');
+          this.notif.info('Link kopiran! Otvori Instagram i zalijepi ga u Story.');
           clearTimeout(this.copyTimeout);
           this.copyTimeout = setTimeout(() => { this.linkCopied = false; this.shareMenuOpen = false; }, 3000);
         });

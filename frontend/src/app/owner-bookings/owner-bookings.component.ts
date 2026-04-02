@@ -15,6 +15,7 @@ export class OwnerBookingsComponent implements OnInit {
   bookings: any[] = [];
   loading = true;
   dateSortOrder: 'asc' | 'desc' = 'desc';
+  visibleCount = 10;
 
   get sortedBookings(): any[] {
     return [...this.bookings].sort((a, b) => {
@@ -23,8 +24,17 @@ export class OwnerBookingsComponent implements OnInit {
     });
   }
 
+  get visibleBookings(): any[] {
+    return this.sortedBookings.slice(0, this.visibleCount);
+  }
+
   toggleDateSort() {
     this.dateSortOrder = this.dateSortOrder === 'asc' ? 'desc' : 'asc';
+    this.visibleCount = 10;
+  }
+
+  loadMore() {
+    this.visibleCount += 10;
   }
 
   stats = {

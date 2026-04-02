@@ -122,7 +122,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let b of sortedBookings">
+            <tr *ngFor="let b of visibleBookings">
               <td class="td-bold">{{ b.venue_name }}</td>
               <td>{{ b.client_name }}</td>
               <td>
@@ -169,6 +169,11 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="load-more-wrap" *ngIf="visibleCount < sortedBookings.length">
+        <button class="load-more-btn" (click)="loadMore()">
+          <i class="bi bi-chevron-down"></i> Učitaj još ({{ sortedBookings.length - visibleCount }} preostalih)
+        </button>
       </div>
     </div>
 

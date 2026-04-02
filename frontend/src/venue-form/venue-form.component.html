@@ -425,9 +425,15 @@
           <button type="button" class="vf-btn-back" (click)="prevStep()">
             <i class="bi bi-arrow-left"></i> Nazad
           </button>
-          <button type="button" class="vf-btn-submit" (click)="createVenue()" [disabled]="venueForm.invalid">
-            <i class="bi" [class.bi-check-circle]="!isEditMode" [class.bi-floppy]="isEditMode"></i>
-            {{ isEditMode ? 'Sačuvaj izmene' : 'Kreiraj teren' }}
+          <button type="button" class="vf-btn-submit" (click)="createVenue()" [disabled]="venueForm.invalid || submitting">
+            <span *ngIf="!submitting">
+              <i class="bi" [class.bi-check-circle]="!isEditMode" [class.bi-floppy]="isEditMode"></i>
+              {{ isEditMode ? 'Sačuvaj izmene' : 'Kreiraj teren' }}
+            </span>
+            <span *ngIf="submitting">
+              <i class="bi bi-arrow-repeat spin-icon"></i>
+              {{ isEditMode ? 'Čuvanje...' : 'Kreiranje...' }}
+            </span>
           </button>
         </div>
       </div>

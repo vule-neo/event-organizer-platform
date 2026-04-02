@@ -298,8 +298,9 @@
           <!-- Book button (single) -->
           <button class="btn-book"
             *ngIf="authService.isLoggedIn() && venue?.owner_id !== authService.getUser().id && !showRecurring"
-            [disabled]="!selectedSlot" (click)="confirmBooking()">
-            <i class="bi bi-check-circle"></i> Potvrdi rezervaciju
+            [disabled]="!selectedSlot || bookingLoading" (click)="confirmBooking()">
+            <i class="bi" [class.bi-check-circle]="!bookingLoading" [class.bi-arrow-repeat]="bookingLoading" [class.spin-icon]="bookingLoading"></i>
+            {{ bookingLoading ? 'Rezervisanje...' : 'Potvrdi rezervaciju' }}
           </button>
 
           <!-- Recurring toggle -->

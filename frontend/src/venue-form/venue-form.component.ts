@@ -31,6 +31,7 @@ export class VenueFormComponent implements OnInit {
   message = '';
   step: number = 1;
   readonly totalSteps = 5;
+  submitting = false;
   apiBase = environment.apiBase;
 
   venueId: string | null = null;
@@ -287,6 +288,7 @@ export class VenueFormComponent implements OnInit {
       }
       if (f.valid) {
         this.step = 2;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => {
           if (this.workingHoursComp && this.savedWorkingHours.length > 0) {
             this.workingHoursComp.setWorkingHoursData(this.savedWorkingHours);
@@ -302,6 +304,7 @@ export class VenueFormComponent implements OnInit {
         this.savedWorkingHours = this.workingHoursComp.getWorkingHoursData();
       }
       this.step = 3;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } else if (this.step === 3) {
       const price = this.venueForm.get('price_per_slot')?.value;
@@ -312,9 +315,11 @@ export class VenueFormComponent implements OnInit {
       }
       if (!this.validatePricingRules()) return;
       this.step = 4;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } else if (this.step === 4) {
       this.step = 5;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -322,6 +327,7 @@ export class VenueFormComponent implements OnInit {
     this.step--;
     this.message = '';
     this.pricingError = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ===== FILE HANDLING =====
@@ -386,10 +392,14 @@ export class VenueFormComponent implements OnInit {
       this.step = 1;
       return;
     }
+    if (this.submitting) return;
 
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     const ownerId = currentUser.id;
     if (!ownerId) { this.message = 'Vlasnik nije identifikovan.'; return; }
+
+    this.submitting = true;
+    this.message = '';
 
     const formData = new FormData();
     const formValues = this.venueForm.value;
@@ -415,12 +425,18 @@ export class VenueFormComponent implements OnInit {
       formData.append('imagesToDelete', JSON.stringify(this.imagesToDelete));
       this.venueService.updateVenue(this.venueId!, formData).subscribe({
         next: () => this.router.navigate(['/tereni/moji']),
-        error: (err) => this.message = 'Greška pri ažuriranju: ' + (err?.error?.message || 'Pokušaj ponovo.')
+        error: (err) => {
+          this.submitting = false;
+          this.message = 'Greška pri ažuriranju: ' + (err?.error?.message || 'Pokušaj ponovo.');
+        }
       });
     } else {
       this.venueService.createVenue(formData).subscribe({
         next: () => this.router.navigate(['/tereni/moji']),
-        error: (err) => this.message = 'Greška pri kreiranju: ' + (err?.error?.message || 'Pokušaj ponovo.')
+        error: (err) => {
+          this.submitting = false;
+          this.message = 'Greška pri kreiranju: ' + (err?.error?.message || 'Pokušaj ponovo.');
+        }
       });
     }
   }

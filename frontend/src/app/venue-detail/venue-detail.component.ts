@@ -597,8 +597,13 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  bookingLoading = false;
+
   confirmBooking() {
     if (!this.selectedSlot || !this.venue) return;
+    if (this.bookingLoading) return;
+
+    this.bookingLoading = true;
 
     const bookingData = {
       venue_id: this.venue.id,
@@ -614,11 +619,15 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
             queryParams: { success: 'true' }
           });
         } else {
+          this.bookingLoading = false;
           this.notif.success('Rezervacija je uspešno kreirana!');
           this.loadOccupiedSlots();
         }
       },
-      error: (err) => this.notif.error(err.error?.message || 'Greška pri rezervaciji.')
+      error: (err) => {
+        this.bookingLoading = false;
+        this.notif.error(err.error?.message || 'Greška pri rezervaciji.');
+      }
     });
   }
 

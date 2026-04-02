@@ -189,19 +189,24 @@ button {
   overflow: hidden !important;
   padding: 4px !important;
   background: #ffffff !important;
+  min-width: min(520px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  box-sizing: border-box !important;
 }
 
 .pac-item {
-  padding: 10px 14px !important;
-  font-size: 14px !important;
+  padding: 12px 14px !important;
+  font-size: 15px !important;
   color: #1a1a2e !important;
   cursor: pointer !important;
   border-top: none !important;
   border-radius: 8px !important;
   margin: 2px 0 !important;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   transition: background 0.15s !important;
+  white-space: normal !important;
+  line-height: 1.4 !important;
 }
 
 .pac-item:hover,
@@ -212,8 +217,9 @@ button {
 .pac-item-query {
   font-weight: 600 !important;
   color: #1e3a5f !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   padding-right: 4px !important;
+  white-space: normal !important;
 }
 
 /* Zamijeni Google pin ikonu sa Bootstrap Icons pin */

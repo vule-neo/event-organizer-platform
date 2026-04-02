@@ -625,7 +625,8 @@
   }
 
   .vf-main {
-    padding: 24px 20px;
+    padding: 24px 16px;
+    overflow-x: hidden;
   }
 
   .vf-row {
@@ -634,8 +635,20 @@
 
   .tags-select-grid {
     grid-template-columns: 1fr 1fr;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 2px;
   }
 }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spin-icon {
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
 .vf-step-error {
   display: flex;
   align-items: center;

@@ -14,6 +14,18 @@ import { NotificationService } from '../services/notification.service';
 export class OwnerBookingsComponent implements OnInit {
   bookings: any[] = [];
   loading = true;
+  dateSortOrder: 'asc' | 'desc' = 'desc';
+
+  get sortedBookings(): any[] {
+    return [...this.bookings].sort((a, b) => {
+      const diff = new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+      return this.dateSortOrder === 'asc' ? diff : -diff;
+    });
+  }
+
+  toggleDateSort() {
+    this.dateSortOrder = this.dateSortOrder === 'asc' ? 'desc' : 'asc';
+  }
 
   stats = {
     totalEarnings: 0,

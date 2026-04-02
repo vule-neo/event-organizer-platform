@@ -189,8 +189,7 @@ button {
   overflow: hidden !important;
   padding: 4px !important;
   background: #ffffff !important;
-  min-width: min(520px, calc(100vw - 24px)) !important;
-  max-width: calc(100vw - 24px) !important;
+  max-width: calc(100vw - 16px) !important;
   box-sizing: border-box !important;
 }
 

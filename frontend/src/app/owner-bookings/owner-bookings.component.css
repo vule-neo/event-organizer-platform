@@ -1,3 +1,35 @@
+/* ---- DATE SORT ---- */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.th-sortable:hover {
+  background: rgba(30, 58, 95, 0.06);
+}
+
+.sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--navy);
+  opacity: 0.8;
+  vertical-align: middle;
+}
+
+.sort-indicator i {
+  font-size: 14px;
+}
+
+.sort-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
 /* ---- PAGE CONTAINER ---- */
 .owner-page {
   max-width: 1140px;

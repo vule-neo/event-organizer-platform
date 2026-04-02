@@ -28,12 +28,12 @@
 
 .address-input {
   width: 100%;
-  padding: 14px 16px 14px 44px;
+  padding: 18px 18px 18px 48px;
   background: var(--card);
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text);
   outline: none;
   transition: var(--transition);

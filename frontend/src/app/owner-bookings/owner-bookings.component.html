@@ -108,7 +108,13 @@
             <tr>
               <th>Teren</th>
               <th>Klijent</th>
-              <th>Datum i vreme</th>
+              <th class="th-sortable" (click)="toggleDateSort()" title="Sortiraj po datumu">
+                Datum i vreme
+                <span class="sort-indicator">
+                  <i class="bi" [class.bi-sort-down]="dateSortOrder === 'desc'" [class.bi-sort-up]="dateSortOrder === 'asc'"></i>
+                  <span class="sort-label">{{ dateSortOrder === 'desc' ? 'Najnovije' : 'Najstarije' }}</span>
+                </span>
+              </th>
               <th>Iznos</th>
               <th>Status</th>
               <th>Kontakt</th>
@@ -116,7 +122,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let b of bookings">
+            <tr *ngFor="let b of sortedBookings">
               <td class="td-bold">{{ b.venue_name }}</td>
               <td>{{ b.client_name }}</td>
               <td>

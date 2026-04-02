@@ -99,6 +99,9 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     this.route.queryParams.subscribe(params => {
       if (params['scrollTo'] === 'booking') {
         this.pendingScrollToBooking = true;
+        if (params['fromCard'] === 'true') {
+          this.stickyDismissed = true;
+        }
       }
     });
   }

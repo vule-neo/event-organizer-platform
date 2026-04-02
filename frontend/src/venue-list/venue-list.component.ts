@@ -512,9 +512,9 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Koristi skipLocationChange da ne triggeruje scroll restoration
     this.router.navigate(['/tereni/detalji', venueId], {
-      queryParams: { scrollTo: 'booking' },
-      skipLocationChange: false, // Ostavi false, ali dodajemo state
-      state: { skipScrollRestoration: true } // Dodajemo custom state
+      queryParams: { scrollTo: 'booking', fromCard: 'true' },
+      skipLocationChange: false,
+      state: { skipScrollRestoration: true }
     });
   }
 
@@ -525,7 +525,7 @@ export class VenueListComponent implements OnInit, OnDestroy, AfterViewInit {
     // Koristi scroll servis da preskoči automatski scroll na vrh
     // Ako imaš ScrollService, inače samo navigiraj
     this.router.navigate(['/tereni/detalji', venueId], {
-      queryParams: { scrollTo: 'booking' },
+      queryParams: { scrollTo: 'booking', fromCard: 'true' },
       state: { skipScroll: true, fromAvailable: true }
     });
   }

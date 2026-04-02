@@ -203,7 +203,8 @@ export class VenueFormComponent implements OnInit {
       const [sh, sm] = r.start_time.split(':').map(Number);
       const [eh, em] = r.end_time.split(':').map(Number);
       const startMins = sh * 60 + sm;
-      const endMins   = eh * 60 + em;
+      // 00:00 kao kraj = ponoć = 1440 minuta
+      const endMins = (eh === 0 && em === 0) ? 1440 : eh * 60 + em;
 
       if (endMins <= startMins) {
         r.error = 'Kraj mora biti poslije početka.';
@@ -233,7 +234,8 @@ export class VenueFormComponent implements OnInit {
         const [oh, om] = openStr.split(':').map(Number);
         const [ch, cm] = closeStr.split(':').map(Number);
         const openMins  = oh * 60 + om;
-        const closeMins = ch * 60 + cm;
+        // 00:00 kao zatvaranje = ponoć = 1440 minuta
+        const closeMins = (ch === 0 && cm === 0) ? 1440 : ch * 60 + cm;
         if (startMins < openMins || endMins > closeMins) {
           r.error = `Mora biti unutar radnog vremena (${openStr}–${closeStr}).`;
           this.pricingError = `Pravilo ${i + 1}: vremenski raspon mora biti unutar radnog vremena (${openStr}–${closeStr}).`;
@@ -248,7 +250,7 @@ export class VenueFormComponent implements OnInit {
       const [ash, asm] = a.start_time.split(':').map(Number);
       const [aeh, aem] = a.end_time.split(':').map(Number);
       const aStart = ash * 60 + asm;
-      const aEnd   = aeh * 60 + aem;
+      const aEnd   = (aeh === 0 && aem === 0) ? 1440 : aeh * 60 + aem;
 
       for (let j = i + 1; j < this.pricingRules.length; j++) {
         const b = this.pricingRules[j];
@@ -257,7 +259,7 @@ export class VenueFormComponent implements OnInit {
         const [bsh, bsm] = b.start_time.split(':').map(Number);
         const [beh, bem] = b.end_time.split(':').map(Number);
         const bStart = bsh * 60 + bsm;
-        const bEnd   = beh * 60 + bem;
+        const bEnd   = (beh === 0 && bem === 0) ? 1440 : beh * 60 + bem;
 
         if (aStart < bEnd && bStart < aEnd) {
           a.error = 'Preklapa se s drugim pravilom.';

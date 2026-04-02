@@ -166,7 +166,7 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
       const [rsh, rsm] = rule.start_time.substring(0, 5).split(':').map(Number);
       const [reh, rem] = rule.end_time.substring(0, 5).split(':').map(Number);
       const ruleMins  = rsh * 60 + rsm;
-      const ruleEnd   = reh * 60 + rem;
+      const ruleEnd   = (reh === 0 && rem === 0) ? 1440 : reh * 60 + rem;
 
       if (slotMins >= ruleMins && slotMins < ruleEnd) {
         return parseFloat(rule.price);
@@ -565,13 +565,27 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  private buildBookingTimes(slot: any): { start_time: string, end_time: string } {
+    const d = new Date(this.selectedDate + 'T12:00:00');
+    d.setDate(d.getDate() + 1);
+    const nextDateStr = d.toISOString().split('T')[0];
+    const startDate = slot.isOvernight ? nextDateStr : this.selectedDate;
+    // end is on next day if slot is overnight, or if end time <= start time (e.g. 23:00→00:00)
+    const endDate = slot.isOvernight ? nextDateStr : (slot.end <= slot.start ? nextDateStr : this.selectedDate);
+    return {
+      start_time: `${startDate}T${slot.start}:00Z`,
+      end_time:   `${endDate}T${slot.end}:00Z`
+    };
+  }
+
   blockSelectedSlot() {
     if (!this.selectedSlot || !this.venue) return;
+    const times = this.buildBookingTimes(this.selectedSlot);
     const blockData = {
       venue_id: this.venue.id,
       owner_id: this.authService.getUser().id,
-      start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
-      end_time: `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
+      start_time: times.start_time,
+      end_time:   times.end_time,
       reason: 'Ručna blokada termina'
     };
     this.notif.confirm(`Blokirati termin ${this.selectedSlot.start}?`).then(ok => {
@@ -605,10 +619,11 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
 
     this.bookingLoading = true;
 
+    const times = this.buildBookingTimes(this.selectedSlot);
     const bookingData = {
       venue_id: this.venue.id,
-      start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
-      end_time:   `${this.selectedDate}T${this.selectedSlot.end}:00Z`
+      start_time: times.start_time,
+      end_time:   times.end_time
     };
 
     this.bookingService.createBooking(bookingData).subscribe({
@@ -643,10 +658,11 @@ export class VenueDetailComponent implements OnInit, OnDestroy {
     this.recurringLoading = true;
     this.recurringResult = null;
 
+    const times = this.buildBookingTimes(this.selectedSlot);
     const data = {
       venue_id: this.venue.id,
-      start_time: `${this.selectedDate}T${this.selectedSlot.start}:00Z`,
-      end_time:   `${this.selectedDate}T${this.selectedSlot.end}:00Z`,
+      start_time: times.start_time,
+      end_time:   times.end_time,
       weeks: this.recurringWeeks
     };
 

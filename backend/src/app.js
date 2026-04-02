@@ -84,12 +84,18 @@ async function runMigrations() {
         start_time  TIME WITHOUT TIME ZONE NOT NULL,
         end_time    TIME WITHOUT TIME ZONE NOT NULL,
         price       DECIMAL(10,2) NOT NULL CHECK (price > 0),
-        created_at  TIMESTAMPTZ DEFAULT NOW(),
-        CONSTRAINT chk_end_after_start CHECK (end_time > start_time)
+        created_at  TIMESTAMPTZ DEFAULT NOW()
       )
     `);
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_venue_pricing_venue_id ON venue_pricing(venue_id)
+    `);
+    // Ukloni check constraint koji blokira cijene/rezervacije do ponoći (00:00)
+    await pool.query(`
+      ALTER TABLE venue_pricing DROP CONSTRAINT IF EXISTS chk_end_after_start
+    `);
+    await pool.query(`
+      ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_check
     `);
     console.log('✅ Migracije završene (venue_pricing OK)');
   } catch (err) {

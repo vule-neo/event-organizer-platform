@@ -28,7 +28,8 @@ exports.upsertPricingInTransaction = async (client, venueId, pricingRules) => {
     // Provjeri preklapanja prije upisa
     const toMins = (t) => {
         const [h, m] = t.split(':').map(Number);
-        return h * 60 + m;
+        const mins = h * 60 + m;
+        return mins === 0 ? 1440 : mins; // 00:00 = ponoć = 1440 min
     };
     for (let i = 0; i < pricingRules.length; i++) {
         const a = pricingRules[i];
@@ -82,7 +83,7 @@ exports.getVenuePrice = async (venueId, startTimeISO) => {
          WHERE venue_id = $1
            AND day_of_week = $2
            AND start_time <= $3::time
-           AND end_time   >  $3::time
+           AND (end_time = '00:00' OR end_time > $3::time)
          ORDER BY start_time ASC
          LIMIT 1`,
         [venueId, dayOfWeek, timeStr]
